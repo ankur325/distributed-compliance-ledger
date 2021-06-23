@@ -22,56 +22,17 @@ const RouterKey = ModuleName
 
 //nolint:maligned
 type MsgAddModelInfo struct {
-	VID                      uint16         `json:"vid"`
-	PID                      uint16         `json:"pid"`
-	CID                      uint16         `json:"cid,omitempty"`
-	Version                  string         `json:"version,omitempty"`
-	Name                     string         `json:"name"`
-	Description              string         `json:"description"`
-	SKU                      string         `json:"sku"`
-	HardwareVersion          string         `json:"hardware_version"`
-	FirmwareVersion          string         `json:"firmware_version"`
-	OtaURL                   string         `json:"ota_url,omitempty"`
-	OtaChecksum              string         `json:"ota_checksum,omitempty"`
-	OtaChecksumType          string         `json:"ota_checksum_type,omitempty"`
-	Custom                   string         `json:"custom,omitempty"`
-	TisOrTrpTestingCompleted bool           `json:"tis_or_trp_testing_completed"`
-	Signer                   sdk.AccAddress `json:"signer"`
+	Model
+	Signer sdk.AccAddress `json:"signer"`
 }
 
 func NewMsgAddModelInfo(
-	vid uint16,
-	pid uint16,
-	cid uint16,
-	version string,
-	name string,
-	description string,
-	sku string,
-	hardwareVersion string,
-	firmwareVersion string,
-	otaURL string,
-	otaChecksum string,
-	otaChecksumType string,
-	custom string,
-	tisOrTrpTestingCompleted bool,
+	model Model,
 	signer sdk.AccAddress,
 ) MsgAddModelInfo {
 	return MsgAddModelInfo{
-		VID:                      vid,
-		PID:                      pid,
-		CID:                      cid,
-		Version:                  version,
-		Name:                     name,
-		Description:              description,
-		SKU:                      sku,
-		HardwareVersion:          hardwareVersion,
-		FirmwareVersion:          firmwareVersion,
-		OtaURL:                   otaURL,
-		OtaChecksum:              otaChecksum,
-		OtaChecksumType:          otaChecksumType,
-		Custom:                   custom,
-		TisOrTrpTestingCompleted: tisOrTrpTestingCompleted,
-		Signer:                   signer,
+		Model:  model,
+		Signer: signer,
 	}
 }
 
@@ -136,35 +97,17 @@ func (m MsgAddModelInfo) GetSigners() []sdk.AccAddress {
 
 //nolint:maligned
 type MsgUpdateModelInfo struct {
-	VID                      uint16         `json:"vid"`
-	PID                      uint16         `json:"pid"`
-	CID                      uint16         `json:"cid,omitempty"`
-	Description              string         `json:"description,omitempty"`
-	OtaURL                   string         `json:"ota_url,omitempty"`
-	Custom                   string         `json:"custom,omitempty"`
-	TisOrTrpTestingCompleted bool           `json:"tis_or_trp_testing_completed"`
-	Signer                   sdk.AccAddress `json:"signer"`
+	Model
+	Signer sdk.AccAddress `json:"signer"`
 }
 
 func NewMsgUpdateModelInfo(
-	vid uint16,
-	pid uint16,
-	cid uint16,
-	description string,
-	otaURL string,
-	custom string,
-	tisOrTrpTestingCompleted bool,
+	model Model,
 	signer sdk.AccAddress,
 ) MsgUpdateModelInfo {
 	return MsgUpdateModelInfo{
-		VID:                      vid,
-		PID:                      pid,
-		CID:                      cid,
-		Description:              description,
-		OtaURL:                   otaURL,
-		Custom:                   custom,
-		TisOrTrpTestingCompleted: tisOrTrpTestingCompleted,
-		Signer:                   signer,
+		Model:  model,
+		Signer: signer,
 	}
 }
 

@@ -66,3 +66,17 @@ check_response "$result" "\"vid\": $vid"
 check_response "$result" "\"pid\": $pid"
 check_response "$result" "\"description\": \"$description\""
 echo "$result"
+
+echo "Update Model with VID: ${vid} PID: ${pid} modifying support-url"
+support_url="https://newsupporturl.test"
+echo dclcli tx modelinfo update-model --vid=$vid --pid=$pid --cd-version-number="32" --from $vendor_account --yes --support-url "$support_url"
+result=$(echo "test1234" | dclcli tx modelinfo update-model --vid=$vid --pid=$pid --cd-version-number="33" --from $vendor_account --yes --support-url "$support_url")
+check_response "$result" "\"success\": true"
+echo "$result"
+
+echo "Get Model with VID: ${vid} PID: ${pid}"
+result=$(dclcli query modelinfo model --vid=$vid --pid=$pid)
+check_response "$result" "\"vid\": $vid"
+check_response "$result" "\"pid\": $pid"
+check_response "$result" "\"support_url\": \"$support_url\""
+echo "$result"

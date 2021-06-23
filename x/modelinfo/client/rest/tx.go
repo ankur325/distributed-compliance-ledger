@@ -25,33 +25,14 @@ import (
 
 //nolint:maligned
 type AddModelInfoRequest struct {
-	BaseReq                  restTypes.BaseReq `json:"base_req"`
-	VID                      uint16            `json:"vid"`
-	PID                      uint16            `json:"pid"`
-	CID                      uint16            `json:"cid,omitempty"`
-	Version                  string            `json:"version,omitempty"`
-	Name                     string            `json:"name"`
-	Description              string            `json:"description"`
-	SKU                      string            `json:"sku"`
-	HardwareVersion          string            `json:"hardware_version"`
-	FirmwareVersion          string            `json:"firmware_version"`
-	OtaURL                   string            `json:"ota_url,omitempty"`
-	OtaChecksum              string            `json:"ota_checksum,omitempty"`
-	OtaChecksumType          string            `json:"ota_checksum_type,omitempty"`
-	Custom                   string            `json:"custom,omitempty"`
-	TisOrTrpTestingCompleted bool              `json:"tis_or_trp_testing_completed"`
+	types.Model
+	BaseReq restTypes.BaseReq `json:"base_req"`
 }
 
 //nolint:maligned
 type UpdateModelInfoRequest struct {
-	BaseReq                  restTypes.BaseReq `json:"base_req"`
-	VID                      uint16            `json:"vid"`
-	PID                      uint16            `json:"pid"`
-	CID                      uint16            `json:"cid,omitempty"`
-	Description              string            `json:"description,omitempty"`
-	OtaURL                   string            `json:"ota_url,omitempty"`
-	Custom                   string            `json:"custom,omitempty"`
-	TisOrTrpTestingCompleted bool              `json:"tis_or_trp_testing_completed"`
+	types.Model
+	BaseReq restTypes.BaseReq `json:"base_req"`
 }
 
 func addModelHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -73,10 +54,39 @@ func addModelHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgAddModelInfo(req.VID, req.PID, req.CID, req.Version,
-			req.Name, req.Description, req.SKU, req.HardwareVersion,
-			req.FirmwareVersion, req.OtaURL, req.OtaChecksum, req.OtaChecksumType,
-			req.Custom, req.TisOrTrpTestingCompleted, restCtx.Signer())
+		model := types.Model{
+			VID:                                      req.VID,
+			PID:                                      req.PID,
+			CID:                                      req.CID,
+			Name:                                     req.Name,
+			Description:                              req.Description,
+			SKU:                                      req.SKU,
+			SoftwareVersion:                          req.SoftwareVersion,
+			SoftwareVersionString:                    req.SoftwareVersionString,
+			HardwareVersion:                          req.HardwareVersion,
+			HardwareVersionString:                    req.HardwareVersionString,
+			CDVersionNumber:                          req.CDVersionNumber,
+			FirmwareDigests:                          req.FirmwareDigests,
+			Revoked:                                  req.Revoked,
+			OtaURL:                                   req.OtaURL,
+			OtaChecksum:                              req.OtaChecksum,
+			OtaChecksumType:                          req.OtaChecksumType,
+			OtaBlob:                                  req.OtaBlob,
+			CommissioningCustomFlow:                  req.CommissioningCustomFlow,
+			CommissioningCustomFlowUrl:               req.CommissioningCustomFlowUrl,
+			CommissioningModeInitialStepsHint:        req.CommissioningModeInitialStepsHint,
+			CommissioningModeInitialStepsInstruction: req.CommissioningModeInitialStepsInstruction,
+			CommissioningModeSecondaryStepsHint:      req.CommissioningModeSecondaryStepsHint,
+			CommissioningModeSecondaryStepsInstruction: req.CommissioningModeSecondaryStepsInstruction,
+			ReleaseNotesUrl: req.ReleaseNotesUrl,
+			UserManualUrl:   req.UserManualUrl,
+			SupportUrl:      req.SupportUrl,
+			ProductURL:      req.ProductURL,
+			ChipBlob:        req.ChipBlob,
+			VendorBlob:      req.VendorBlob,
+		}
+
+		msg := types.NewMsgAddModelInfo(model, restCtx.Signer())
 
 		restCtx.HandleWriteRequest(msg)
 	}
@@ -101,9 +111,27 @@ func updateModelHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateModelInfo(req.VID, req.PID, req.CID, req.Description,
-			req.OtaURL, req.Custom, req.TisOrTrpTestingCompleted, restCtx.Signer())
+		model := types.Model{
+			VID:                        req.VID,
+			PID:                        req.PID,
+			CID:                        req.CID,
+			Description:                req.Description,
+			CDVersionNumber:            req.CDVersionNumber,
+			Revoked:                    req.Revoked,
+			OtaURL:                     req.OtaURL,
+			OtaChecksum:                req.OtaChecksum,
+			OtaChecksumType:            req.OtaChecksumType,
+			OtaBlob:                    req.OtaBlob,
+			CommissioningCustomFlowUrl: req.CommissioningCustomFlowUrl,
+			ReleaseNotesUrl:            req.ReleaseNotesUrl,
+			UserManualUrl:              req.UserManualUrl,
+			SupportUrl:                 req.SupportUrl,
+			ProductURL:                 req.ProductURL,
+			ChipBlob:                   req.ChipBlob,
+			VendorBlob:                 req.VendorBlob,
+		}
 
+		msg := types.NewMsgUpdateModelInfo(model, restCtx.Signer())
 		restCtx.HandleWriteRequest(msg)
 	}
 }

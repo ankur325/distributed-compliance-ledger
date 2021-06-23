@@ -104,10 +104,47 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Tis-or-trp-testing-completed: "+
 					"Parsing Error: \"%v\" must be boolean", viper.GetString(FlagTisOrTrpTestingCompleted)))
 			}
+			commissioningModeSecondaryStepsInstruction := viper.GetString(FlagCommissioningModeSecondaryStepsInstruction)
+			releaseNotesUrl := viper.GetString(FlagReleaseNotesUrl)
+			userManualUrl := viper.GetString(FlagUserManualUrl)
+			supportUrl := viper.GetString(FlagSupportUrl)
+			productURL := viper.GetString(FlagProductURL)
+			chipBlob := viper.GetString(FlagChipBlob)
+			vendorBlob := viper.GetString(FlagVendorBlob)
+			model := types.Model{
 
-			msg := types.NewMsgAddModelInfo(vid, pid, cid, version, name, description, sku,
-				hardwareVersion, firmwareVersion, otaURL, otaChecksum, otaChecksumType,
-				custom, tisOrTrpTestingCompleted, cliCtx.FromAddress())
+				VID:                                      vid,
+				PID:                                      pid,
+				CID:                                      cid,
+				Name:                                     name,
+				Description:                              description,
+				SKU:                                      sku,
+				SoftwareVersion:                          softwareVersion,
+				SoftwareVersionString:                    softwareVersionString,
+				HardwareVersion:                          hardwareVersion,
+				HardwareVersionString:                    hardwareVersionString,
+				CDVersionNumber:                          cdVersionNumber,
+				FirmwareDigests:                          firmwareDigests,
+				Revoked:                                  revoked,
+				OtaURL:                                   otaURL,
+				OtaChecksum:                              otaChecksum,
+				OtaChecksumType:                          otaChecksumType,
+				OtaBlob:                                  otaBlob,
+				CommissioningCustomFlow:                  commissioningCustomFlow,
+				CommissioningCustomFlowUrl:               commissioningCustomFlowUrl,
+				CommissioningModeInitialStepsHint:        commissioningModeInitialStepsHint,
+				CommissioningModeInitialStepsInstruction: commissioningModeInitialStepsInstruction,
+				CommissioningModeSecondaryStepsHint:      commissioningModeSecondaryStepsHint,
+				CommissioningModeSecondaryStepsInstruction: commissioningModeSecondaryStepsInstruction,
+				ReleaseNotesUrl: releaseNotesUrl,
+				UserManualUrl:   userManualUrl,
+				SupportUrl:      supportUrl,
+				ProductURL:      productURL,
+				ChipBlob:        chipBlob,
+				VendorBlob:      vendorBlob,
+			}
+
+			msg := types.NewMsgAddModelInfo(model, cliCtx.FromAddress())
 
 			return cliCtx.HandleWriteMessage(msg)
 		},
@@ -198,8 +235,27 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 					"Parsing Error: \"%v\" must be boolean", viper.GetString(FlagTisOrTrpTestingCompleted)))
 			}
 
-			msg := types.NewMsgUpdateModelInfo(vid, pid, cid, description,
-				otaURL, custom, tisOrTrpTestingCompleted, cliCtx.FromAddress())
+			model := types.Model{
+
+				VID:                        vid,
+				PID:                        pid,
+				CID:                        cid,
+				Description:                description,
+				CDVersionNumber:            cdVersionNumber,
+				Revoked:                    revoked,
+				OtaURL:                     otaURL,
+				OtaChecksum:                otaChecksum,
+				OtaChecksumType:            otaChecksumType,
+				OtaBlob:                    otaBlob,
+				CommissioningCustomFlowUrl: commissioningCustomFlowUrl,
+				ReleaseNotesUrl:            releaseNotesUrl,
+				UserManualUrl:              userManualUrl,
+				SupportUrl:                 supportUrl,
+				ProductURL:                 productURL,
+				ChipBlob:                   chipBlob,
+				VendorBlob:                 vendorBlob,
+			}
+			msg := types.NewMsgUpdateModelInfo(model, cliCtx.FromAddress())
 
 			return cliCtx.HandleWriteMessage(msg)
 		},
