@@ -61,7 +61,7 @@ services:
     ports:
       - "26662-26663:26656-26657"
       # uncomment following line if starting in debug mode 
-      # - "2345:2345"
+      #- "2345:2345"
     volumes:
       - ./localnet/node3:/root/.dcld:Z
     networks:

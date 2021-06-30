@@ -17,16 +17,19 @@
 ############################
 FROM golang:alpine AS builder
 
+# Git is required for fetching the dependencies,
+RUN apk update && apk add --no-cache git make
+
+# Download the go modules as a separate layer
+WORKDIR /go/src/dc-ledger
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 # Build Delve - This is helpful if you want to do remote debugging by attaching to one of the docker containers remotely
 RUN go get github.com/go-delve/delve/cmd/dlv
 
-# Git is required for fetching the dependencies,
-# make is required for building.
-RUN apk update && apk add --no-cache git make
-
-WORKDIR /go/src/dc-ledger
+# Copy the files and then do a full build.
 COPY . .
-
 RUN make
 
 ############################

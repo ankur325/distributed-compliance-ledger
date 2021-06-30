@@ -94,7 +94,11 @@ cleanup_pool() {
   log "-> Removing configurations" >${DETAILED_OUTPUT_TARGET}
   rm -rf ~/.dclcli
   rm -rf ~/.dcld
-  sudo rm -rf localnet
+  if [ "$(uname)" == "Darwin" ]; then
+    rm -rf localnet 
+  else
+    sudo rm -rf localnet
+  fi
 }
 
 run_rest_server() {
@@ -132,7 +136,7 @@ for CLI_SHELL_TEST in ${CLI_SHELL_TESTS}; do
   if bash "$CLI_SHELL_TEST" &>${DETAILED_OUTPUT_TARGET}; then
     log "$CLI_SHELL_TEST finished successfully"
   else
-    log "$CLI_SHELL_TEST falied"
+    log "$CLI_SHELL_TEST failed"
     exit 1
   fi
 

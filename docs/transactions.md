@@ -29,7 +29,7 @@ This is useful to avoid correlation by the sender's IP address.
     - See `CLI` section for every write request (transaction).
     - Example
         ```json
-        dclcli tx modelinfo add-model 1 1 "Device #1" "Device Description" "SKU12FS" "1.0" "2.0" true --from cosmos1ar04n6hxwk8ny54s2kzkpyqjcsnqm7jzv5y62y
+        dclcli tx model add-model 1 1 "Device #1" "Device Description" "SKU12FS" "1.0" "2.0" true --from cosmos1ar04n6hxwk8ny54s2kzkpyqjcsnqm7jzv5y62y
         ```
 - CLI (keys at the edge)
     - There are two CLIs are started in a CLI mode.
@@ -43,7 +43,7 @@ This is useful to avoid correlation by the sender's IP address.
     - CLI 2: Broadcast signed transaction using CLI (`broadcast command)
     - Example
         ```json
-        CLI 2: dclcli tx modelinfo add-model 1 1 "Device #1" "Device Description" "SKU12FS" "1.0" "2.0" true --from cosmos1ar04n6hxwk8ny54s2kzkpyqjcsnqm7jzv5y62y --generate-only
+        CLI 2: dclcli tx model add-model 1 1 "Device #1" "Device Description" "SKU12FS" "1.0" "2.0" true --from cosmos1ar04n6hxwk8ny54s2kzkpyqjcsnqm7jzv5y62y --generate-only
         CLI 2: dclcli query auth accounts
         CLI 1: dclcli tx sign /home/artem/dc-ledger/txn.json --from cosmos1ar04n6hxwk8ny54s2kzkpyqjcsnqm7jzv5y62y --account-number 0 --sequence 24 --gas "auto" --offline --output-document txn.json
         CLI 2: dclcli tx broadcast /home/artem/dc-ledger/txn.json
@@ -59,7 +59,7 @@ This is useful to avoid correlation by the sender's IP address.
     - The user does a `POST` of the signed request to the CLI-based server for broadcasting using `tx/broadcast`.     
     - Example
         ```json
-        POST /modelinfo/models
+        POST /model/models
         POST tx/sign
         POST tx/broadcast
         ```
@@ -72,7 +72,7 @@ This is useful to avoid correlation by the sender's IP address.
     - See `REST API` section for every write request (transaction).
     - Example
         ```json
-        POST /modelinfo/models with setting Authorization header 
+        POST /model/models with setting Authorization header 
         ```
 
 ## How to read from the Ledger
@@ -120,7 +120,7 @@ A summary of KV store and paths used:
         - `5` : `CRL (Certificate Revocation List)`
     - Certificate uniqueness:
         - `6:<Certificate's Subject>:<Certificate's Subject Key ID>` : bool
-- KV store name: `modelinfo`
+- KV store name: `model`
     - Model Infos 
         - `1:<vid>:<pid>` : `<model info>`
     - Vendor to products (models) index:
@@ -704,17 +704,17 @@ If one of `OTA_URl`, `OTA_checksum` and `OTA_checksum_type` fields is set, then 
   - vendorBlob: `optional(string)` - field for vendors to provide any additional metadata about the device model using a string, blob, or URL.  
 
 - In State:
-  - `modelinfo` store  
+  - `model` store  
   - `1:<vid>:<pid>` : `<model info>`
   - `2:<vid>` : `<list of pids + metadata>`
 - Who can send: 
     - Vendor
 - CLI command: 
-    -   `dclcli tx modelinfo add-model --vid=<uint16> --pid=<uint16> --name=<string> --description=<string or path> --sku=<string> 
+    -   `dclcli tx model add-model --vid=<uint16> --pid=<uint16> --productName=<string> --productLabel=<string or path> --sku=<string> 
 --softwareVersion=<uint32> --softwareVersionString=<string> --hardwareVersion=<uint32> --hardwareVersionString=<string> --cdVersionNumber=<uint16> 
 --from=<account> .... `
 - REST API: 
-    -   POST `/modelinfo/models`
+    -   POST `/model/models`
 
 #### EDIT_MODEL_INFO
 **Status: Implemented**
@@ -738,15 +738,15 @@ All non-edited fields remain the same.
     - `tis_or_trp_testing_completed`: bool
     - `custom`: string (optional)
 - In State:
-  - `modelinfo` store  
+  - `model` store  
   - `1:<vid>:<pid>` : `<model info>`
   - `2:<vid>` : `<list of pids + metadata>`
 - Who can send: 
     - Vendor; owner
 - CLI command: 
-    -   `dclcli tx modelinfo update-model --vid=<uint16> --pid=<uint16> --tis-or-trp-testing-completed=<bool> --from=<account> .... `
+    -   `dclcli tx model update-model --vid=<uint16> --pid=<uint16> --tis-or-trp-testing-completed=<bool> --from=<account> .... `
 - REST API: 
-    -   PUT `/modelinfo/models/vid/pid`
+    -   PUT `/model/models/vid/pid`
 
 
 #### GET_ALL_MODEL_INFO
@@ -758,9 +758,9 @@ Gets all Model Infos for all vendors.
   - `skip`: optional(int)  - number records to skip (`0` by default)
   - `take`: optional(int)  - number records to take (all records are returned by default)
 - CLI command: 
-    -   `dclcli query modelinfo all-models ...`
+    -   `dclcli query model all-models ...`
 - REST API: 
-    -   GET `/modelinfo/models`
+    -   GET `/model/models`
 - Result
 ```json
 {
@@ -788,9 +788,9 @@ Gets all Model Info by the given Vendor (`vid`).
 - Parameters:
     - `vid`: 16 bits int
 - CLI command: 
-    -   `dclcli query modelinfo vendor-models --vid=<uint16>`
+    -   `dclcli query model vendor-models --vid=<uint16>`
 - REST API: 
-    -   GET `/modelinfo/models/vid`
+    -   GET `/model/models/vid`
 - Result
 ```json
 {
@@ -819,9 +819,9 @@ Gets a Model Info with the given `vid` (vendor ID) and `pid` (product ID).
     - `pid`: 16 bits int
     - `prev-height`: optional(bool) - query data from previous height to avoid delay linked to state proof verification
 - CLI command: 
-    -   `dclcli query modelinfo model --vid=<uint16> --pid=<uint16> .... `
+    -   `dclcli query model model --vid=<uint16> --pid=<uint16> .... `
 - REST API: 
-    -   GET `/modelinfo/models/vid/pid`
+    -   GET `/model/models/vid/pid`
 - Result
 ```json
 {
@@ -854,9 +854,9 @@ Get a list of all Vendors (`vid`s).
   - `skip`: optional(int)  - number records to skip (`0` by default)
   - `take`: optional(int)  - number records to take (all records are returned by default)
 - CLI command: 
-    -   `dclcli query modelinfo vendors .... `
+    -   `dclcli query model vendors .... `
 - REST API: 
-    -   GET `/modelinfo/vendors`
+    -   GET `/model/vendors`
 - Result
 ```json
 {

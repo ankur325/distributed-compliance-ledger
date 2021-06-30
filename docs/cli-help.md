@@ -393,7 +393,7 @@ The set of commands that allows you to manage model infos.
 
   Role: `Vendor`
   
-  Command: `dclcli tx modelinfo add-model --vid=<uint16> --pid=<uint16> --name=<string> --description=<string or path> --sku=<string> 
+  Command: `dclcli tx model add-model --vid=<uint16> --pid=<uint16> --productName=<string> --productLabel=<string or path> --sku=<string> 
 --softwareVersion=<uint32> --softwareVersionString=<string> --hardwareVersion=<uint32> --hardwareVersionString=<string> --cdVersionNumber=<uint16> 
 --from=<account>`
 
@@ -429,16 +429,16 @@ The set of commands that allows you to manage model infos.
   - vendorBlob: `optional(string)` - field for vendors to provide any additional metadata about the device model using a string, blob, or URL.  
   
 
-  Example: `dclcli tx modelinfo add-model --vid=1 --pid=1 --name="Device #1" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from="jack"`
+  Example: `dclcli tx model add-model --vid=1 --pid=1 --productName="Device #1" --productLabel="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from="jack"`
   
-  Example: `dclcli tx modelinfo add-model --vid=1 --pid=1 --name="Device #1" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32"  --cid=1 --custom="Some Custom information" --otaURL="http://my-ota.com" --otaChecksum="df56hf" --otaChecksumType="SHA-256" --from=jack `
+  Example: `dclcli tx model add-model --vid=1 --pid=1 --productName="Device #1" --productLabel="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32"  --cid=1 --custom="Some Custom information" --otaURL="http://my-ota.com" --otaChecksum="df56hf" --otaChecksumType="SHA-256" --from=jack `
 
 - Update an existing model info. Only the owner can edit a Model Info.
 
   Role: `Vendor`
 
-  Command: `dclcli tx modelinfo update-model --vid=<uint16> --pid=<uint16>  --from=<account>`
-  existing ModelInfo.
+  Command: `dclcli tx model update-model --vid=<uint16> --pid=<uint16>  --from=<account>`
+  existing Model.
     
   Flags:
   - vid: `uint16` -  model vendor ID
@@ -459,51 +459,51 @@ The set of commands that allows you to manage model infos.
   - chipBlob: `optional(string)` - chipBlob SHALL identify CHIP specific configurations
   - vendorBlob: `optional(string)` - field for vendors to provide any additional metadata about the device model using a string, blob, or URL.  
     
-  Example: `dclcli tx modelinfo update-model --vid=1 --pid=1 --cdVersionNumber="32" --description="New Description" --from=jack `
+  Example: `dclcli tx model update-model --vid=1 --pid=1 --cdVersionNumber="32" --productLabel="New Description" --from=jack `
   
-  Example: `dclcli tx modelinfo update-model --vid=1 --pid=1 --supportURL="https://product-support.url.test" --otaURL="http://new-ota.com" --from=jack `
+  Example: `dclcli tx model update-model --vid=1 --pid=1 --supportURL="https://product-support.url.test" --otaURL="http://new-ota.com" --from=jack `
 
 ##### Queries
 - Query a single model info.
 
-  Command: `dclcli query modelinfo model --vid=<uint16> --pid=<uint16>`
+  Command: `dclcli query model model --vid=<uint16> --pid=<uint16>`
 
   Flags:
   - vid: `uint16` -  model vendor ID
   - pid: `uint16` -  model product ID
 
-  Example: `dclcli query modelinfo model --vid=1 --pid=1`
+  Example: `dclcli query model model --vid=1 --pid=1`
   
 - Query a list of all model infos. 
 
-  Command: `dclcli query modelinfo all-models`
+  Command: `dclcli query model all-models`
 
   Flags:
   - skip: `optional(int)` - number records to skip (`0` by default)
   - take: `optional(int)` - number records to take (all records are returned by default)
     
-  Example: `dclcli query modelinfo all-models`
+  Example: `dclcli query model all-models`
 
 - Query a list of all vendors.
 
-  Command: `dclcli query modelinfo vendors`
+  Command: `dclcli query model vendors`
   
   Flags:
   - skip: `optional(int)` - number records to skip (`0` by default)
   - take: `optional(int)` - number records to take (all records are returned by default)
     
-  Example: `dclcli query modelinfo vendors`
+  Example: `dclcli query model vendors`
   
 - Query a list of all model infos for the given vendor.
 
-  Command: `dclcli query modelinfo vendor-models --vid=<uint16>`
+  Command: `dclcli query model vendor-models --vid=<uint16>`
 
   Flags:
   - vid: `uint16` -  model vendor ID
   - skip: `optional(int)` - number records to skip (`0` by default)
   - take: `optional(int)` - number records to take (all records are returned by default)
 
-  Example: `dclcli query modelinfo vendor-models --vid=1`
+  Example: `dclcli query model vendor-models --vid=1`
 
 ### Compliance Test
 

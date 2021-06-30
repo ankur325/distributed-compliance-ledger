@@ -18,65 +18,82 @@ source integration_tests/cli/common.sh
 
 # Preparation of Actors
 
-echo "Create Vendor account"
-create_new_account vendor_account "Vendor"
-
-# Body
-
 vid=$RANDOM
 pid=$RANDOM
-name="Device #1"
+vendor_account=vendor_account_$vid
+echo "Create Vendor account - $vendor_account"
+create_new_vendor_account $vendor_account $vid
+
+test_divider
+# Body
+
+productLabel="Device #1"
 echo "Add Model with VID: $vid PID: $pid"
-result=$(echo "test1234" | dclcli tx modelinfo add-model --vid=$vid --pid=$pid --supportURL="https://originalsupporturl.test" --name="$name" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from $vendor_account --yes)
+result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --deviceTypeID=1 --productName=TestProduct --productLabel="$productLabel" --partNumber=1 --commissioningCustomFlow=0 --from=$vendor_account --yes)
 check_response "$result" "\"success\": true"
 echo "$result"
 
+test_divider
+
 echo "Get Model with VID: $vid PID: $pid"
-result=$(dclcli query modelinfo model --vid=$vid --pid=$pid)
+result=$(dclcli query model model --vid=$vid --pid=$pid)
 check_response "$result" "\"vid\": $vid"
 check_response "$result" "\"pid\": $pid"
-check_response "$result" "\"name\": \"$name\""
+check_response "$result" "\"productLabel\": \"$productLabel\""
 echo "$result"
+
+test_divider
 
 echo "Get all model infos"
-result=$(dclcli query modelinfo all-models)
+result=$(dclcli query model all-models)
 check_response "$result" "\"vid\": $vid"
 check_response "$result" "\"pid\": $pid"
 echo "$result"
+
+test_divider
 
 echo "Get all vendors"
-result=$(dclcli query modelinfo vendors)
+result=$(dclcli query model vendors)
 check_response "$result" "\"vid\": $vid"
 echo "$result"
 
+test_divider
+
 echo "Get Vendor Models with VID: ${vid}"
-result=$(dclcli query modelinfo vendor-models --vid=$vid)
+result=$(dclcli query model vendor-models --vid=$vid)
 check_response "$result" "\"pid\": $pid"
 echo "$result"
+
+test_divider
 
 echo "Update Model with VID: ${vid} PID: ${pid} with new description"
 description="New Device Description"
-result=$(echo "test1234" | dclcli tx modelinfo update-model --vid=$vid --pid=$pid --cdVersionNumber="32" --from $vendor_account --yes --description "$description")
+result=$(echo "test1234" | dclcli tx model update-model --vid=$vid --pid=$pid --from $vendor_account --yes --productLabel "$description")
 check_response "$result" "\"success\": true"
 echo "$result"
 
+test_divider
+
 echo "Get Model with VID: ${vid} PID: ${pid}"
-result=$(dclcli query modelinfo model --vid=$vid --pid=$pid)
+result=$(dclcli query model model --vid=$vid --pid=$pid)
 check_response "$result" "\"vid\": $vid"
 check_response "$result" "\"pid\": $pid"
-check_response "$result" "\"description\": \"$description\""
+check_response "$result" "\"productLabel\": \"$description\""
 echo "$result"
+
+test_divider
 
 echo "Update Model with VID: ${vid} PID: ${pid} modifying supportURL"
-support_url="https://newsupporturl.test"
-echo dclcli tx modelinfo update-model --vid=$vid --pid=$pid --cdVersionNumber="32" --from $vendor_account --yes --supportURL "$support_url"
-result=$(echo "test1234" | dclcli tx modelinfo update-model --vid=$vid --pid=$pid --cdVersionNumber="33" --from $vendor_account --yes --supportURL "$support_url")
+supportURL="https://newsupporturl.test"
+result=$(echo "test1234" | dclcli tx model update-model --vid=$vid --pid=$pid --from $vendor_account --yes --supportURL "$supportURL")
 check_response "$result" "\"success\": true"
 echo "$result"
 
+test_divider
+
 echo "Get Model with VID: ${vid} PID: ${pid}"
-result=$(dclcli query modelinfo model --vid=$vid --pid=$pid)
+result=$(dclcli query model model --vid=$vid --pid=$pid)
 check_response "$result" "\"vid\": $vid"
 check_response "$result" "\"pid\": $pid"
-check_response "$result" "\"support_url\": \"$support_url\""
+check_response "$result" "\"supportURL\": \"$supportURL\""
 echo "$result"
