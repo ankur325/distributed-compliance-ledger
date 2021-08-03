@@ -37,7 +37,7 @@ dcld add-genesis-account --address=$(dclcli keys show jack -a) --pubkey=$(dclcli
 dcld add-genesis-account --address=$(dclcli keys show alice -a) --pubkey=$(dclcli keys show alice -p) --roles="Trustee,NodeAdmin"
 dcld add-genesis-account --address=$(dclcli keys show bob -a) --pubkey=$(dclcli keys show bob -p) --roles="Trustee,NodeAdmin"
 
-echo 'test1234' | dcld gentx --from jack
+echo 'test1234' | dcld gentx --trust-node=true  --from jack
 
 dcld collect-gentxs
 dcld validate-genesis

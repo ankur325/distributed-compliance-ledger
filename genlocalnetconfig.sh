@@ -62,7 +62,7 @@ dcld add-genesis-account --address=$alice_address --pubkey=$alice_pubkey --roles
 dcld add-genesis-account --address=$bob_address --pubkey=$bob_pubkey --roles="Trustee,NodeAdmin"
 dcld add-genesis-account --address=$anna_address --pubkey=$anna_pubkey --roles="NodeAdmin"
 
-echo 'test1234' | dcld gentx --from jack
+echo 'test1234' | dcld gentx --trust-node=true  --from jack
 
 mv ~/.dcld/* localnet/node0
 
@@ -75,7 +75,7 @@ dcld add-genesis-account --address=$alice_address --pubkey=$alice_pubkey --roles
 dcld add-genesis-account --address=$bob_address --pubkey=$bob_pubkey --roles="Trustee,NodeAdmin"
 dcld add-genesis-account --address=$anna_address --pubkey=$anna_pubkey --roles="NodeAdmin"
 
-echo 'test1234' | dcld gentx --from alice
+echo 'test1234' | dcld gentx --trust-node=true  --from alice
 
 mv ~/.dcld/* localnet/node1
 
@@ -88,7 +88,7 @@ dcld add-genesis-account --address=$alice_address --pubkey=$alice_pubkey --roles
 dcld add-genesis-account --address=$bob_address --pubkey=$bob_pubkey --roles="Trustee,NodeAdmin"
 dcld add-genesis-account --address=$anna_address --pubkey=$anna_pubkey --roles="NodeAdmin"
 
-echo 'test1234' | dcld gentx --from bob
+echo 'test1234' | dcld gentx --trust-node=true  --from bob
 
 mv ~/.dcld/* localnet/node2
 
@@ -101,7 +101,7 @@ dcld add-genesis-account --address=$alice_address --pubkey=$alice_pubkey --roles
 dcld add-genesis-account --address=$bob_address --pubkey=$bob_pubkey --roles="Trustee,NodeAdmin"
 dcld add-genesis-account --address=$anna_address --pubkey=$anna_pubkey --roles="NodeAdmin"
 
-echo 'test1234' | dcld gentx --from anna
+echo 'test1234' | dcld gentx --trust-node=true  --from anna
 
 cp -r ~/.dcld/* localnet/node3
 

@@ -165,6 +165,7 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 
 	ipDefault, _ := server.ExternalIP()
 	cmd.Flags().String(validator.FlagIP, ipDefault, "The node's public IP")
+	cmd.Flags().Bool(flags.FlagTrustNode, true, "Trust the Node")
 	cmd.Flags().String(validator.FlagNodeID, "", "The node's NodeID")
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "node's home directory")
 	cmd.Flags().String(flagClientHome, defaultCLIHome, "client's home directory")
@@ -175,6 +176,7 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 	cmd.Flags().AddFlagSet(validator.InitValidatorFlags())
 
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
+	_ = cmd.MarkFlagRequired(flags.FlagTrustNode)
 
 	return cmd
 }
