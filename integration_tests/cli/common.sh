@@ -21,7 +21,7 @@ random_string() {
   local __resultvar=$1
   local length=${2:-6} # Default is 6
 
-  eval $__resultvar="'$(date +%s.%N | sha1sum | fold -w ${length} | head -n 1)'"
+  eval $__resultvar="'$(date +%s.%N | shasum | fold -w ${length} | head -n 1)'"
 }
 
 check_response() {
