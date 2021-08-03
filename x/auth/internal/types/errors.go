@@ -17,46 +17,44 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	DefaultCodespace sdk.CodespaceType = ModuleName
-
-	CodeAccountAlreadyExists                  sdk.CodeType = 101
-	CodeAccountDoesNotExist                   sdk.CodeType = 102
-	CodePendingAccountAlreadyExists           sdk.CodeType = 103
-	CodePendingAccountDoesNotExist            sdk.CodeType = 104
-	CodePendingAccountRevocationAlreadyExists sdk.CodeType = 105
-	CodePendingAccountRevocationDoesNotExist  sdk.CodeType = 106
+var (
+	CodeAccountAlreadyExists                  = errors.Register(ModuleName, 101, "AccountAlreadyExists")
+	CodeAccountDoesNotExist                   = errors.Register(ModuleName, 102, "AccountDoesNotExist")
+	CodePendingAccountAlreadyExists           = errors.Register(ModuleName, 103, "PendingAccountAlreadyExists")
+	CodePendingAccountDoesNotExist            = errors.Register(ModuleName, 104, "PendingAccountDoesNotExist")
+	CodePendingAccountRevocationAlreadyExists = errors.Register(ModuleName, 105, "PendingAccountRevocationAlreadyExists")
+	CodePendingAccountRevocationDoesNotExist  = errors.Register(ModuleName, 106, "PendingAccountRevocationDoesNotExist")
 )
 
-func ErrAccountAlreadyExists(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeAccountAlreadyExists,
+func ErrAccountAlreadyExists(address interface{}) error {
+	return errors.Wrap(CodeAccountAlreadyExists,
 		fmt.Sprintf("Account associated with the address=%v already exists on the ledger", address))
 }
 
-func ErrAccountDoesNotExist(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeAccountDoesNotExist,
+func ErrAccountDoesNotExist(address interface{}) error {
+	return errors.Wrap(CodeAccountDoesNotExist,
 		fmt.Sprintf("No account associated with the address=%v on the ledger", address))
 }
 
-func ErrPendingAccountAlreadyExists(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodePendingAccountAlreadyExists,
+func ErrPendingAccountAlreadyExists(address interface{}) error {
+	return errors.Wrap(CodePendingAccountAlreadyExists,
 		fmt.Sprintf("Pending account associated with the address=%v already exists on the ledger", address))
 }
 
-func ErrPendingAccountDoesNotExist(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodePendingAccountDoesNotExist,
+func ErrPendingAccountDoesNotExist(address interface{}) error {
+	return errors.Wrap(CodePendingAccountDoesNotExist,
 		fmt.Sprintf("No pending account associated with the address=%v on the ledger", address))
 }
 
-func ErrPendingAccountRevocationAlreadyExists(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodePendingAccountRevocationAlreadyExists,
+func ErrPendingAccountRevocationAlreadyExists(address interface{}) error {
+	return errors.Wrap(CodePendingAccountRevocationAlreadyExists,
 		fmt.Sprintf("Pending account revocation associated with the address=%v already exists on the ledger", address))
 }
 
-func ErrPendingAccountRevocationDoesNotExist(address interface{}) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodePendingAccountRevocationDoesNotExist,
+func ErrPendingAccountRevocationDoesNotExist(address interface{}) error {
+	return errors.Wrap(CodePendingAccountRevocationDoesNotExist,
 		fmt.Sprintf("No pending account revocation associated with the address=%v on the ledger", address))
 }

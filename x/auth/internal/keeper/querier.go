@@ -19,6 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/pagination"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth/internal/types"
@@ -43,7 +44,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryAllPendingAccountRevocations:
 			return queryAllPendingAccountRevocations(ctx, req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
+			return nil, errors.Wrap(errors.ErrInvalidRequest, "unknown auth query endpoint")
 		}
 	}
 }
@@ -51,7 +52,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryAccountParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	if !keeper.IsAccountPresent(ctx, params.Address) {
@@ -69,7 +70,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 func queryAllAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListAccounts{
@@ -105,7 +106,7 @@ func queryAllAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (re
 func queryAllPendingAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListPendingAccounts{
@@ -142,7 +143,7 @@ func queryAllPendingAccountRevocations(ctx sdk.Context,
 	req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListPendingAccountRevocations{

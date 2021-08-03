@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/types"
@@ -32,7 +33,7 @@ func NewHandler(keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper, authKeep
 		default:
 			errMsg := fmt.Sprintf("unrecognized compliancetest Msg type: %v", msg.Type())
 
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
 		}
 	}
 }

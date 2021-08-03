@@ -19,6 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/conversions"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
@@ -49,7 +50,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryAllRevokedModels:
 			return queryAllComplianceInfoInStateRecords(ctx, req, keeper, types.Revoked)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown compliance query endpoint")
+			return nil, errors.Wrap(errors.ErrInvalidRequest, "unknown compliance query endpoint")
 		}
 	}
 }
@@ -90,7 +91,7 @@ func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
 func queryAllComplianceInfoRecords(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params types.ListQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListComplianceInfoItems{
@@ -126,7 +127,7 @@ func queryAllComplianceInfoInStateRecords(ctx sdk.Context, req abci.RequestQuery
 	requestedState types.ComplianceState) (res []byte, err sdk.Error) {
 	var params types.ListQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListComplianceInfoKeyItems{

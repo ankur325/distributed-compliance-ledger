@@ -20,6 +20,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/tendermint/tendermint/crypto"
 )
 
@@ -46,7 +47,7 @@ func (role AccountRole) Validate() sdk.Error {
 		}
 	}
 
-	return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Account Role: %v. Supported roles: [%v]", role, Roles))
+	return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid Account Role: %v. Supported roles: [%v]", role, Roles))
 }
 
 /*
@@ -100,12 +101,12 @@ func (pendAcc PendingAccount) String() string {
 // Validate checks for errors on the vesting and module account parameters.
 func (pendAcc PendingAccount) Validate() sdk.Error {
 	if pendAcc.Address == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Pending Account: Value: %s. Error: Missing Address", pendAcc.Address))
 	}
 
 	if pendAcc.PubKey == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Pending Account: Value: %s. Error: Missing PubKey", pendAcc.PubKey))
 	}
 
@@ -160,12 +161,12 @@ func (acc Account) String() string {
 // Validate checks for errors on the vesting and module account parameters.
 func (acc Account) Validate() error {
 	if acc.Address == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Account: Value: %s. Error: Missing Address", acc.Address))
 	}
 
 	if acc.PubKey == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Account: Value: %s. Error: Missing PubKey", acc.PubKey))
 	}
 
@@ -193,7 +194,7 @@ func (acc Account) GetAddress() sdk.AccAddress {
 // SetAddress - Implements sdk.Account.
 func (acc *Account) SetAddress(addr sdk.AccAddress) error {
 	if len(acc.Address) != 0 {
-		return sdk.ErrInvalidAddress("Cannot override Account address")
+		return errors.Wrap(errors.ErrInvalidAddress, "Cannot override Account address")
 	}
 
 	acc.Address = addr
@@ -282,7 +283,7 @@ func (revoc PendingAccountRevocation) String() string {
 // Validate checks for errors on the vesting and module account parameters.
 func (revoc PendingAccountRevocation) Validate() sdk.Error {
 	if revoc.Address == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Pending Account Revocation: Value: %s. Error: Missing Address", revoc.Address))
 	}
 

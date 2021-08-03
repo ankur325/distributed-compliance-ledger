@@ -51,7 +51,7 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := ctx.Config
-			config.SetRoot(viper.GetString(client.FlagHome))
+			config.SetRoot(viper.GetString(flags.FlagHome))
 
 			nodeID, valPubKey, err := genutil.InitializeNodeValidatorFiles(ctx.Config)
 			if err != nil {
@@ -89,14 +89,14 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 				return err
 			}
 
-			from := viper.GetString(client.FlagFrom)
+			from := viper.GetString(flags.FlagFrom)
 			key, err := kb.Get(from)
 			if err != nil {
 				return err
 			}
 
 			// Set flags for creating gentx
-			viper.Set(client.FlagHome, viper.GetString(flagClientHome))
+			viper.Set(flags.FlagHome, viper.GetString(flagClientHome))
 			validator.PrepareFlagsForTxCreateValidator(config, nodeID, genDoc.ChainID, valPubKey)
 
 			err = genutil.ValidateAccountInGenesis(genesisState, key.GetAddress(), cdc)

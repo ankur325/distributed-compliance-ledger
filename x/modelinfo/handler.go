@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/internal/types"
@@ -35,7 +36,7 @@ func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
 		}
 	}
 }

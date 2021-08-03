@@ -21,7 +21,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -46,18 +46,18 @@ func ValidateGenesisCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicM
 
 			var genDoc *tmtypes.GenesisDoc
 			if genDoc, err = tmtypes.GenesisDocFromFile(genesis); err != nil {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Error loading genesis doc from %s: %s", genesis, err.Error()))
 			}
 
 			var genState map[string]json.RawMessage
 			if err = cdc.UnmarshalJSON(genDoc.AppState, &genState); err != nil {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Error unmarshaling genesis doc %s: %s", genesis, err.Error()))
 			}
 
 			if err = mbm.ValidateGenesis(genState); err != nil {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Error validating genesis file %s: %s", genesis, err.Error()))
 			}
 

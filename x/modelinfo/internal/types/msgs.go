@@ -16,6 +16,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const RouterKey = ModuleName
@@ -85,40 +86,40 @@ func (m MsgAddModelInfo) Type() string {
 
 func (m MsgAddModelInfo) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	if len(m.Name) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Name: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Name: it cannot be empty")
 	}
 
 	if len(m.Description) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Description: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Description: it cannot be empty")
 	}
 
 	if len(m.SKU) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SKU: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid SKU: it cannot be empty")
 	}
 
 	if len(m.HardwareVersion) == 0 {
-		return sdk.ErrUnknownRequest("Invalid HardwareVersion: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid HardwareVersion: it cannot be empty")
 	}
 
 	if len(m.FirmwareVersion) == 0 {
-		return sdk.ErrUnknownRequest("Invalid FirmwareVersion: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid FirmwareVersion: it cannot be empty")
 	}
 
 	if m.OtaURL != "" || m.OtaChecksum != "" || m.OtaChecksumType != "" {
 		if m.OtaURL == "" || m.OtaChecksum == "" || m.OtaChecksumType == "" {
-			return sdk.ErrUnknownRequest("Invalid MsgAddModelInfo: the fields OtaURL, OtaChecksum and " +
+			return errors.Wrap(errors.ErrInvalidRequest, "Invalid MsgAddModelInfo: the fields OtaURL, OtaChecksum and "+
 				"OtaChecksumType must be either specified together, or not specified together")
 		}
 	}
@@ -178,15 +179,15 @@ func (m MsgUpdateModelInfo) Type() string {
 
 func (m MsgUpdateModelInfo) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	return nil
@@ -224,15 +225,15 @@ func (m MsgDeleteModelInfo) Type() string {
 
 func (m MsgDeleteModelInfo) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non-zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non-zero 16-bit unsigned integer")
 	}
 
 	return nil

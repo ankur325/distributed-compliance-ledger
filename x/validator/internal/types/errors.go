@@ -17,35 +17,33 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	Codespace sdk.CodespaceType = ModuleName
-
-	CodeValidatorAlreadyExist sdk.CodeType = 601
-	CodeValidatorDoesNotExist sdk.CodeType = 602
-	CodePoolIsFull            sdk.CodeType = 603
-	CodeAccountAlreadyHasNode sdk.CodeType = 604
+var (
+	CodeValidatorAlreadyExist = errors.Register(ModuleName, 601, "Validator already exists")
+	CodeValidatorDoesNotExist = errors.Register(ModuleName, 602, "Validator does not exists")
+	CodePoolIsFull            = errors.Register(ModuleName, 603, "Poll is full")
+	CodeAccountAlreadyHasNode = errors.Register(ModuleName, 604, "Account already has node")
 )
 
-func ErrValidatorExists(address interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeValidatorAlreadyExist,
+func ErrValidatorExists(address interface{}) error {
+	return errors.Wrap(CodeValidatorAlreadyExist,
 		fmt.Sprintf("Validator associated with the validator_address=%v already exists on the ledger", address))
 }
 
-func ErrValidatorDoesNotExist(address interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeValidatorDoesNotExist,
+func ErrValidatorDoesNotExist(address interface{}) error {
+	return errors.Wrap(CodeValidatorDoesNotExist,
 		fmt.Sprintf("No validator associated with the validator_address=%v on the ledger", address))
 }
 
-func ErrPoolIsFull() sdk.Error {
-	return sdk.NewError(Codespace, CodePoolIsFull,
+func ErrPoolIsFull() error {
+	return errors.Wrap(CodePoolIsFull,
 		fmt.Sprintf("Pool ledger already contains maximum number of active nodes: \"%v\"", MaxNodes))
 }
 
-func ErrAccountAlreadyHasNode(address interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeAccountAlreadyHasNode,
+func ErrAccountAlreadyHasNode(address interface{}) error {
+	return errors.Wrap(CodeAccountAlreadyHasNode,
 		fmt.Sprintf("There is already node stored on the ledger managed by an account"+
 			" associated with the address=\"%v\"", address))
 }

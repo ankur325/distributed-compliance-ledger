@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/validator/internal/types"
@@ -131,7 +132,7 @@ func validateGenesisStateValidators(validators []Validator) (err error) {
 		strKey := string(val.GetConsPubKey().Bytes())
 
 		if _, ok := addrMap[strKey]; ok {
-			return sdk.ErrUnknownRequest(fmt.Sprintf(
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf(
 				"duplicate validator in genesis state: name %v, address %v", val.GetName(), val.Address))
 		}
 

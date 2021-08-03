@@ -57,16 +57,16 @@ func main() {
 	}
 
 	// Add --chain-id to persistent flags and mark it required
-	rootCmd.PersistentFlags().String(client.FlagChainID, "", "Chain ID of tendermint node")
+	rootCmd.PersistentFlags().String(flags.FlagChainID, "", "Chain ID of tendermint node")
 	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
 		return initConfig(rootCmd)
 	}
 
-	rootCmd.PersistentFlags().String(client.FlagBroadcastMode, settings.DefaultBroadcastMode,
+	rootCmd.PersistentFlags().String(flags.FlagBroadcastMode, settings.DefaultBroadcastMode,
 		fmt.Sprintf("Transaction broadcast mode to use (%s, %s, %s)",
 			flags.BroadcastBlock, flags.BroadcastSync, flags.BroadcastAsync))
 
-	viper.SetDefault(client.FlagBroadcastMode, settings.DefaultBroadcastMode)
+	viper.SetDefault(flags.FlagBroadcastMode, settings.DefaultBroadcastMode)
 
 	// Construct Root Command
 	rootCmd.AddCommand(
@@ -75,13 +75,13 @@ func main() {
 		client.ConfigCmd(app.DefaultCLIHome),
 		queryCmd(cdc),
 		txCmd(cdc),
-		client.LineBreak,
+		flags.LineBreak,
 		lcd.ServeCommand(cdc, registerRoutes),
-		client.LineBreak,
+		flags.LineBreak,
 		keys.Commands(),
-		client.LineBreak,
+		flags.LineBreak,
 		version.Cmd,
-		client.NewCompletionCmd(rootCmd, true),
+		flags.NewCompletionCmd(rootCmd, true),
 	)
 
 	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
@@ -113,7 +113,7 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		rpc.BlockCommand(),
 		authcmd.QueryTxsByEventsCmd(cdc),
 		authcmd.QueryTxCmd(cdc),
-		client.LineBreak,
+		flags.LineBreak,
 	)
 
 	// add modules' query commands
@@ -155,7 +155,7 @@ func initConfig(cmd *cobra.Command) error {
 		}
 	}
 
-	if err := viper.BindPFlag(client.FlagChainID, cmd.PersistentFlags().Lookup(client.FlagChainID)); err != nil {
+	if err := viper.BindPFlag(flags.FlagChainID, cmd.PersistentFlags().Lookup(flags.FlagChainID)); err != nil {
 		return err
 	}
 

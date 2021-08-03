@@ -17,35 +17,33 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	Codespace sdk.CodespaceType = ModuleName
-
-	CodeComplianceInfoDoesNotExist sdk.CodeType = 301
-	CodeInconsistentDates          sdk.CodeType = 302
-	CodeAlreadyCertifyed           sdk.CodeType = 303
-	CodeModelInfoDoesNotExist      sdk.CodeType = 304
+var (
+	CodeComplianceInfoDoesNotExist = errors.Register(ModuleName, 301, "No certification information exists")
+	CodeInconsistentDates          = errors.Register(ModuleName, 302, "Inconsistent Dates")
+	CodeAlreadyCertifyed           = errors.Register(ModuleName, 303, "Already Certified")
+	CodeModelInfoDoesNotExist      = errors.Register(ModuleName, 304, "No Model Info Present")
 )
 
-func ErrComplianceInfoDoesNotExist(vid interface{}, pid interface{}, certificationType interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeComplianceInfoDoesNotExist,
+func ErrComplianceInfoDoesNotExist(vid interface{}, pid interface{}, certificationType interface{}) error {
+	return errors.Wrap(CodeComplianceInfoDoesNotExist,
 		fmt.Sprintf("No certification information about the model with vid=%v, pid=%v and "+
 			"certification_type=%v on the ledger. This means that the model is either not certified yet or "+
 			"certified by default (off-ledger).", vid, pid, certificationType))
 }
 
-func ErrInconsistentDates(error interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeInconsistentDates, fmt.Sprintf("%v", error))
+func ErrInconsistentDates(error interface{}) error {
+	return errors.Wrap(CodeInconsistentDates, fmt.Sprintf("%v", error))
 }
 
-func ErrAlreadyCertifyed(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeAlreadyCertifyed,
+func ErrAlreadyCertifyed(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeAlreadyCertifyed,
 		fmt.Sprintf("Model with vid=%v, pid=%v already certified on the ledger", vid, pid))
 }
 
-func ErrModelInfoDoesNotExist(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeModelInfoDoesNotExist,
+func ErrModelInfoDoesNotExist(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeModelInfoDoesNotExist,
 		fmt.Sprintf("Model with vid=%v, pid=%v does not exist on the ledger", vid, pid))
 }

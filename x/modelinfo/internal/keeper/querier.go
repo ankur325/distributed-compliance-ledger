@@ -19,6 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/conversions"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/pagination"
@@ -44,7 +45,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryVendorModels:
 			return queryVendorModels(ctx, path[1:], keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown modelinfo query endpoint")
+			return nil, errors.Wrap(errors.ErrInvalidRequest, "unknown modelinfo query endpoint")
 		}
 	}
 }
@@ -74,7 +75,7 @@ func queryModel(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListModelInfoItems{
@@ -115,7 +116,7 @@ func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res 
 func queryVendors(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
 	}
 
 	result := types.ListVendorItems{

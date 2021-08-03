@@ -20,7 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/cli"
@@ -69,7 +69,7 @@ func GetCmdAddTestingResult(cdc *codec.Codec) *cobra.Command {
 
 			testDate, err_ := time.Parse(time.RFC3339, viper.GetString(FlagTestDate))
 			if err_ != nil {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid TestDate \"%v\": "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid TestDate \"%v\": "+
 					"it must be RFC3339 encoded date", viper.GetString(FlagTestDate)))
 			}
 

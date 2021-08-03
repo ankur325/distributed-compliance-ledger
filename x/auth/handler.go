@@ -19,6 +19,7 @@ import (
 	"math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth/internal/types"
 )
@@ -37,7 +38,7 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized auth Msg type: %v", msg.Type())
 
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
 		}
 	}
 }

@@ -17,6 +17,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/conversions"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/types"
@@ -32,7 +33,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryTestingResult:
 			return queryTestingResult(ctx, path[1:], keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown compliancetest query endpoint")
+			return nil, errors.Wrap(errors.ErrInvalidRequest, "unknown compliancetest query endpoint")
 		}
 	}
 }

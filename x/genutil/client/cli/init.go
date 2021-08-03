@@ -20,10 +20,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -83,7 +84,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 			config := ctx.Config
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 
-			chainID := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(flags.FlagChainID)
 
 			nodeID, _, err := genutil.InitializeNodeValidatorFiles(config)
 			if err != nil {
@@ -94,7 +95,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 
 			genFile := config.GenesisFile()
 			if !viper.GetBool(flagOverwrite) && common.FileExists(genFile) {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Error genesis.json file already exists: %v", genFile))
 			}
 			appState, err := codec.MarshalJSONIndent(cdc, mbm.DefaultGenesis())
@@ -131,9 +132,9 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 
 	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
 	cmd.Flags().BoolP(flagOverwrite, "o", false, "overwrite the genesis.json file")
-	cmd.Flags().String(client.FlagChainID, "", "genesis file chain-id")
+	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id")
 
-	_ = cmd.MarkFlagRequired(client.FlagChainID)
+	_ = cmd.MarkFlagRequired(flags.FlagChainID)
 
 	return cmd
 }

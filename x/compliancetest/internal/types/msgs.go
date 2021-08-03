@@ -18,6 +18,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const RouterKey = ModuleName
@@ -51,23 +52,23 @@ func (m MsgAddTestingResult) Type() string {
 
 func (m MsgAddTestingResult) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if len(m.TestResult) == 0 {
-		return sdk.ErrUnknownRequest("Invalid TestResult: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid TestResult: it cannot be empty")
 	}
 
 	if m.TestDate.IsZero() {
-		return sdk.ErrUnknownRequest("Invalid TestDate: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid TestDate: it cannot be empty")
 	}
 
 	return nil

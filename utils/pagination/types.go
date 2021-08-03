@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/viper"
 )
 
@@ -53,7 +53,7 @@ func ParsePaginationParamsFromRequest(r *http.Request) (PaginationParams, error)
 	if str := r.FormValue("skip"); len(str) > 0 {
 		val_, err := strconv.Atoi(str)
 		if err != nil {
-			return PaginationParams{}, error(sdk.ErrUnknownRequest(
+			return PaginationParams{}, error(errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid query parameter `skip`: Parsing Error: %v must be number", str)))
 		}
 
@@ -65,7 +65,7 @@ func ParsePaginationParamsFromRequest(r *http.Request) (PaginationParams, error)
 	if str := r.FormValue("take"); len(str) > 0 {
 		val_, err := strconv.Atoi(str)
 		if err != nil {
-			return PaginationParams{}, error(sdk.ErrUnknownRequest(
+			return PaginationParams{}, error(errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid query parameter `take`: Parsing Error: %v must be number", str)))
 		}
 

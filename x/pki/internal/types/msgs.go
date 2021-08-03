@@ -16,6 +16,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const RouterKey = ModuleName
@@ -46,11 +47,11 @@ func (m MsgProposeAddX509RootCert) Type() string {
 
 func (m MsgProposeAddX509RootCert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Cert) == 0 {
-		return sdk.ErrUnknownRequest("Invalid x509Cert: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid x509Cert: it cannot be empty")
 	}
 
 	return nil
@@ -93,15 +94,15 @@ func (m MsgApproveAddX509RootCert) Type() string {
 
 func (m MsgApproveAddX509RootCert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Subject) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Subject: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Subject: it cannot be empty")
 	}
 
 	if len(m.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SubjectKeyID: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid SubjectKeyID: it cannot be empty")
 	}
 
 	return nil
@@ -141,11 +142,11 @@ func (m MsgAddX509Cert) Type() string {
 
 func (m MsgAddX509Cert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Cert) == 0 {
-		return sdk.ErrUnknownRequest("Invalid x509Cert: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid x509Cert: it cannot be empty")
 	}
 
 	return nil
@@ -188,15 +189,15 @@ func (m MsgProposeRevokeX509RootCert) Type() string {
 
 func (m MsgProposeRevokeX509RootCert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Subject) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Subject: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Subject: it cannot be empty")
 	}
 
 	if len(m.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SubjectKeyID: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid SubjectKeyID: it cannot be empty")
 	}
 
 	return nil
@@ -239,15 +240,15 @@ func (m MsgApproveRevokeX509RootCert) Type() string {
 
 func (m MsgApproveRevokeX509RootCert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Subject) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Subject: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Subject: it cannot be empty")
 	}
 
 	if len(m.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SubjectKeyID: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid SubjectKeyID: it cannot be empty")
 	}
 
 	return nil
@@ -289,15 +290,15 @@ func (m MsgRevokeX509Cert) Type() string {
 
 func (m MsgRevokeX509Cert) ValidateBasic() sdk.Error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if len(m.Subject) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Subject: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Subject: it cannot be empty")
 	}
 
 	if len(m.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SubjectKeyID: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid SubjectKeyID: it cannot be empty")
 	}
 
 	return nil

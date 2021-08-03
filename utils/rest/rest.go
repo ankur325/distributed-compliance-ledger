@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
@@ -164,7 +165,7 @@ func (ctx RestContext) WithSigner() (RestContext, error) {
 func (ctx RestContext) WithBaseRequest(baseReq rest.BaseReq) (RestContext, error) {
 	ctx.baseReq = baseReq.Sanitize()
 	if !baseReq.ValidateBasic(ctx.responseWriter) {
-		return RestContext{}, sdk.ErrUnknownRequest("Base request validation failed")
+		return RestContext{}, errors.Wrap(errors.ErrInvalidRequest, "Base request validation failed")
 	}
 
 	return ctx, nil

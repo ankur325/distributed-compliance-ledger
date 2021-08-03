@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/functions"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
@@ -35,7 +36,7 @@ func NewHandler(k Keeper, authKeeper auth.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized validator Msg type: %v", msg.Type())
 
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
 		}
 	}
 }
@@ -66,7 +67,7 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator,
 	if ctx.ConsensusParams() != nil {
 		tmPubKey := tmtypes.TM2PB.PubKey(msg.GetPubKey())
 		if !functions.StringInSlice(tmPubKey.Type, ctx.ConsensusParams().Validator.PubKeyTypes) {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Validator pubkey type \"%s\" is not supported. Supported types: [%s]",
 					tmPubKey.Type, strings.Join(ctx.ConsensusParams().Validator.PubKeyTypes, ","))).Result()
 		}

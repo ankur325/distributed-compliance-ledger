@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
@@ -37,7 +38,7 @@ func NewHandler(keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
 		}
 	}
 }
@@ -157,7 +158,7 @@ func checkZbCertificationRights(ctx sdk.Context, authKeeper auth.Keeper, signer 
 				"signed by an account with the %s role", auth.ZBCertificationCenter))
 		}
 	} else {
-		return sdk.ErrUnknownRequest(fmt.Sprintf("Unexpected CertificationType: \"%s\". Supported types: [%s]",
+		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Unexpected CertificationType: \"%s\". Supported types: [%s]",
 			certificationType, ZbCertificationType))
 	}
 

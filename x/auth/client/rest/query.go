@@ -20,6 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth/internal/types"
@@ -73,7 +74,7 @@ func accountHandler(cliCtx context.CLIContext, storeName string) http.HandlerFun
 
 		address, err := sdk.AccAddressFromBech32(accAddr)
 		if err != nil {
-			restCtx.WriteErrorResponse(http.StatusBadRequest, sdk.ErrInvalidAddress(accAddr).Error())
+			restCtx.WriteErrorResponse(http.StatusBadRequest, errors.Wrap(errors.ErrInvalidAddress, accAddr).Error())
 
 			return
 		}

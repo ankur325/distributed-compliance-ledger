@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -30,22 +31,22 @@ const (
 )
 
 func ErrModelInfoAlreadyExists(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeModelInfoAlreadyExists,
+	return errors.Wrap(ModuleName, CodeModelInfoAlreadyExists,
 		fmt.Sprintf("Model info associated with vid=%v and pid=%v already exists on the ledger", vid, pid))
 }
 
 func ErrModelInfoDoesNotExist(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeModelInfoDoesNotExist,
+	return errors.Wrap(ModuleName, CodeModelInfoDoesNotExist,
 		fmt.Sprintf("No model info associated with vid=%v and pid=%v exist on the ledger", vid, pid))
 }
 
 func ErrOtaURLCannotBeSet(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeOtaURLCannotBeSet,
+	return errors.Wrap(ModuleName, CodeOtaURLCannotBeSet,
 		fmt.Sprintf("OTA URL cannot be set for model info associated with vid=%v and pid=%v "+
 			"because OTA was not set for this model info initially", vid, pid))
 }
 
 func ErrVendorProductsDoNotExist(vid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeVendorProductsDoNotExist,
+	return errors.Wrap(ModuleName, CodeVendorProductsDoNotExist,
 		fmt.Sprintf("No vendor products associated with vid=%v exist on the ledger", vid))
 }

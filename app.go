@@ -16,6 +16,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
@@ -26,7 +27,6 @@ import (
 	authutils "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
@@ -137,7 +137,8 @@ func NewDcLedgerApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.Ba
 
 	err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
 	if err != nil {
-		cmn.Exit(err.Error())
+		fmt.Printf(err.Error() + "\n")
+		os.Exit(1)
 	}
 
 	return app

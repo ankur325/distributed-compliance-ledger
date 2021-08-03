@@ -20,7 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/cli"
@@ -95,13 +95,13 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 			if customFilename := viper.GetString(FlagCustom); len(customFilename) != 0 {
 				custom, err_ = cliCtx.ReadFromFile(customFilename)
 				if err_ != nil {
-					return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid custom:\"%v\"", err_))
+					return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid custom:\"%v\"", err_))
 				}
 			}
 
 			tisOrTrpTestingCompleted, err_ := strconv.ParseBool(viper.GetString(FlagTisOrTrpTestingCompleted))
 			if err_ != nil {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Tis-or-trp-testing-completed: "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid Tis-or-trp-testing-completed: "+
 					"Parsing Error: \"%v\" must be boolean", viper.GetString(FlagTisOrTrpTestingCompleted)))
 			}
 
@@ -178,7 +178,7 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 			if descriptionFilename := viper.GetString(FlagDescription); len(descriptionFilename) != 0 {
 				description, err_ = cliCtx.ReadFromFile(descriptionFilename)
 				if err_ != nil {
-					return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid description:\"%v\"", err_))
+					return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid description:\"%v\"", err_))
 				}
 			}
 
@@ -188,13 +188,13 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 			if customFilename := viper.GetString(FlagCustom); len(customFilename) != 0 {
 				custom, err_ = cliCtx.ReadFromFile(customFilename)
 				if err_ != nil {
-					return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid custom:\"%v\"", err_))
+					return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid custom:\"%v\"", err_))
 				}
 			}
 
 			tisOrTrpTestingCompleted, err_ := strconv.ParseBool(viper.GetString(FlagTisOrTrpTestingCompleted))
 			if err_ != nil {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid tis-or-trp-testing-completed: "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid tis-or-trp-testing-completed: "+
 					"Parsing Error: \"%v\" must be boolean", viper.GetString(FlagTisOrTrpTestingCompleted)))
 			}
 

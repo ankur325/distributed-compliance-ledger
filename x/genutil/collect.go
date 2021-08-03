@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	cfg "github.com/tendermint/tendermint/config"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -49,7 +49,7 @@ func GenAppStateFromConfig(cdc *codec.Codec, config *cfg.Config,
 
 	// if there are no gen txs to be processed, return the default empty state.
 	if len(appGenTxs) == 0 {
-		return appState, sdk.ErrUnknownRequest("there must be at least one genesis tx")
+		return appState, errors.Wrap(errors.ErrInvalidRequest, "there must be at least one genesis tx")
 	}
 
 	// create the app state.
@@ -134,14 +134,14 @@ func CollectStdTxs(cdc *codec.Codec, name, genTxsDir string,
 		// "528fd3df22b31f4969b05652bfe8f0fe921321d5@192.168.2.37:26656".
 		nodeAddrIP := genStdTx.GetMemo()
 		if len(nodeAddrIP) == 0 {
-			return appGenTxs, persistentPeers, sdk.ErrUnknownRequest(
+			return appGenTxs, persistentPeers, errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("couldn't find node's address and IP in %s", fo.Name()))
 		}
 
 		// genesis transactions must be single-message.
 		msgs := genStdTx.GetMsgs()
 		if len(msgs) != 1 {
-			return appGenTxs, persistentPeers, sdk.ErrUnknownRequest(
+			return appGenTxs, persistentPeers, errors.Wrap(errors.ErrInvalidRequest,
 				"each genesis transaction must provide a single genesis message")
 		}
 
@@ -150,7 +150,7 @@ func CollectStdTxs(cdc *codec.Codec, name, genTxsDir string,
 
 		_, valOk := addrMap[account]
 		if !valOk {
-			return appGenTxs, persistentPeers, sdk.ErrUnknownRequest(
+			return appGenTxs, persistentPeers, errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Error account %v not in genesis.json: %+v", account, addrMap))
 		}
 

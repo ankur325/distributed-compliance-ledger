@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/types"
 )
@@ -33,17 +34,17 @@ func NewGenesisState() GenesisState {
 func ValidateGenesis(data GenesisState) error {
 	for _, record := range data.TestingResultRecords {
 		if record.VID == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid TestingResultRecord: value: %v. "+
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid TestingResultRecord: value: %v. "+
 				"Error: Invalid VID", record.VID))
 		}
 
 		if record.PID == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid TestingResultRecord: value: %v. "+
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid TestingResultRecord: value: %v. "+
 				"Error: Invalid PID", record.PID))
 		}
 
 		if len(record.Results) == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid TestingResultRecord: value: %s. "+
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid TestingResultRecord: value: %s. "+
 				"Error: Missing TestResult", record.Results))
 		}
 	}

@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
 )
@@ -33,29 +34,29 @@ func NewGenesisState() GenesisState {
 func ValidateGenesis(data GenesisState) error {
 	for _, record := range data.ComplianceInfoRecords {
 		if record.VID == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid CertifiedModelRecord: value: %d. "+
 					"Error: Invalid VID: it cannot be 0", record.VID))
 		}
 
 		if record.PID == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid CertifiedModelRecord: value: %d. "+
 					"Error: Invalid PID: it cannot be 0", record.PID))
 		}
 
 		if len(record.State) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid CertifiedModelRecord: value: %d."+
 					" Error: Invalid State: it cannot be empty", record.PID))
 		}
 
 		if record.Date.IsZero() {
-			return sdk.ErrUnknownRequest("Invalid Date: it cannot be empty")
+			return errors.Wrap(errors.ErrInvalidRequest, "Invalid Date: it cannot be empty")
 		}
 
 		if record.CertificationType != "" && record.CertificationType != types.ZbCertificationType {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid CertifiedModelRecord: value: %v."+
 					" Error: Invalid CertificationType: "+
 					"unknown type; supported types: [%s]", record.CertificationType, types.ZbCertificationType))

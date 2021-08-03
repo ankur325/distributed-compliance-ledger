@@ -20,7 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/cli"
@@ -68,7 +68,7 @@ func GetCmdCertifyModel(cdc *codec.Codec) *cobra.Command {
 
 			certificationDate, err_ := time.Parse(time.RFC3339, viper.GetString(FlagCertificationDate))
 			if err_ != nil {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid CertificationDate \"%v\": "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid CertificationDate \"%v\": "+
 					"it must be RFC3339 date. Error: %v", viper.GetString(FlagRevocationDate), err_.Error()))
 			}
 
@@ -119,7 +119,7 @@ func GetCmdRevokeModel(cdc *codec.Codec) *cobra.Command {
 
 			revocationDate, err_ := time.Parse(time.RFC3339, viper.GetString(FlagRevocationDate))
 			if err_ != nil {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid CertificationDate \"%v\": "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid CertificationDate \"%v\": "+
 					"it must be RFC3339 date. Error: %v", viper.GetString(FlagRevocationDate), err_.Error()))
 			}
 

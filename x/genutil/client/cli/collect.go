@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/cobra"
@@ -44,7 +44,7 @@ func CollectGenTxsCmd(ctx *server.Context, cdc *codec.Codec, defaultNodeHome str
 				return err
 			}
 
-			name := viper.GetString(client.FlagName)
+			name := viper.GetString(flags.FlagName)
 
 			genDoc, err := tmtypes.GenesisDocFromFile(config.GenesisFile())
 			if err != nil {

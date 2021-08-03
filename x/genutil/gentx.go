@@ -20,6 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
@@ -56,7 +57,7 @@ func ValidateAccountInGenesis(appGenesisState map[string]json.RawMessage,
 	})
 
 	if !accountIsInGenesis {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Error account %s in not in the app_state.accounts array of genesis.json", key))
 	}
 

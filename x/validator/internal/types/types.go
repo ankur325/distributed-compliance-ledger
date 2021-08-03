@@ -20,6 +20,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -158,28 +159,28 @@ const (
 // Ensure the length of a validator's description.
 func (d Description) Validate() sdk.Error {
 	if len(d.Name) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Description Name: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Description Name: it cannot be empty")
 	}
 
 	if len(d.Name) > MaxNameLength {
-		return sdk.ErrUnknownRequest(fmt.Sprintf(
+		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf(
 			"Invalid Description Name: received string of length %v, max is %v", len(d.Name), MaxNameLength))
 	}
 
 	if len(d.Identity) > MaxIdentityLength {
-		return sdk.ErrUnknownRequest(fmt.Sprintf(
+		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf(
 			"Invalid Description Identity: "+
 				"received string of length %v, max is %v", len(d.Identity), MaxIdentityLength))
 	}
 
 	if len(d.Website) > MaxWebsiteLength {
-		return sdk.ErrUnknownRequest(fmt.Sprintf(
+		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf(
 			"Invalid Description Website: "+
 				"received string of length %v, max is %v", len(d.Website), MaxWebsiteLength))
 	}
 
 	if len(d.Details) > MaxDetailsLength {
-		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Description Details: "+
+		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid Description Details: "+
 			"received string of length %v, max is %v", len(d.Details), MaxDetailsLength))
 	}
 

@@ -14,7 +14,10 @@
 
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 const RouterKey = ModuleName
 
@@ -48,11 +51,11 @@ func (m MsgProposeAddAccount) Type() string {
 
 func (m MsgProposeAddAccount) ValidateBasic() sdk.Error {
 	if m.Address.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Account Address: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
 
 	if len(m.PublicKey) == 0 {
-		return sdk.ErrUnknownRequest("Invalid PublicKey: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PublicKey: it cannot be empty")
 	}
 
 	if err := m.Roles.Validate(); err != nil {
@@ -60,7 +63,7 @@ func (m MsgProposeAddAccount) ValidateBasic() sdk.Error {
 	}
 
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	return nil
@@ -99,11 +102,11 @@ func (m MsgApproveAddAccount) Type() string {
 
 func (m MsgApproveAddAccount) ValidateBasic() sdk.Error {
 	if m.Address.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Account Address: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
 
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	return nil
@@ -142,11 +145,11 @@ func (m MsgProposeRevokeAccount) Type() string {
 
 func (m MsgProposeRevokeAccount) ValidateBasic() sdk.Error {
 	if m.Address.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Account Address: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
 
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	return nil
@@ -185,11 +188,11 @@ func (m MsgApproveRevokeAccount) Type() string {
 
 func (m MsgApproveRevokeAccount) ValidateBasic() sdk.Error {
 	if m.Address.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Account Address: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
 
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	return nil

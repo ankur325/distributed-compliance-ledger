@@ -19,6 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/validator/internal/types"
 )
@@ -38,7 +39,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case QueryValidator:
 			return queryValidator(ctx, path[1:], k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown pki query endpoint")
+			return nil, errors.Wrap(errors.ErrInvalidRequest, "unknown pki query endpoint")
 		}
 	}
 }
@@ -46,7 +47,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 func queryValidators(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
 	var params types.ListValidatorsParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("Failed to parse request params: %s", err))
+		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Failed to parse request params: %s", err))
 	}
 
 	result := types.NewListValidatorItems()
@@ -92,7 +93,7 @@ func queryValidators(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res
 func queryValidator(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 	validatorAddr, err := sdk.ConsAddressFromBech32(path[0])
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(err.Error())
+		return nil, errors.Wrap(errors.ErrInvalidRequest, err.Error())
 	}
 
 	if !k.IsValidatorPresent(ctx, validatorAddr) {

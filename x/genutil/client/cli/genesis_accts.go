@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -93,7 +94,7 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec,
 			cdc.MustUnmarshalJSON(appState[genutil.ModuleName], &genesisState)
 
 			if genesisState.Accounts.Contains(addr) {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("cannot add account at existing address %v", addr))
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("cannot add account at existing address %v", addr))
 			}
 
 			genesisState.Accounts = append(genesisState.Accounts, account)

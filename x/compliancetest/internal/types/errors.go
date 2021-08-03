@@ -17,16 +17,14 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	Codespace sdk.CodespaceType = ModuleName
-
-	CodeTestingResultsDoNotExist sdk.CodeType = 201
+var (
+	CodeTestingResultsDoNotExist = errors.Register(ModuleName, 201, "Testing results do not exist")
 )
 
-func ErrTestingResultDoesNotExist(vid interface{}, pid interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeTestingResultsDoNotExist,
+func ErrTestingResultDoesNotExist(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeTestingResultsDoNotExist,
 		fmt.Sprintf("No testing results about the model with vid=%v and pid=%v on the ledger", vid, pid))
 }

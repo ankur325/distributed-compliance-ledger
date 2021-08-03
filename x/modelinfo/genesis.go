@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/internal/types"
 )
@@ -34,40 +35,40 @@ func NewGenesisState() GenesisState {
 func ValidateGenesis(data GenesisState) error {
 	for _, record := range data.ModelInfoRecords {
 		if record.VID == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid VID. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Invalid VID. Value: %v", record))
 		}
 
 		if record.PID == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid PID. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Invalid PID. Value: %v", record))
 		}
 
 		if record.Name == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Name. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed Name. Value: %v", record))
 		}
 
 		if record.Description == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Description. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed Description. Value: %v", record))
 		}
 
 		if record.SKU == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SKU. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed SKU. Value: %v", record))
 		}
 
 		if record.HardwareVersion == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersion. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersion. Value: %v", record))
 		}
 
 		if record.FirmwareVersion == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed FirmwareVersion. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed FirmwareVersion. Value: %v", record))
 		}
 
 		if record.Owner.Empty() {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Owner. Value: %v", record))
+			return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: Missed Owner. Value: %v", record))
 		}
 
 		if record.OtaURL != "" || record.OtaChecksum != "" || record.OtaChecksumType != "" {
 			if record.OtaURL == "" || record.OtaChecksum == "" || record.OtaChecksumType == "" {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: The fields OtaURL, OtaChecksum and "+
+				return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid ModelInfo: The fields OtaURL, OtaChecksum and "+
 					"OtaChecksumType must be either specified together, or not specified together. Value: %v", record))
 			}
 		}

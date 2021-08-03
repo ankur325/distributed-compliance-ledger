@@ -19,9 +19,9 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/tendermint/tendermint/libs/common"
+	tmos "github.com/tendermint/tendermint/libs/os"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/validator"
 )
@@ -71,8 +71,8 @@ func GenesisStateFromGenDoc(cdc *codec.Codec, genDoc tmtypes.GenesisDoc,
 // NOTE: The pubkey input is this machines pubkey.
 func GenesisStateFromGenFile(cdc *codec.Codec, genFile string,
 ) (genesisState map[string]json.RawMessage, genDoc *tmtypes.GenesisDoc, err error) {
-	if !common.FileExists(genFile) {
-		return genesisState, genDoc, sdk.ErrUnknownRequest(
+	if !tmos.FileExists(genFile) {
+		return genesisState, genDoc, errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("%s does not exist, run `init` first", genFile))
 	}
 
@@ -97,7 +97,7 @@ func ValidateGenesis(genesisState GenesisState) error {
 
 		// disallow any duplicate accounts
 		if _, ok := addrMap[addrStr]; ok {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("duplicate account found in genesis state; address: %s", addrStr))
 		}
 
@@ -112,11 +112,11 @@ func ValidateGenesis(genesisState GenesisState) error {
 
 		msgs := tx.GetMsgs()
 		if len(msgs) != 1 {
-			return sdk.ErrUnknownRequest("must provide genesis StdTx with exactly 1 CreateValidator message")
+			return errors.Wrap(errors.ErrInvalidRequest, "must provide genesis StdTx with exactly 1 CreateValidator message")
 		}
 
 		if _, ok := msgs[0].(validator.MsgCreateValidator); !ok {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("genesis transaction %v does not contain a MsgCreateValidator", i))
 		}
 	}

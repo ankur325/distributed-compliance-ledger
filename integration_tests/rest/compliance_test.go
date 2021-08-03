@@ -20,7 +20,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/rand"
 	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/utils"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
@@ -139,7 +139,7 @@ func TestComplianceDemo_KeepTrackRevocation(t *testing.T) {
 
 	// Revoke non-existent model
 	revocationTime := time.Now().UTC()
-	revokeModelMsg := compliance.NewMsgRevokeModel(common.RandUint16(), common.RandUint16(), revocationTime,
+	revokeModelMsg := compliance.NewMsgRevokeModel(rand.Uint16(), rand.Uint16(), revocationTime,
 		compliance.CertificationType(testconstants.CertificationType), testconstants.RevocationReason, zb.Address)
 	_, _ = utils.PublishRevokedModel(revokeModelMsg, zb)
 

@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/internal/types"
 )
 
@@ -75,38 +76,38 @@ func ValidateGenesis(data GenesisState) error {
 
 func validateProposedCertificate(record types.ProposedCertificate) error {
 	if len(record.PemCert) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Empty X509 Certificate. Value: %v", record))
 	}
 
 	if len(record.Subject) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Empty Subject. Value: %v", record))
 	}
 
 	if len(record.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Empty SubjectKeyID. Value: %v", record))
 	}
 
 	if len(record.SerialNumber) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Empty SerialNumber. Value: %v", record))
 	}
 
 	if record.Owner.Empty() {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Empty Owner. Value: %v", record))
 	}
 
 	if record.Approvals == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificate: Approvals is nil. Value: %v", record))
 	}
 
 	for _, approval := range record.Approvals {
 		if approval.Empty() {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid ProposedCertificate: Empty Approval. Value: %v", record))
 		}
 	}
@@ -116,55 +117,55 @@ func validateProposedCertificate(record types.ProposedCertificate) error {
 
 func validateCertificates(record types.Certificates) error {
 	if len(record.Items) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Certificates: Empty Items. Value: %v", record))
 	}
 
 	for _, certificate := range record.Items {
 		if len(certificate.PemCert) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid Certificate: Empty PemCert. Value: %v", certificate))
 		}
 
 		if len(certificate.Subject) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid Certificate: Empty Subject. Value: %v", certificate))
 		}
 
 		if len(certificate.SubjectKeyID) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid Certificate: Empty SubjectKeyID. Value: %v", certificate))
 		}
 
 		if len(certificate.SerialNumber) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid Certificate: Empty SerialNumber. Value: %v", certificate))
 		}
 
 		if !certificate.IsRoot {
 			if len(certificate.Issuer) == 0 {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Invalid Certificate: Empty Issuer. Value: %v", certificate))
 			}
 
 			if len(certificate.AuthorityKeyID) == 0 {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Invalid Certificate: Empty AuthorityKeyID. Value: %v", certificate))
 			}
 
 			if len(certificate.RootSubject) == 0 {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Invalid Certificate: Empty RootSubject. Value: %v", certificate))
 			}
 
 			if len(certificate.RootSubjectKeyID) == 0 {
-				return sdk.ErrUnknownRequest(
+				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Invalid Certificate: Empty RootSubjectKeyID. Value: %v", certificate))
 			}
 		}
 
 		if certificate.Owner.Empty() {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid Certificate: Empty Owner. Value: %v", certificate))
 		}
 	}
@@ -174,23 +175,23 @@ func validateCertificates(record types.Certificates) error {
 
 func validateProposedCertificateRevocation(record types.ProposedCertificateRevocation) error {
 	if len(record.Subject) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificateRevocation: Empty Subject. Value: %v", record))
 	}
 
 	if len(record.SubjectKeyID) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificateRevocation: Empty SubjectKeyID. Value: %v", record))
 	}
 
 	if record.Approvals == nil {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ProposedCertificateRevocation: Approvals is nil. Value: %v", record))
 	}
 
 	for _, approval := range record.Approvals {
 		if approval.Empty() {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid ProposedCertificateRevocation: Empty Approval. Value: %v", record))
 		}
 	}
@@ -200,28 +201,28 @@ func validateProposedCertificateRevocation(record types.ProposedCertificateRevoc
 
 func validateChildCertificates(record types.ChildCertificates) error {
 	if len(record.Issuer) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ChildCertificates: Empty Issuer. Value: %v", record))
 	}
 
 	if len(record.AuthorityKeyID) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ChildCertificates: Empty AuthorityKeyID. Value: %v", record))
 	}
 
 	if len(record.CertIdentifiers) == 0 {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid ChildCertificates: Empty CertIdentifiers. Value: %v", record))
 	}
 
 	for _, certIdentifier := range record.CertIdentifiers {
 		if len(certIdentifier.Subject) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid ChildCertificates: Empty CertIdentifier.Subject. Value: %v", record))
 		}
 
 		if len(certIdentifier.SubjectKeyID) == 0 {
-			return sdk.ErrUnknownRequest(
+			return errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Invalid ChildCertificates: Empty CertIdentifier.SubjectKeyID. Value: %v", record))
 		}
 	}

@@ -19,6 +19,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const RouterKey = ModuleName
@@ -52,25 +53,25 @@ func (m MsgCertifyModel) Type() string {
 	return "certify_model"
 }
 
-func (m MsgCertifyModel) ValidateBasic() sdk.Error {
+func (m MsgCertifyModel) ValidateBasic() error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.ErrInvalidAddress //.ErrInvalidAddress("Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if m.CertificationDate.IsZero() {
-		return sdk.ErrUnknownRequest("Invalid CertificationDate: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid CertificationDate: it cannot be empty")
 	}
 
 	if m.CertificationType != ZbCertificationType {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid CertificationType: \"%s\". Supported types: [%s]", m.CertificationType, ZbCertificationType))
 	}
 
@@ -114,25 +115,25 @@ func (m MsgRevokeModel) Type() string {
 	return "revoke_model"
 }
 
-func (m MsgRevokeModel) ValidateBasic() sdk.Error {
+func (m MsgRevokeModel) ValidateBasic() error {
 	if m.Signer.Empty() {
-		return sdk.ErrInvalidAddress("Invalid Signer: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
 
 	if m.VID == 0 {
-		return sdk.ErrUnknownRequest("Invalid VID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid VID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if m.PID == 0 {
-		return sdk.ErrUnknownRequest("Invalid PID: it must be non zero 16-bit unsigned integer")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid PID: it must be non zero 16-bit unsigned integer")
 	}
 
 	if m.RevocationDate.IsZero() {
-		return sdk.ErrUnknownRequest("Invalid RevocationDate: it cannot be empty")
+		return errors.Wrap(errors.ErrInvalidRequest, "Invalid RevocationDate: it cannot be empty")
 	}
 
 	if m.CertificationType != ZbCertificationType {
-		return sdk.ErrUnknownRequest(
+		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid CertificationType: \"%s\". Supported types: [%s]", m.CertificationType, ZbCertificationType))
 	}
 

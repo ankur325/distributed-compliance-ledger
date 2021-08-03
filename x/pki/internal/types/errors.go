@@ -17,70 +17,68 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	Codespace sdk.CodespaceType = ModuleName
-
-	CodeProposedCertificateAlreadyExists           sdk.CodeType = 401
-	CodeProposedCertificateDoesNotExist            sdk.CodeType = 402
-	CodeCertificateAlreadyExists                   sdk.CodeType = 403
-	CodeCertificateDoesNotExist                    sdk.CodeType = 404
-	CodeProposedCertificateRevocationAlreadyExists sdk.CodeType = 405
-	CodeProposedCertificateRevocationDoesNotExist  sdk.CodeType = 406
-	CodeRevokedCertificateDoesNotExist             sdk.CodeType = 407
-	CodeInappropriateCertificateType               sdk.CodeType = 408
-	CodeInvalidCertificate                         sdk.CodeType = 409
+var (
+	CodeProposedCertificateAlreadyExists           = errors.Register(ModuleName, 401, "ProposedCertificateAlreadyExists")
+	CodeProposedCertificateDoesNotExist            = errors.Register(ModuleName, 402, "ProposedCertificateDoesNotExist")
+	CodeCertificateAlreadyExists                   = errors.Register(ModuleName, 403, "CertificateAlreadyExists")
+	CodeCertificateDoesNotExist                    = errors.Register(ModuleName, 404, "CertificateDoesNotExist")
+	CodeProposedCertificateRevocationAlreadyExists = errors.Register(ModuleName, 405, "ProposedCertificateRevocationAlreadyExists")
+	CodeProposedCertificateRevocationDoesNotExist  = errors.Register(ModuleName, 406, "ProposedCertificateRevocationDoesNotExist ")
+	CodeRevokedCertificateDoesNotExist             = errors.Register(ModuleName, 407, "RevokedCertificateDoesNotExist")
+	CodeInappropriateCertificateType               = errors.Register(ModuleName, 408, "InappropriateCertificateType")
+	CodeInvalidCertificate                         = errors.Register(ModuleName, 409, "InvalidCertificate")
 )
 
-func ErrProposedCertificateAlreadyExists(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeProposedCertificateAlreadyExists,
+func ErrProposedCertificateAlreadyExists(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeProposedCertificateAlreadyExists,
 		fmt.Sprintf("Proposed X509 root certificate associated with the combination "+
 			"of subject=%v and subjectKeyID=%v already exists on the ledger", subject, subjectKeyID))
 }
 
-func ErrProposedCertificateDoesNotExist(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeProposedCertificateDoesNotExist,
+func ErrProposedCertificateDoesNotExist(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeProposedCertificateDoesNotExist,
 		fmt.Sprintf("No proposed X509 root certificate associated "+
 			"with the combination of subject=%v and subjectKeyID=%v on the ledger. "+
 			"The cerificate either does not exists or already approved.", subject, subjectKeyID))
 }
 
-func ErrCertificateAlreadyExists(issuer string, serialNumber string) sdk.Error {
-	return sdk.NewError(Codespace, CodeCertificateAlreadyExists,
+func ErrCertificateAlreadyExists(issuer string, serialNumber string) error {
+	return errors.Wrap(CodeCertificateAlreadyExists,
 		fmt.Sprintf("X509 certificate associated with the combination of "+
 			"issuer=%v and serialNumber=%v already exists on the ledger", issuer, serialNumber))
 }
 
-func ErrCertificateDoesNotExist(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeCertificateDoesNotExist,
+func ErrCertificateDoesNotExist(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeCertificateDoesNotExist,
 		fmt.Sprintf("No X509 certificate associated with the "+
 			"combination of subject=%v and subjectKeyID=%v on the ledger", subject, subjectKeyID))
 }
 
-func ErrProposedCertificateRevocationAlreadyExists(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeProposedCertificateRevocationAlreadyExists,
+func ErrProposedCertificateRevocationAlreadyExists(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeProposedCertificateRevocationAlreadyExists,
 		fmt.Sprintf("Proposed X509 root certificate revocation associated with the combination "+
 			"of subject=%v and subjectKeyID=%v already exists on the ledger", subject, subjectKeyID))
 }
 
-func ErrProposedCertificateRevocationDoesNotExist(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeProposedCertificateRevocationDoesNotExist,
+func ErrProposedCertificateRevocationDoesNotExist(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeProposedCertificateRevocationDoesNotExist,
 		fmt.Sprintf("No proposed X509 root certificate revocation associated "+
 			"with the combination of subject=%v and subjectKeyID=%v on the ledger.", subject, subjectKeyID))
 }
 
-func ErrRevokedCertificateDoesNotExist(subject string, subjectKeyID string) sdk.Error {
-	return sdk.NewError(Codespace, CodeRevokedCertificateDoesNotExist,
+func ErrRevokedCertificateDoesNotExist(subject string, subjectKeyID string) error {
+	return errors.Wrap(CodeRevokedCertificateDoesNotExist,
 		fmt.Sprintf("No revoked X509 certificate associated with the "+
 			"combination of subject=%v and subjectKeyID=%v on the ledger", subject, subjectKeyID))
 }
 
-func ErrInappropriateCertificateType(error interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeInappropriateCertificateType, fmt.Sprintf("%v", error))
+func ErrInappropriateCertificateType(error interface{}) error {
+	return errors.Wrap(CodeInappropriateCertificateType, fmt.Sprintf("%v", error))
 }
 
-func ErrCodeInvalidCertificate(error interface{}) sdk.Error {
-	return sdk.NewError(Codespace, CodeInvalidCertificate, fmt.Sprintf("%v", error))
+func ErrCodeInvalidCertificate(error interface{}) error {
+	return errors.Wrap(CodeInvalidCertificate, fmt.Sprintf("%v", error))
 }
