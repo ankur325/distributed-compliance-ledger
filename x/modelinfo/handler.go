@@ -25,7 +25,7 @@ import (
 )
 
 func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case types.MsgAddModelInfo:
 			return handleMsgAddModelInfo(ctx, keeper, authKeeper, msg)
@@ -36,21 +36,21 @@ func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
 
 func handleMsgAddModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper,
-	msg types.MsgAddModelInfo) sdk.Result {
+	msg types.MsgAddModelInfo) (*sdk.Result, error) {
 	// check if model already exists
 	if keeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return types.ErrModelInfoAlreadyExists(msg.VID, msg.PID).Result()
+		return nil, types.ErrModelInfoAlreadyExists(msg.VID, msg.PID)
 	}
 
 	// check sender has enough rights to add model
-	if err := checkAddModelRights(ctx, authKeeper, msg.Signer); err != nil {
-		return err.Result()
+	if _, err := checkAddModelRights(ctx, authKeeper, msg.Signer); err != nil {
+		return nil, err
 	}
 
 	modelInfo := types.NewModelInfo(
@@ -74,25 +74,25 @@ func handleMsgAddModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper aut
 	// store new model
 	keeper.SetModelInfo(ctx, modelInfo)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper,
-	msg types.MsgUpdateModelInfo) sdk.Result {
+	msg types.MsgUpdateModelInfo) (*sdk.Result, error) {
 	// check if model exists
 	if !keeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID).Result()
+		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	modelInfo := keeper.GetModelInfo(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to update model
 	if err := checkUpdateModelRights(modelInfo.Owner, msg.Signer); err != nil {
-		return err.Result()
+		return err
 	}
 
 	if msg.OtaURL != "" && modelInfo.OtaURL == "" {
-		return types.ErrOtaURLCannotBeSet(msg.VID, msg.PID).Result()
+		return types.ErrOtaURLCannotBeSet(msg.VID, msg.PID)
 	}
 
 	// updates existing model value only if corresponding value in MsgUpdate is not empty
@@ -123,26 +123,26 @@ func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 
 //nolint:unused,deadcode
 func handleMsgDeleteModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper,
-	msg types.MsgDeleteModelInfo) sdk.Result {
+	msg types.MsgDeleteModelInfo) (*sdk.Result, error) {
 	// check if model exists
 	if !keeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID).Result()
+		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	modelInfo := keeper.GetModelInfo(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to delete model
 	if err := checkUpdateModelRights(modelInfo.Owner, msg.Signer); err != nil {
-		return err.Result()
+		return err
 	}
 
 	// remove model from the store
 	keeper.DeleteModelInfo(ctx, msg.VID, msg.PID)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
-func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress) sdk.Error {
+func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress) error {
 	// sender must have Vendor role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.Vendor) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelInfo transaction should be "+
@@ -152,7 +152,7 @@ func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.Acc
 	return nil
 }
 
-func checkUpdateModelRights(owner sdk.AccAddress, signer sdk.AccAddress) sdk.Error {
+func checkUpdateModelRights(owner sdk.AccAddress, signer sdk.AccAddress) error {
 	// sender must be equal to owner to edit model
 	if !signer.Equals(owner) {
 		return sdk.ErrUnauthorized("MsgUpdateModelInfo tx should be signed by owner")
