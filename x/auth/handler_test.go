@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -38,8 +39,8 @@ func TestHandler_CreateAccount_OneApprovalIsNeeded(t *testing.T) {
 		require.Equal(t, 1, AccountApprovalsCount(setup.Ctx, setup.Keeper))
 
 		// propose account
-		result, address, pubkey := proposeAddAccount(setup, trustee)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		_, address, pubkey, err := proposeAddAccount(setup, trustee)
+		require.NoError(t, err)
 
 		// ensure active account created
 		account := setup.Keeper.GetAccount(setup.Ctx, address)
@@ -63,10 +64,9 @@ func TestHandler_CreateAccount_TwoApprovalsAreNeeded(t *testing.T) {
 	require.Equal(t, 2, AccountApprovalsCount(setup.Ctx, setup.Keeper))
 
 	// trustee1 propose account
-	result, address, pubkey := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, pubkey, err := proposeAddAccount(setup, trustee1)
 	require.NoError(t, err)
-		require.NotNil(t, res)
+	require.NotNil(t, result)
 
 	// ensure pending account created
 	pendingAccount := setup.Keeper.GetPendingAccount(setup.Ctx, address)
@@ -78,8 +78,9 @@ func TestHandler_CreateAccount_TwoApprovalsAreNeeded(t *testing.T) {
 
 	// trustee2 approves account
 	approveAddAccount := types.NewMsgApproveAddAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveAddAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// active account must be created
 	account := setup.Keeper.GetAccount(setup.Ctx, address)
@@ -103,8 +104,9 @@ func TestHandler_CreateAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 	require.Equal(t, 3, AccountApprovalsCount(setup.Ctx, setup.Keeper))
 
 	// trustee1 propose account
-	result, address, pubkey := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, pubkey, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account created
 	pendingAccount := setup.Keeper.GetPendingAccount(setup.Ctx, address)
@@ -116,8 +118,9 @@ func TestHandler_CreateAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 
 	// trustee2 approves account
 	approveAddAccount := types.NewMsgApproveAddAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveAddAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure second approval added to pending account
 	pendingAccount = setup.Keeper.GetPendingAccount(setup.Ctx, address)
@@ -129,8 +132,9 @@ func TestHandler_CreateAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 
 	// trustee3 approves account
 	approveAddAccount = types.NewMsgApproveAddAccount(address, trustee3)
-	result = setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveAddAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// active account must be created
 	account := setup.Keeper.GetAccount(setup.Ctx, address)
@@ -149,8 +153,8 @@ func TestHandler_ProposeAddAccount_ByNotTrustee(t *testing.T) {
 		signer := storeAccount(setup, role)
 
 		// propose new account
-		result, _, _ := proposeAddAccount(setup, signer)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, _, _, err := proposeAddAccount(setup, signer)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -162,8 +166,9 @@ func TestHandler_ProposeAddAccount_ForExistingActiveAccount(t *testing.T) {
 	trustee2 := storeTrustee(setup)
 
 	// propose account
-	result, address, pubkey := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, pubkey, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure active account created
 	require.True(t, setup.Keeper.IsAccountPresent(setup.Ctx, address))
@@ -175,8 +180,8 @@ func TestHandler_ProposeAddAccount_ForExistingActiveAccount(t *testing.T) {
 		types.AccountRoles{types.Vendor},
 		trustee2,
 	)
-	result = setup.Handler(setup.Ctx, proposeAddAccount)
-	require.Equal(t, types.CodeAccountAlreadyExists, result.Code)
+	result, err = setup.Handler(setup.Ctx, proposeAddAccount)
+	require.Equal(t, types.CodeAccountAlreadyExists, err)
 }
 
 func TestHandler_ProposeAddAccount_ForExistingPendingAccount(t *testing.T) {
@@ -188,8 +193,9 @@ func TestHandler_ProposeAddAccount_ForExistingPendingAccount(t *testing.T) {
 	_ = storeTrustee(setup)
 
 	// trustee1 proposes account
-	result, address, pubkey := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, pubkey, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account created
 	require.True(t, setup.Keeper.IsPendingAccountPresent(setup.Ctx, address))
@@ -201,8 +207,8 @@ func TestHandler_ProposeAddAccount_ForExistingPendingAccount(t *testing.T) {
 		types.AccountRoles{types.Vendor},
 		trustee2,
 	)
-	result = setup.Handler(setup.Ctx, proposeAddAccount)
-	require.Equal(t, types.CodePendingAccountAlreadyExists, result.Code)
+	result, err = setup.Handler(setup.Ctx, proposeAddAccount)
+	require.Equal(t, types.CodePendingAccountAlreadyExists, err)
 }
 
 func TestHandler_ApproveAddAccount_ByNotTrustee(t *testing.T) {
@@ -214,8 +220,9 @@ func TestHandler_ApproveAddAccount_ByNotTrustee(t *testing.T) {
 	_ = storeTrustee(setup)
 
 	// propose account
-	result, address, _ := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, _, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account created
 	require.True(t, setup.Keeper.IsPendingAccountPresent(setup.Ctx, address))
@@ -226,8 +233,8 @@ func TestHandler_ApproveAddAccount_ByNotTrustee(t *testing.T) {
 
 		// try to approve account
 		approveAddAccount := types.NewMsgApproveAddAccount(address, signer)
-		result := setup.Handler(setup.Ctx, approveAddAccount)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, approveAddAccount)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -239,16 +246,17 @@ func TestHandler_ApproveAddAccount_ForExistingActiveAccount(t *testing.T) {
 	trustee2 := storeTrustee(setup)
 
 	// propose account
-	result, address, _ := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, _, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure active account created
 	require.True(t, setup.Keeper.IsAccountPresent(setup.Ctx, address))
 
 	// try to approve active account
 	approveAddAccount := types.NewMsgApproveAddAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, types.CodePendingAccountDoesNotExist, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveAddAccount)
+	require.Equal(t, types.CodePendingAccountDoesNotExist, err)
 }
 
 func TestHandler_ApproveAddAccount_ForUnknownAccount(t *testing.T) {
@@ -259,8 +267,8 @@ func TestHandler_ApproveAddAccount_ForUnknownAccount(t *testing.T) {
 
 	// approve unknown account
 	approveAddAccount := types.NewMsgApproveAddAccount(testconstants.Address1, trustee)
-	result := setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, types.CodePendingAccountDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, approveAddAccount)
+	require.Equal(t, types.CodePendingAccountDoesNotExist, err)
 }
 
 func TestHandler_ApproveAddAccount_ForDuplicateApproval(t *testing.T) {
@@ -272,16 +280,17 @@ func TestHandler_ApproveAddAccount_ForDuplicateApproval(t *testing.T) {
 	_ = storeTrustee(setup)
 
 	// propose account
-	result, address, _ := proposeAddAccount(setup, trustee1)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, address, _, err := proposeAddAccount(setup, trustee1)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account created
 	require.True(t, setup.Keeper.IsPendingAccountPresent(setup.Ctx, address))
 
 	// the same trustee tries to approve the account
 	approveAddAccount := types.NewMsgApproveAddAccount(address, trustee1)
-	result = setup.Handler(setup.Ctx, approveAddAccount)
-	require.Equal(t, sdk.CodeUnauthorized, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveAddAccount)
+	require.Equal(t, errors.ErrUnauthorized, err)
 }
 
 func TestHandler_RevokeAccount_OneApprovalIsNeeded(t *testing.T) {
@@ -301,8 +310,9 @@ func TestHandler_RevokeAccount_OneApprovalIsNeeded(t *testing.T) {
 
 		// propose to revoke account
 		proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee)
-		result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 
 		// ensure active account removed
 		require.False(t, setup.Keeper.IsAccountPresent(setup.Ctx, address))
@@ -328,8 +338,9 @@ func TestHandler_RevokeAccount_TwoApprovalsAreNeeded(t *testing.T) {
 
 	// trustee1 proposes to revoke account
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee1)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account revocation created
 	revocation := setup.Keeper.GetPendingAccountRevocation(setup.Ctx, address)
@@ -341,8 +352,9 @@ func TestHandler_RevokeAccount_TwoApprovalsAreNeeded(t *testing.T) {
 
 	// trustee2 approves account revocation
 	approveRevokeAccount := types.NewMsgApproveRevokeAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// active account must be removed
 	require.False(t, setup.Keeper.IsAccountPresent(setup.Ctx, address))
@@ -368,8 +380,9 @@ func TestHandler_RevokeAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 
 	// trustee1 proposes to revoke account
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee1)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account revocation created
 	revocation := setup.Keeper.GetPendingAccountRevocation(setup.Ctx, address)
@@ -381,8 +394,9 @@ func TestHandler_RevokeAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 
 	// trustee2 approves account revocation
 	approveRevokeAccount := types.NewMsgApproveRevokeAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure second approval added to pending account revocation
 	revocation = setup.Keeper.GetPendingAccountRevocation(setup.Ctx, address)
@@ -394,8 +408,9 @@ func TestHandler_RevokeAccount_ThreeApprovalsAreNeeded(t *testing.T) {
 
 	// trustee3 approves account revocation
 	approveRevokeAccount = types.NewMsgApproveRevokeAccount(address, trustee3)
-	result = setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// active account must be removed
 	require.False(t, setup.Keeper.IsAccountPresent(setup.Ctx, address))
@@ -416,8 +431,8 @@ func TestHandler_ProposeRevokeAccount_ByNotTrustee(t *testing.T) {
 
 		// propose new account
 		proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, signer)
-		result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -429,8 +444,8 @@ func TestHandler_ProposeRevokeAccount_ForUnknownAccount(t *testing.T) {
 
 	// propose to revoke unknown account
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(testconstants.Address1, trustee)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, types.CodeAccountDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.Equal(t, types.CodeAccountDoesNotExist, err)
 }
 
 func TestHandler_ProposeRevokeAccount_ForExistingPendingAccountRevocation(t *testing.T) {
@@ -446,16 +461,17 @@ func TestHandler_ProposeRevokeAccount_ForExistingPendingAccountRevocation(t *tes
 
 	// trustee1 proposes to revoke account
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee1)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account revocation created
 	require.True(t, setup.Keeper.IsPendingAccountRevocationPresent(setup.Ctx, address))
 
 	// trustee2 proposes to revoke the same account
 	proposeRevokeAccount = types.NewMsgProposeRevokeAccount(address, trustee2)
-	result = setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, types.CodePendingAccountRevocationAlreadyExists, result.Code)
+	result, err = setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.Equal(t, types.CodePendingAccountRevocationAlreadyExists, err)
 }
 
 func TestHandler_ApproveRevokeAccount_ByNotTrustee(t *testing.T) {
@@ -471,8 +487,9 @@ func TestHandler_ApproveRevokeAccount_ByNotTrustee(t *testing.T) {
 
 	// trustee1 proposes to revoke account
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee1)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account revocation created
 	require.True(t, setup.Keeper.IsPendingAccountRevocationPresent(setup.Ctx, address))
@@ -483,8 +500,8 @@ func TestHandler_ApproveRevokeAccount_ByNotTrustee(t *testing.T) {
 
 		// try to approve account
 		approveRevokeAccount := types.NewMsgApproveRevokeAccount(address, signer)
-		result := setup.Handler(setup.Ctx, approveRevokeAccount)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, approveRevokeAccount)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -499,8 +516,8 @@ func TestHandler_ApproveRevokeAccount_ForAbsentPendingAccountRevocation(t *testi
 
 	// approve absent revocation of active account
 	approveRevokeAccount := types.NewMsgApproveRevokeAccount(address, trustee)
-	result := setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, types.CodePendingAccountRevocationDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.Equal(t, types.CodePendingAccountRevocationDoesNotExist, err)
 }
 
 func TestHandler_ApproveRevokeAccount_ForUnknownAccount(t *testing.T) {
@@ -511,8 +528,8 @@ func TestHandler_ApproveRevokeAccount_ForUnknownAccount(t *testing.T) {
 
 	// approve absent revocation of unknown account
 	approveRevokeAccount := types.NewMsgApproveRevokeAccount(testconstants.Address1, trustee)
-	result := setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, types.CodePendingAccountRevocationDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.Equal(t, types.CodePendingAccountRevocationDoesNotExist, err)
 }
 
 func TestHandler_ApproveRevokeAccount_ForDuplicateApproval(t *testing.T) {
@@ -528,16 +545,17 @@ func TestHandler_ApproveRevokeAccount_ForDuplicateApproval(t *testing.T) {
 
 	// propose account revocation
 	proposeRevokeAccount := types.NewMsgProposeRevokeAccount(address, trustee1)
-	result := setup.Handler(setup.Ctx, proposeRevokeAccount)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, proposeRevokeAccount)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// ensure pending account revocation created
 	require.True(t, setup.Keeper.IsPendingAccountRevocationPresent(setup.Ctx, address))
 
 	// the same trustee tries to approve the account revocation
 	approveRevokeAccount := types.NewMsgApproveRevokeAccount(address, trustee1)
-	result = setup.Handler(setup.Ctx, approveRevokeAccount)
-	require.Equal(t, sdk.CodeUnauthorized, result.Code)
+	result, err = setup.Handler(setup.Ctx, approveRevokeAccount)
+	require.Equal(t, errors.ErrUnauthorized, err)
 }
 
 func storeTrustee(setup TestSetup) sdk.AccAddress {
@@ -553,7 +571,7 @@ func storeAccount(setup TestSetup, role types.AccountRole) sdk.AccAddress {
 	return address
 }
 
-func proposeAddAccount(setup TestSetup, signer sdk.AccAddress) (sdk.Result, sdk.AccAddress, crypto.PubKey, err error) {
+func proposeAddAccount(setup TestSetup, signer sdk.AccAddress) (*sdk.Result, sdk.AccAddress, crypto.PubKey, error) {
 	address, pubkey, pubkeyStr := testconstants.TestAddress()
 	proposeAddAccount := types.NewMsgProposeAddAccount(
 		address,

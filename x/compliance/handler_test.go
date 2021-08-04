@@ -21,6 +21,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	constants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -40,8 +41,9 @@ func TestHandler_CertifyModel(t *testing.T) {
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query certified model
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, vid, pid)
@@ -72,8 +74,8 @@ func TestHandler_CertifyModelByDifferentRoles(t *testing.T) {
 
 		// try to certify model
 		certifyModelMsg := msgCertifyModel(address, vid, pid)
-		result := setup.Handler(setup.Ctx, certifyModelMsg)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, certifyModelMsg)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -82,7 +84,7 @@ func TestHandler_CertifyModelForUnknownModel(t *testing.T) {
 
 	// try to certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, constants.VID, constants.PID)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
 	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, result.Code)
 }
 
@@ -94,7 +96,7 @@ func TestHandler_CertifyModelForModelWithoutTestingResults(t *testing.T) {
 
 	// try to certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
 	require.Equal(t, compliancetest.CodeTestingResultDoesNotExist, result.Code)
 }
 
@@ -107,14 +109,16 @@ func TestHandler_CertifyModelTwice(t *testing.T) {
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// certify model second time
 	secondCertifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	secondCertifyModelMsg.CertificationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, secondCertifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code) // result is OK, BUT CertificationDate must be from the first message
+	require.NoError(t, err)
+	require.NotNil(t, result) // result is OK, BUT CertificationDate must be from the first message
 
 	// check
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, vid, pid)
@@ -131,8 +135,9 @@ func TestHandler_CertifyDifferentModels(t *testing.T) {
 
 		// add new testing result
 		certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-		result := setup.Handler(setup.Ctx, certifyModelMsg)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 
 		// query certified model
 		receivedModel, _ := queryComplianceInfo(setup, vid, pid)
@@ -152,7 +157,7 @@ func TestHandler_CertifyModelForEmptyCertificationType(t *testing.T) {
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	certifyModelMsg.CertificationType = ""
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
 	require.Equal(t, sdk.CodeUnknownRequest, result.Code)
 }
 
@@ -166,7 +171,7 @@ func TestHandler_CertifyModelForNotZbCertificationType(t *testing.T) {
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	certifyModelMsg.CertificationType = "Other"
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
 	require.Equal(t, sdk.CodeUnknownRequest, result.Code)
 }
 
@@ -179,8 +184,9 @@ func TestHandler_RevokeModel(t *testing.T) {
 
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, revokedModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query revoked model
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, revokedModelMsg.VID, revokedModelMsg.PID)
@@ -201,14 +207,16 @@ func TestHandler_RevokeCertifiedModel(t *testing.T) {
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
 	revokedModelMsg.RevocationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query revoked model
 	revokedModel, _ := queryComplianceInfo(setup, vid, pid)
@@ -242,7 +250,7 @@ func TestHandler_RevokeModelByDifferentRoles(t *testing.T) {
 
 		// try to certify model
 		revokeModelMsg := msgRevokedModel(address, constants.VID, constants.PID)
-		result := setup.Handler(setup.Ctx, revokeModelMsg)
+		result, err := setup.Handler(setup.Ctx, revokeModelMsg)
 		require.Equal(t, sdk.CodeUnauthorized, result.Code)
 	}
 }
@@ -256,14 +264,16 @@ func TestHandler_RevokeModelTwice(t *testing.T) {
 
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, revokedModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// certify model second time
 	secondRevokeModelMsg := msgRevokedModel(setup.CertificationCenter, revokedModelMsg.VID, revokedModelMsg.PID)
 	secondRevokeModelMsg.RevocationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, secondRevokeModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code) // result is OK, BUT RevocationDate must be from the first message
+	require.NoError(t, err)
+	require.NotNil(t, result) // result is OK, BUT RevocationDate must be from the first message
 
 	// check
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, secondRevokeModelMsg.VID, secondRevokeModelMsg.PID)
@@ -280,8 +290,9 @@ func TestHandler_RevokeDifferentModels(t *testing.T) {
 	for i := uint16(1); i < uint16(5); i++ {
 		// revoke model
 		revokedModelMsg := msgRevokedModel(setup.CertificationCenter, constants.VID, constants.PID)
-		result := setup.Handler(setup.Ctx, revokedModelMsg)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		result, err := setup.Handler(setup.Ctx, revokedModelMsg)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 
 		// query certified model
 		receivedModel, _ := queryComplianceInfo(setup, revokedModelMsg.VID, revokedModelMsg.PID)
@@ -304,8 +315,9 @@ func TestHandler_RevokeCertifiedModelForRevocationDateBeforeCertificationDate(t 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	certifyModelMsg.CertificationDate = certificationDate
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
@@ -327,8 +339,9 @@ func TestHandler_CertifyRevokedModelForCertificationDateBeforeRevocationDate(t *
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
 	revokedModelMsg.RevocationDate = revocationDate
-	result := setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, revokedModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
@@ -346,14 +359,16 @@ func TestHandler_CertifyRevokedModel(t *testing.T) {
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// revoke model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, vid, pid)
 	revokedModelMsg.RevocationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query revoked model
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, vid, pid)
@@ -364,7 +379,8 @@ func TestHandler_CertifyRevokedModel(t *testing.T) {
 	secondCertifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	secondCertifyModelMsg.CertificationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, secondCertifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query certified model
 	receivedComplianceInfo, _ = queryComplianceInfo(setup, vid, pid)
@@ -390,7 +406,7 @@ func TestHandler_CertifyRevokedModelForTrackRevocationStrategy(t *testing.T) {
 	// revoke non-existent model
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, constants.VID, constants.PID)
 	revokedModelMsg.RevocationDate = time.Now().UTC()
-	result := setup.Handler(setup.Ctx, revokedModelMsg)
+	result, err := setup.Handler(setup.Ctx, revokedModelMsg)
 	require.Equal(t, types.CodeModelInfoDoesNotExist, result.Code)
 
 	// add model
@@ -400,7 +416,8 @@ func TestHandler_CertifyRevokedModelForTrackRevocationStrategy(t *testing.T) {
 	revokedModelMsg = msgRevokedModel(setup.CertificationCenter, vid, pid)
 	revokedModelMsg.RevocationDate = time.Now().UTC()
 	result = setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query certified model
 	receivedComplianceInfo, _ := queryComplianceInfo(setup, vid, pid)
@@ -410,7 +427,8 @@ func TestHandler_CertifyRevokedModelForTrackRevocationStrategy(t *testing.T) {
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
 	certifyModelMsg.CertificationDate = revokedModelMsg.RevocationDate.AddDate(0, 0, 1)
 	result = setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 }
 
 func TestHandler_CheckZbCertificationDone(t *testing.T) {
@@ -422,8 +440,9 @@ func TestHandler_CheckZbCertificationDone(t *testing.T) {
 
 	// certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, vid, pid)
-	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// create other account certification center
 	account := auth.NewAccount(constants.Address3, constants.PubKey3, auth.AccountRoles{auth.ZBCertificationCenter})

@@ -25,7 +25,7 @@ import (
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case types.MsgProposeAddAccount:
 			return handleMsgProposeAddAccount(ctx, keeper, msg)
@@ -38,33 +38,33 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized auth Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
 
-func handleMsgProposeAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgProposeAddAccount) sdk.Result {
+func handleMsgProposeAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgProposeAddAccount) (*sdk.Result, error) {
 	// check if sender has enough rights to propose account.
 	if !keeper.HasRole(ctx, msg.Signer, types.Trustee) {
-		return sdk.ErrUnauthorized(
+		return nil, errors.Wrap(errors.ErrUnauthorized,
 			fmt.Sprintf("MsgProposeAddAccount transaction should be signed by an account with the %s role",
-				types.Trustee)).Result()
+				types.Trustee))
 	}
 
 	// check if active account already exists.
 	if keeper.IsAccountPresent(ctx, msg.Address) {
-		return types.ErrAccountAlreadyExists(msg.Address).Result()
+		return nil, types.ErrAccountAlreadyExists(msg.Address)
 	}
 
 	// check if pending account already exists.
 	if keeper.IsPendingAccountPresent(ctx, msg.Address) {
-		return types.ErrPendingAccountAlreadyExists(msg.Address).Result()
+		return nil, types.ErrPendingAccountAlreadyExists(msg.Address)
 	}
 
 	// parse the key.
 	pubKey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, msg.PublicKey)
 	if err != nil {
-		return sdk.ErrInvalidPubKey(err.Error()).Result()
+		return nil, errors.Wrap(errors.ErrInvalidPubKey, err.Error())
 	}
 
 	// if more than 1 trustee's approval is needed, create pending account else create an active account.
@@ -79,19 +79,19 @@ func handleMsgProposeAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types
 		keeper.SetAccount(ctx, account)
 	}
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
-func handleMsgApproveAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgApproveAddAccount) sdk.Result {
+func handleMsgApproveAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgApproveAddAccount) (*sdk.Result, error) {
 	// check if sender has enough rights to approve account
 	if !keeper.HasRole(ctx, msg.Signer, Trustee) {
-		return sdk.ErrUnauthorized(
-			fmt.Sprintf("MsgApproveAddAccount transaction should be signed by an account with the %s role", Trustee)).Result()
+		return nil, errors.Wrap(errors.ErrUnauthorized,
+			fmt.Sprintf("MsgApproveAddAccount transaction should be signed by an account with the %s role", Trustee))
 	}
 
 	// check if pending account exists
 	if !keeper.IsPendingAccountPresent(ctx, msg.Address) {
-		return types.ErrPendingAccountDoesNotExist(msg.Address).Result()
+		return nil, types.ErrPendingAccountDoesNotExist(msg.Address)
 	}
 
 	// get pending account
@@ -99,9 +99,10 @@ func handleMsgApproveAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types
 
 	// check if pending account already has approval from signer
 	if pendAcc.HasApprovalFrom(msg.Signer) {
-		return sdk.ErrUnauthorized(
+		return nil, errors.Wrap(errors.ErrUnauthorized,
 			fmt.Sprintf("Pending account associated with the address=%v already has approval from=%v",
-				msg.Address, msg.Signer)).Result()
+				msg.Address, msg.Signer))
+
 	}
 
 	// append approval
@@ -121,26 +122,26 @@ func handleMsgApproveAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types
 		keeper.SetPendingAccount(ctx, pendAcc)
 	}
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func handleMsgProposeRevokeAccount(ctx sdk.Context, keeper keeper.Keeper,
-	msg types.MsgProposeRevokeAccount) sdk.Result {
+	msg types.MsgProposeRevokeAccount) (*sdk.Result, error) {
 	// check that sender has enough rights to propose account revocation
 	if !keeper.HasRole(ctx, msg.Signer, types.Trustee) {
-		return sdk.ErrUnauthorized(
+		return nil, errors.Wrap(errors.ErrUnauthorized,
 			fmt.Sprintf("MsgProposeRevokeAccount transaction should be signed by an account with the %s role",
-				types.Trustee)).Result()
+				types.Trustee))
 	}
 
 	// check that account exists
 	if !keeper.IsAccountPresent(ctx, msg.Address) {
-		return types.ErrAccountDoesNotExist(msg.Address).Result()
+		return nil, types.ErrAccountDoesNotExist(msg.Address)
 	}
 
 	// check that pending account revocation does not exist yet
 	if keeper.IsPendingAccountRevocationPresent(ctx, msg.Address) {
-		return types.ErrPendingAccountRevocationAlreadyExists(msg.Address).Result()
+		return nil, types.ErrPendingAccountRevocationAlreadyExists(msg.Address)
 	}
 
 	// if more than 1 trustee's approval is needed, create pending account revocation else delete the account.
@@ -153,21 +154,21 @@ func handleMsgProposeRevokeAccount(ctx sdk.Context, keeper keeper.Keeper,
 		keeper.DeleteAccount(ctx, msg.Address)
 	}
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func handleMsgApproveRevokeAccount(ctx sdk.Context, keeper keeper.Keeper,
-	msg types.MsgApproveRevokeAccount) sdk.Result {
+	msg types.MsgApproveRevokeAccount) (*sdk.Result, error) {
 	// check that sender has enough rights to approve account revocation
 	if !keeper.HasRole(ctx, msg.Signer, types.Trustee) {
-		return sdk.ErrUnauthorized(
+		return nil, errors.Wrap(errors.ErrUnauthorized,
 			fmt.Sprintf("MsgApproveRevokeAccount transaction should be signed by an account with the %s role",
-				types.Trustee)).Result()
+				types.Trustee))
 	}
 
 	// check that pending account revocation exists
 	if !keeper.IsPendingAccountRevocationPresent(ctx, msg.Address) {
-		return types.ErrPendingAccountRevocationDoesNotExist(msg.Address).Result()
+		return nil, types.ErrPendingAccountRevocationDoesNotExist(msg.Address)
 	}
 
 	// get pending account revocation
@@ -175,9 +176,9 @@ func handleMsgApproveRevokeAccount(ctx sdk.Context, keeper keeper.Keeper,
 
 	// check if pending account revocation already has approval from signer
 	if revoc.HasApprovalFrom(msg.Signer) {
-		return sdk.ErrUnauthorized(
+		return nil, errors.Wrap(errors.ErrUnauthorized,
 			fmt.Sprintf("Pending account revocation associated with the address=%v already has approval from=%v",
-				msg.Address, msg.Signer)).Result()
+				msg.Address, msg.Signer))
 	}
 
 	// append approval
@@ -195,7 +196,7 @@ func handleMsgApproveRevokeAccount(ctx sdk.Context, keeper keeper.Keeper,
 		keeper.SetPendingAccountRevocation(ctx, revoc)
 	}
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func AccountApprovalsCount(ctx sdk.Context, keeper keeper.Keeper) int {

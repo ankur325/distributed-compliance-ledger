@@ -20,10 +20,9 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
+	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
 )
 
@@ -55,7 +54,7 @@ func TestQuerier_QueryComplianceInfoForUnknownModel(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryCertifiedModel(t *testing.T) {
@@ -80,7 +79,7 @@ func TestQuerier_QueryCertifiedModelForUnknown(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryCertifiedModelForModelInRevokedState(t *testing.T) {
@@ -95,7 +94,7 @@ func TestQuerier_QueryCertifiedModelForModelInRevokedState(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryRevokedModel(t *testing.T) {
@@ -120,7 +119,7 @@ func TestQuerier_QueryRevokedModelForUnknown(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryRevokedModelForModelInRevokedState(t *testing.T) {
@@ -135,7 +134,7 @@ func TestQuerier_QueryRevokedModelForModelInRevokedState(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeComplianceInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryAllModels(t *testing.T) {
@@ -247,15 +246,15 @@ func TestQuerier_QueryAllModelsInStateWithPaginationHeaders(t *testing.T) {
 	}
 }
 
-func getComplianceInfo(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfo, sdk.Error) {
+func getComplianceInfo(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfo, error) {
 	return getSingle(setup, vid, pid, QueryComplianceInfo)
 }
 
-func getCertifiedModel(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfoInState, sdk.Error) {
+func getCertifiedModel(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfoInState, error) {
 	return getSingleInState(setup, vid, pid, QueryCertifiedModel)
 }
 
-func getRevokedModel(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfoInState, sdk.Error) {
+func getRevokedModel(setup TestSetup, vid uint16, pid uint16) (types.ComplianceInfoInState, error) {
 	return getSingleInState(setup, vid, pid, QueryRevokedModel)
 }
 
@@ -271,7 +270,7 @@ func getRevokedModels(setup TestSetup, params types.ListQueryParams) types.ListC
 	return getAllInState(setup, params, QueryAllRevokedModels)
 }
 
-func getSingle(setup TestSetup, vid uint16, pid uint16, state string) (types.ComplianceInfo, sdk.Error) {
+func getSingle(setup TestSetup, vid uint16, pid uint16, state string) (types.ComplianceInfo, error) {
 	result, err := setup.Querier(
 		setup.Ctx,
 		[]string{state, fmt.Sprintf("%v", vid), fmt.Sprintf("%v", pid), fmt.Sprintf("%v", types.ZbCertificationType)},
@@ -287,7 +286,7 @@ func getSingle(setup TestSetup, vid uint16, pid uint16, state string) (types.Com
 	return receivedComplianceInfo, nil
 }
 
-func getSingleInState(setup TestSetup, vid uint16, pid uint16, state string) (types.ComplianceInfoInState, sdk.Error) {
+func getSingleInState(setup TestSetup, vid uint16, pid uint16, state string) (types.ComplianceInfoInState, error) {
 	result, err := setup.Querier(
 		setup.Ctx,
 		[]string{state, fmt.Sprintf("%v", vid), fmt.Sprintf("%v", pid), fmt.Sprintf("%v", types.ZbCertificationType)},

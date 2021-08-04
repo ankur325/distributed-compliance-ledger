@@ -80,7 +80,7 @@ func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) 
 
 		// signatures contains the sequence number, account number, and signatures.
 		signers := stdTx.GetSigners()
-		signatures := stdTx.GetSignatures()
+		signatures := stdTx.Signatures
 
 		isGenesis := ctx.BlockHeight() == 0
 
