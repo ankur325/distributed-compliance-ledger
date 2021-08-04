@@ -74,7 +74,7 @@ func TestQuerier_QueryModelForUnknown(t *testing.T) {
 	// check
 	require.Nil(t, result)
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeModelInfoDoesNotExist, err.Code())
+	require.Equal(t, types.CodeModelInfoDoesNotExist, err)
 }
 
 func TestQuerier_QueryAllModels(t *testing.T) {

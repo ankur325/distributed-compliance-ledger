@@ -84,7 +84,7 @@ func (m MsgAddModelInfo) Type() string {
 	return "add_model_info"
 }
 
-func (m MsgAddModelInfo) ValidateBasic() sdk.Error {
+func (m MsgAddModelInfo) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -177,7 +177,7 @@ func (m MsgUpdateModelInfo) Type() string {
 	return "update_model_info"
 }
 
-func (m MsgUpdateModelInfo) ValidateBasic() sdk.Error {
+func (m MsgUpdateModelInfo) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -223,7 +223,7 @@ func (m MsgDeleteModelInfo) Type() string {
 	return "delete_model_info"
 }
 
-func (m MsgDeleteModelInfo) ValidateBasic() sdk.Error {
+func (m MsgDeleteModelInfo) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
