@@ -61,7 +61,7 @@ func TestQuerier_QueryAccount_ForNotFound(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeAccountDoesNotExist, err.Code())
+	require.Equal(t, types.CodeAccountDoesNotExist, err)
 }
 
 func TestQuerier_QueryAllAccounts(t *testing.T) {

@@ -100,7 +100,7 @@ func PrepareFlagsForTxCreateValidator(
 	viper.Set(flags.FlagChainID, chainID)
 	viper.Set(FlagNodeID, nodeID)
 	viper.Set(FlagAddress, sdk.ConsAddress(valPubKey.Address()).String())
-	viper.Set(FlagPubKey, sdk.MustBech32ifyConsPub(valPubKey))
+	viper.Set(FlagPubKey, sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, valPubKey))
 	viper.Set(FlagName, config.Moniker)
 
 	if config.Moniker == "" {

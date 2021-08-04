@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
@@ -37,7 +38,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	complianceTxCmd.AddCommand(cli.SignedCommands(client.PostCommands(
+	complianceTxCmd.AddCommand(cli.SignedCommands(flags.PostCommands(
 		GetCmdCertifyModel(cdc),
 		GetCmdRevokeModel(cdc),
 	)...)...)

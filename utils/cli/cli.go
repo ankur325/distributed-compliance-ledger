@@ -20,11 +20,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/spf13/cobra"
@@ -59,7 +59,7 @@ func (n ReadResult) String() string {
 }
 
 type CliContext struct {
-	context client.CLIContext
+	context context.CLIContext
 }
 
 func NewCLIContext() CliContext {
@@ -68,7 +68,7 @@ func NewCLIContext() CliContext {
 	}
 }
 
-func (ctx CliContext) Context() client.CLIContext {
+func (ctx CliContext) Context() context.CLIContext {
 	return ctx.context
 }
 
@@ -134,7 +134,10 @@ func (ctx CliContext) QueryWithData(path string, data interface{}) ([]byte, int6
 func (ctx CliContext) QueryList(path string, params interface{}) error {
 	res, height, err := ctx.QueryWithData(path, params)
 	if err != nil {
-		return sdk.ErrInternal(fmt.Sprintf("Could not get data: %s\n", err))
+		return sdkerrors.Wrap(
+			sdkerrors.ErrUnknownRequest,
+			fmt.Sprintf("Could not get data: %s\n", err),
+		)
 	}
 
 	return ctx.PrintWithHeight(res, height)
@@ -154,7 +157,10 @@ func (ctx CliContext) HandleWriteMessage(msg sdk.Msg) error {
 func (ctx CliContext) EncodeAndPrintWithHeight(data interface{}, height int64) (err error) {
 	out, err := json.Marshal(data)
 	if err != nil {
-		return sdk.ErrInternal(fmt.Sprintf("Could not encode result: %v", err))
+		return sdkerrors.Wrap(
+			sdkerrors.ErrInvalidSequence,
+			fmt.Sprintf("Could not encode result: %v", err),
+		)
 	}
 
 	return ctx.PrintWithHeight(out, height)

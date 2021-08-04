@@ -34,7 +34,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryModel:
 			return queryModel(ctx, path[1:], req, keeper)
@@ -50,7 +50,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func queryModel(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryModel(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	vid, err := conversions.ParseVID(path[0])
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func queryModel(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	return res, nil
 }
 
-func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -113,7 +113,7 @@ func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res 
 	return res, nil
 }
 
-func queryVendors(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryVendors(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -151,7 +151,7 @@ func queryVendors(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []
 	return res, nil
 }
 
-func queryVendorModels(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryVendorModels(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	vid, err := conversions.ParseVID(path[0])
 	if err != nil {
 		return nil, err

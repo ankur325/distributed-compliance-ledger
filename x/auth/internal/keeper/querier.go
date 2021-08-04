@@ -33,7 +33,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryAccount:
 			return queryAccount(ctx, req, keeper)
@@ -49,7 +49,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, err error) {
 	var params types.QueryAccountParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -67,7 +67,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 }
 
 // nolint:dupl
-func queryAllAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryAllAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -103,7 +103,7 @@ func queryAllAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (re
 }
 
 // nolint:dupl
-func queryAllPendingAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryAllPendingAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -140,7 +140,7 @@ func queryAllPendingAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keep
 
 // nolint:dupl
 func queryAllPendingAccountRevocations(ctx sdk.Context,
-	req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+	req abci.RequestQuery, keeper Keeper) (res []byte, error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))

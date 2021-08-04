@@ -35,7 +35,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryComplianceInfo:
 			return queryComplianceInfo(ctx, path[1:], keeper, "")
@@ -56,7 +56,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
-	requestedState types.ComplianceState) (res []byte, err sdk.Error) {
+	requestedState types.ComplianceState) (res []byte, err error) {
 	vid, err := conversions.ParseVID(path[0])
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
 	return res, nil
 }
 
-func queryAllComplianceInfoRecords(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryAllComplianceInfoRecords(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params types.ListQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -124,7 +124,7 @@ func queryAllComplianceInfoRecords(ctx sdk.Context, req abci.RequestQuery, keepe
 }
 
 func queryAllComplianceInfoInStateRecords(ctx sdk.Context, req abci.RequestQuery, keeper Keeper,
-	requestedState types.ComplianceState) (res []byte, err sdk.Error) {
+	requestedState types.ComplianceState) (res []byte, err error) {
 	var params types.ListQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))

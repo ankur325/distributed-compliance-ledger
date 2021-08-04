@@ -52,7 +52,7 @@ func (m MsgCreateValidator) ValidateBasic() sdk.Error {
 		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Validator Address: it cannot be empty")
 	}
 
-	pubkey, err := sdk.GetConsPubKeyBech32(m.PubKey)
+	pubkey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, m.PubKey)
 	if err != nil {
 		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid Validator Public Key: %v", err))
 	}
@@ -81,5 +81,5 @@ func (m MsgCreateValidator) GetSignBytes() []byte {
 }
 
 func (m MsgCreateValidator) GetPubKey() crypto.PubKey {
-	return sdk.MustGetConsPubKeyBech32(m.PubKey)
+	return sdk.MustGetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, m.PubKey)
 }

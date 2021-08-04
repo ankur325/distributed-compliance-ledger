@@ -39,7 +39,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryAllProposedX509RootCerts:
 			return queryAllProposedX509RootCerts(ctx, req, keeper)
@@ -70,7 +70,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 // nolint:dupl
-func queryAllProposedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err sdk.Error) {
+func queryAllProposedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params types.PkiQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Failed to parse request params: %s", err))
@@ -103,7 +103,7 @@ func queryAllProposedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keepe
 	return res, nil
 }
 
-func queryProposedX509RootCert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryProposedX509RootCert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	subject := path[0]
 	subjectKeyID := path[1]
 
@@ -118,7 +118,7 @@ func queryProposedX509RootCert(ctx sdk.Context, path []string, keeper Keeper) (r
 	return res, nil
 }
 
-func queryX509Cert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryX509Cert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	subject := path[0]
 	subjectKeyID := path[1]
 
@@ -150,7 +150,7 @@ func queryAllSubjectX509Certs(ctx sdk.Context, path []string,
 
 // nolint:gocognit
 func queryX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper,
-	onlyRoot bool, revoked bool, iteratorPrefix string) (res []byte, err sdk.Error) {
+	onlyRoot bool, revoked bool, iteratorPrefix string) (res []byte, err error) {
 	var params types.PkiQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Failed to parse request params: %s", err))
@@ -214,7 +214,7 @@ func queryX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper,
 
 // nolint:dupl
 func queryAllProposedX509RootCertRevocations(ctx sdk.Context, req abci.RequestQuery,
-	keeper Keeper) (res []byte, err sdk.Error) {
+	keeper Keeper) (res []byte, err error) {
 	var params types.PkiQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Failed to parse request params: %s", err))
@@ -247,7 +247,7 @@ func queryAllProposedX509RootCertRevocations(ctx sdk.Context, req abci.RequestQu
 	return res, nil
 }
 
-func queryProposedX509RootCertRevocation(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryProposedX509RootCertRevocation(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	subject := path[0]
 	subjectKeyID := path[1]
 
@@ -270,7 +270,7 @@ func queryAllRevokedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper
 	return queryX509Certs(ctx, req, keeper, true, true, "")
 }
 
-func queryRevokedX509Cert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryRevokedX509Cert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	subject := path[0]
 	subjectKeyID := path[1]
 

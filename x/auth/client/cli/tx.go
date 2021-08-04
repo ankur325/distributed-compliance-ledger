@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
@@ -36,7 +37,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	authTxCmd.AddCommand(cli.SignedCommands(client.PostCommands(
+	authTxCmd.AddCommand(cli.SignedCommands(flags.PostCommands(
 		GetCmdProposeAddAccount(cdc),
 		GetCmdApproveAddAccount(cdc),
 		GetCmdProposeRevokeAccount(cdc),
@@ -60,7 +61,7 @@ func GetCmdProposeAddAccount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			pubkey := viper.GetString(FlagPubKey)
-			_, err = sdk.GetAccPubKeyBech32(pubkey)
+			_, err = sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, pubkey)
 			if err != nil {
 				return err
 			}

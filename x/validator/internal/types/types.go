@@ -55,7 +55,7 @@ func (v Validator) GetConsAddress() sdk.ConsAddress {
 }
 
 func (v Validator) GetConsPubKey() crypto.PubKey {
-	return sdk.MustGetConsPubKeyBech32(v.PubKey)
+	return sdk.MustGetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, v.PubKey)
 }
 
 func (v Validator) GetPower() int64 { return v.Power }

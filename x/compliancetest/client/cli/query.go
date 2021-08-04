@@ -16,6 +16,7 @@ package cli
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,7 +33,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	complianceQueryCmd.AddCommand(client.GetCommands(
+	complianceQueryCmd.AddCommand(flags.GetCommands(
 		GetCmdTestingResult(storeKey, cdc),
 	)...)
 

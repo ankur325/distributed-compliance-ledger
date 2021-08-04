@@ -28,7 +28,7 @@ const (
 )
 
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryTestingResult:
 			return queryTestingResult(ctx, path[1:], keeper)
@@ -38,7 +38,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func queryTestingResult(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
+func queryTestingResult(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
 	vid, err := conversions.ParseVID(path[0])
 	if err != nil {
 		return nil, err

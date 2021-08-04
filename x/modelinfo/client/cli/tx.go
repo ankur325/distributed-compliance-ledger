@@ -19,6 +19,7 @@ import (
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
@@ -37,7 +38,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	modelinfoTxCmd.AddCommand(cli.SignedCommands(client.PostCommands(
+	modelinfoTxCmd.AddCommand(cli.SignedCommands(flags.PostCommands(
 		GetCmdAddModel(cdc),
 		GetCmdUpdateModel(cdc),
 		// GetCmdDeleteModel(cdc), Disable deletion

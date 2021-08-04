@@ -65,6 +65,8 @@ func TestHandler_CreateAccount_TwoApprovalsAreNeeded(t *testing.T) {
 	// trustee1 propose account
 	result, address, pubkey := proposeAddAccount(setup, trustee1)
 	require.Equal(t, sdk.CodeOK, result.Code)
+	require.NoError(t, err)
+		require.NotNil(t, res)
 
 	// ensure pending account created
 	pendingAccount := setup.Keeper.GetPendingAccount(setup.Ctx, address)
@@ -169,7 +171,7 @@ func TestHandler_ProposeAddAccount_ForExistingActiveAccount(t *testing.T) {
 	// propose existing active account
 	proposeAddAccount := types.NewMsgProposeAddAccount(
 		address,
-		sdk.MustBech32ifyAccPub(pubkey),
+		sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, pubkey),
 		types.AccountRoles{types.Vendor},
 		trustee2,
 	)
@@ -195,7 +197,7 @@ func TestHandler_ProposeAddAccount_ForExistingPendingAccount(t *testing.T) {
 	// trustee2 proposes the same account
 	proposeAddAccount := types.NewMsgProposeAddAccount(
 		address,
-		sdk.MustBech32ifyAccPub(pubkey),
+		sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, pubkey),
 		types.AccountRoles{types.Vendor},
 		trustee2,
 	)
@@ -551,7 +553,7 @@ func storeAccount(setup TestSetup, role types.AccountRole) sdk.AccAddress {
 	return address
 }
 
-func proposeAddAccount(setup TestSetup, signer sdk.AccAddress) (sdk.Result, sdk.AccAddress, crypto.PubKey) {
+func proposeAddAccount(setup TestSetup, signer sdk.AccAddress) (sdk.Result, sdk.AccAddress, crypto.PubKey, err error) {
 	address, pubkey, pubkeyStr := testconstants.TestAddress()
 	proposeAddAccount := types.NewMsgProposeAddAccount(
 		address,
@@ -559,7 +561,7 @@ func proposeAddAccount(setup TestSetup, signer sdk.AccAddress) (sdk.Result, sdk.
 		types.AccountRoles{types.Vendor},
 		signer,
 	)
-	result := setup.Handler(setup.Ctx, proposeAddAccount)
+	result, err := setup.Handler(setup.Ctx, proposeAddAccount)
 
-	return result, address, pubkey
+	return result, address, pubkey, err
 }

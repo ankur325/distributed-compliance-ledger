@@ -62,7 +62,7 @@ func handleMsgProposeAddAccount(ctx sdk.Context, keeper keeper.Keeper, msg types
 	}
 
 	// parse the key.
-	pubKey, err := sdk.GetAccPubKeyBech32(msg.PublicKey)
+	pubKey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, msg.PublicKey)
 	if err != nil {
 		return sdk.ErrInvalidPubKey(err.Error()).Result()
 	}

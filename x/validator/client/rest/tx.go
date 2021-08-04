@@ -19,6 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	restTypes "github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/validator/internal/types"
@@ -50,7 +51,7 @@ func createValidatorHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		_, err = sdk.GetConsPubKeyBech32(req.Pubkey)
+		_, err = sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, req.Pubkey)
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest, err.Error())
 

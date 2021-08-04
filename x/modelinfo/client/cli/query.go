@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +36,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	modelinfoQueryCmd.AddCommand(client.GetCommands(
+	modelinfoQueryCmd.AddCommand(flags.GetCommands(
 		GetCmdModel(storeKey, cdc),
 		GetCmdAllModels(storeKey, cdc),
 		GetCmdVendors(storeKey, cdc),

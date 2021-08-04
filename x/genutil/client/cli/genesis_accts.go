@@ -64,7 +64,7 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec,
 				addr = info.GetAddress()
 			}
 
-			pubkey, err := sdk.GetAccPubKeyBech32(viper.GetString(FlagPubKey))
+			pubkey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, viper.GetString(FlagPubKey))
 			if err != nil {
 				return err
 			}
