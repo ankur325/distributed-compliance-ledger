@@ -15,6 +15,7 @@
 package cli
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -23,10 +24,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	tmos "github.com/tendermint/tendermint/libs/os"
+
+	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	kbkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -36,7 +39,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/common"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/genutil"
 	validator "github.com/zigbee-alliance/distributed-compliance-ledger/x/validator/client/cli"
@@ -85,15 +87,17 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 				return err
 			}
 
-			kb, err := client.NewKeyBaseFromDir(viper.GetString(flagClientHome))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			kb, err := keys.NewKeyring(sdk.KeyringServiceName(),
+				viper.GetString(flags.FlagKeyringBackend), viper.GetString(flagClientHome), inBuf)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "failed to initialize keybase")
 			}
 
-			from := viper.GetString(flags.FlagFrom)
-			key, err := kb.Get(from)
+			name := viper.GetString(flags.FlagName)
+			key, err := kb.Get(name)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "failed to read from keybase")
 			}
 
 			// Set flags for creating gentx
@@ -105,8 +109,8 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 				return err
 			}
 
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := client.NewCLIContext().WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			// create a 'create-validator' message
 			txBldr, msg, err := validator.BuildCreateValidatorMsg(cliCtx, txBldr, true)
@@ -114,14 +118,8 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 				return errors.Wrap(err, "failed to build create-validator message")
 			}
 
-			info, err := txBldr.Keybase().Get(from)
-			if err != nil {
-				return errors.Wrap(err, "failed to read from tx builder keybase")
-			}
-
-			if info.GetType() == kbkeys.TypeOffline || info.GetType() == kbkeys.TypeMulti {
+			if key.GetType() == keys.TypeOffline || key.GetType() == keys.TypeMulti {
 				fmt.Println("Offline key passed in. Use `tx sign` command to sign:")
-
 				return utils.PrintUnsignedStdTx(txBldr, cliCtx, []sdk.Msg{msg})
 			}
 
@@ -140,7 +138,7 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 			}
 
 			// sign the transaction and write it to the output file
-			signedTx, err := utils.SignStdTx(txBldr, cliCtx, from, stdTx, false, true)
+			signedTx, err := utils.SignStdTx(txBldr, cliCtx, name, stdTx, false, true)
 			if err != nil {
 				return errors.Wrap(err, "failed to sign std tx")
 			}
@@ -184,10 +182,9 @@ func GenTxCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 
 func makeOutputFilepath(rootDir, nodeID string) (string, error) {
 	writePath := filepath.Join(rootDir, "config", "gentx")
-	if err := common.EnsureDir(writePath, 0o700); err != nil {
+	if err := tmos.EnsureDir(writePath, 0700); err != nil {
 		return "", err
 	}
-
 	return filepath.Join(writePath, fmt.Sprintf("gentx-%v.json", nodeID)), nil
 }
 

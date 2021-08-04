@@ -43,7 +43,7 @@ func (m MsgCreateValidator) Route() string { return RouterKey }
 
 func (m MsgCreateValidator) Type() string { return EventTypeCreateValidator }
 
-func (m MsgCreateValidator) ValidateBasic() sdk.Error {
+func (m MsgCreateValidator) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}

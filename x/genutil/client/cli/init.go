@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/common"
+	tmos "github.com/tendermint/tendermint/libs/os"
 	"github.com/tendermint/tendermint/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/genutil"
 )
@@ -94,7 +94,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager,
 			config.Moniker = args[0]
 
 			genFile := config.GenesisFile()
-			if !viper.GetBool(flagOverwrite) && common.FileExists(genFile) {
+			if !viper.GetBool(flagOverwrite) && tmos.FileExists(genFile) {
 				return errors.Wrap(errors.ErrInvalidRequest,
 					fmt.Sprintf("Error genesis.json file already exists: %v", genFile))
 			}
