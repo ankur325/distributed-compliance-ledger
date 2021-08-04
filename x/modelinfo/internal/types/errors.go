@@ -17,36 +17,33 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const (
-	Codespace sdk.CodespaceType = ModuleName
-
-	CodeModelInfoAlreadyExists   sdk.CodeType = 501
-	CodeModelInfoDoesNotExist    sdk.CodeType = 502
-	CodeOtaURLCannotBeSet        sdk.CodeType = 503
-	CodeVendorProductsDoNotExist sdk.CodeType = 504
+var (
+	CodeModelInfoAlreadyExists   = errors.Register(ModuleName, 501, "Model Info already exists")
+	CodeModelInfoDoesNotExist    = errors.Register(ModuleName, 502, "Model Info does not exist")
+	CodeOtaURLCannotBeSet        = errors.Register(ModuleName, 503, "Ota URL Cannot be Set")
+	CodeVendorProductsDoNotExist = errors.Register(ModuleName, 504, "Vendor Products do not exist")
 )
 
-func ErrModelInfoAlreadyExists(vid interface{}, pid interface{}) sdk.Error {
-	return errors.Wrap(ModuleName, CodeModelInfoAlreadyExists,
+func ErrModelInfoAlreadyExists(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeModelInfoAlreadyExists,
 		fmt.Sprintf("Model info associated with vid=%v and pid=%v already exists on the ledger", vid, pid))
 }
 
-func ErrModelInfoDoesNotExist(vid interface{}, pid interface{}) sdk.Error {
-	return errors.Wrap(ModuleName, CodeModelInfoDoesNotExist,
+func ErrModelInfoDoesNotExist(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeModelInfoDoesNotExist,
 		fmt.Sprintf("No model info associated with vid=%v and pid=%v exist on the ledger", vid, pid))
 }
 
-func ErrOtaURLCannotBeSet(vid interface{}, pid interface{}) sdk.Error {
-	return errors.Wrap(ModuleName, CodeOtaURLCannotBeSet,
+func ErrOtaURLCannotBeSet(vid interface{}, pid interface{}) error {
+	return errors.Wrap(CodeOtaURLCannotBeSet,
 		fmt.Sprintf("OTA URL cannot be set for model info associated with vid=%v and pid=%v "+
 			"because OTA was not set for this model info initially", vid, pid))
 }
 
-func ErrVendorProductsDoNotExist(vid interface{}) sdk.Error {
-	return errors.Wrap(ModuleName, CodeVendorProductsDoNotExist,
+func ErrVendorProductsDoNotExist(vid interface{}) error {
+	return errors.Wrap(CodeVendorProductsDoNotExist,
 		fmt.Sprintf("No vendor products associated with vid=%v exist on the ledger", vid))
 }

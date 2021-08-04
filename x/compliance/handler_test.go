@@ -84,8 +84,8 @@ func TestHandler_CertifyModelForUnknownModel(t *testing.T) {
 
 	// try to certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, constants.VID, constants.PID)
-	result, err := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, certifyModelMsg)
+	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, err)
 }
 
 func TestHandler_CertifyModelForModelWithoutTestingResults(t *testing.T) {

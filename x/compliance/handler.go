@@ -29,7 +29,7 @@ import (
 
 func NewHandler(keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
 	compliancetestKeeper compliancetest.Keeper, authKeeper auth.Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case types.MsgCertifyModel:
 			return handleMsgCertifyModel(ctx, keeper, modelinfoKeeper, compliancetestKeeper, authKeeper, msg)
@@ -38,21 +38,21 @@ func NewHandler(keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
 
 func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
 	compliancetestKeeper compliancetest.Keeper, authKeeper auth.Keeper,
-	msg types.MsgCertifyModel) sdk.Result {
+	msg types.MsgCertifyModel) (*sdk.Result, error) {
 	// check if sender has enough rights to certify model
 	if err := checkZbCertificationRights(ctx, authKeeper, msg.Signer, msg.CertificationType); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	if err := checkZbCertificationDone(ctx, keeper, authKeeper, msg.Signer, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	var complianceInfo types.ComplianceInfo
@@ -69,9 +69,9 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeepe
 		// if state changes on `certified` check that certification_date is after revocation_date
 		if complianceInfo.State == types.Revoked {
 			if msg.CertificationDate.Before(complianceInfo.Date) {
-				return types.ErrInconsistentDates(
+				return nil, types.ErrInconsistentDates(
 					fmt.Sprintf("The `certification_date`:%v must be after the current `date`:%v to "+
-						"certify model", msg.CertificationDate, complianceInfo.Date)).Result()
+						"certify model", msg.CertificationDate, complianceInfo.Date))
 			}
 
 			complianceInfo.UpdateComplianceInfo(msg.CertificationDate, msg.Reason)
@@ -80,11 +80,11 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeepe
 		// Compliance is tracked on ledger. There is no compliance record yet.
 		// The corresponding Model Info and test results must be present on ledger.
 		if !modelinfoKeeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-			return modelinfo.ErrModelInfoDoesNotExist(msg.VID, msg.PID).Result()
+			return nil, modelinfo.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 		}
 
 		if !compliancetestKeeper.IsTestingResultsPresents(ctx, msg.VID, msg.PID) {
-			return compliancetest.ErrTestingResultDoesNotExist(msg.VID, msg.PID).Result()
+			return nil, compliancetest.ErrTestingResultDoesNotExist(msg.VID, msg.PID)
 		}
 
 		complianceInfo = types.NewCertifiedComplianceInfo(
@@ -100,14 +100,14 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeepe
 	// store compliance info
 	keeper.SetComplianceInfo(ctx, complianceInfo)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
-	authKeeper auth.Keeper, msg types.MsgRevokeModel) sdk.Result {
+	authKeeper auth.Keeper, msg types.MsgRevokeModel) (*sdk.Result, error) {
 	// check if sender has enough rights to revoke model
 	if err := checkZbCertificationRights(ctx, authKeeper, msg.Signer, msg.CertificationType); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	var complianceInfo types.ComplianceInfo
@@ -120,9 +120,9 @@ func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper
 		// if state changes on `revoked` check that revocation_date is after certification_date
 		if complianceInfo.State == types.Certified {
 			if msg.RevocationDate.Before(complianceInfo.Date) {
-				return types.ErrInconsistentDates(
+				return nil, types.ErrInconsistentDates(
 					fmt.Sprintf("The `revocation_date`:%v must be after the `certification_date`:%v to "+
-						"revoke model", msg.RevocationDate, complianceInfo.Date)).Result()
+						"revoke model", msg.RevocationDate, complianceInfo.Date))
 			}
 
 			complianceInfo.UpdateComplianceInfo(msg.RevocationDate, msg.Reason)
@@ -139,23 +139,24 @@ func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper
 			msg.Signer,
 		)
 	} else {
-		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID).Result()
+		return nil, types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	// store compliance info
 	keeper.SetComplianceInfo(ctx, complianceInfo)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func checkZbCertificationRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress,
-	certificationType types.CertificationType) sdk.Error {
+	certificationType types.CertificationType) error {
 	// rights are depend on certification type
 	if certificationType == types.ZbCertificationType {
 		// sender must have ZBCertificationCenter role to certify/revoke model
 		if !authKeeper.HasRole(ctx, signer, auth.ZBCertificationCenter) {
-			return sdk.ErrUnauthorized(fmt.Sprintf("MsgCertifyModel/MsgRevokeMode transaction should be "+
-				"signed by an account with the %s role", auth.ZBCertificationCenter))
+			return errors.Wrap(errors.ErrUnauthorized,
+				fmt.Sprintf("MsgCertifyModel/MsgRevokeMode transaction should be "+
+					"signed by an account with the %s role", auth.ZBCertificationCenter))
 		}
 	} else {
 		return errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Unexpected CertificationType: \"%s\". Supported types: [%s]",
@@ -170,7 +171,7 @@ func checkZbCertificationDone(
 	keeper keeper.Keeper,
 	authKeeper auth.Keeper,
 	signer sdk.AccAddress,
-	msg types.MsgCertifyModel) sdk.Error {
+	msg types.MsgCertifyModel) error {
 	if !keeper.IsComplianceInfoPresent(ctx, msg.CertificationType, msg.VID, msg.PID) {
 		return nil
 	}
