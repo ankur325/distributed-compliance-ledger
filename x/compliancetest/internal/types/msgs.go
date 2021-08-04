@@ -50,7 +50,7 @@ func (m MsgAddTestingResult) Type() string {
 	return "add_testing_result"
 }
 
-func (m MsgAddTestingResult) ValidateBasic() sdk.Error {
+func (m MsgAddTestingResult) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}

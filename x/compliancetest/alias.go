@@ -20,19 +20,19 @@ import (
 )
 
 const (
-	ModuleName                    = types.ModuleName
-	RouterKey                     = types.RouterKey
-	StoreKey                      = types.StoreKey
-	CodeTestingResultDoesNotExist = types.CodeTestingResultsDoNotExist
+	ModuleName = types.ModuleName
+	RouterKey  = types.RouterKey
+	StoreKey   = types.StoreKey
 )
 
 var (
-	NewKeeper                    = keeper.NewKeeper
-	NewQuerier                   = keeper.NewQuerier
-	NewMsgAddTestingResult       = types.NewMsgAddTestingResult
-	ModuleCdc                    = types.ModuleCdc
-	RegisterCodec                = types.RegisterCodec
-	ErrTestingResultDoesNotExist = types.ErrTestingResultDoesNotExist
+	CodeTestingResultDoesNotExist = types.CodeTestingResultsDoNotExist
+	NewKeeper                     = keeper.NewKeeper
+	NewQuerier                    = keeper.NewQuerier
+	NewMsgAddTestingResult        = types.NewMsgAddTestingResult
+	ModuleCdc                     = types.ModuleCdc
+	RegisterCodec                 = types.RegisterCodec
+	ErrTestingResultDoesNotExist  = types.ErrTestingResultDoesNotExist
 )
 
 type (

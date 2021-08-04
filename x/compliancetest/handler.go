@@ -26,28 +26,28 @@ import (
 )
 
 func NewHandler(keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper, authKeeper auth.Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		switch msg := msg.(type) {
 		case types.MsgAddTestingResult:
 			return handleMsgAddTestingResult(ctx, keeper, modelinfoKeeper, authKeeper, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized compliancetest Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
 
 func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper modelinfo.Keeper,
-	authKeeper auth.Keeper, msg types.MsgAddTestingResult) sdk.Result {
+	authKeeper auth.Keeper, msg types.MsgAddTestingResult) (*sdk.Result, error) {
 	// check if sender has enough rights to add testing results
-	if err := checkAddTestingResultRights(ctx, authKeeper, msg.Signer); err != nil {
-		return err.Result()
+	if _, err := checkAddTestingResultRights(ctx, authKeeper, msg.Signer); err != nil {
+		return nil, err
 	}
 
 	// check that corresponding model exists on the ledger
 	if !modelinfoKeeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return modelinfo.ErrModelInfoDoesNotExist(msg.VID, msg.PID).Result()
+		return nil, modelinfo.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	testingResult := types.NewTestingResult(
@@ -61,15 +61,14 @@ func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelinfoK
 	// store testing results. it extends existing value if testing results already exists
 	keeper.AddTestingResult(ctx, testingResult)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
-func checkAddTestingResultRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress) sdk.Error {
+func checkAddTestingResultRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress) (*sdk.Result, error) {
 	// sender must have TestHouse role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.TestHouse) {
-		return sdk.ErrUnauthorized(fmt.Sprintf(
+		return nil, errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf(
 			"MsgAddTestingResult transaction should be signed by an account with the %s role", auth.TestHouse))
 	}
-
-	return nil
+	return nil, nil
 }

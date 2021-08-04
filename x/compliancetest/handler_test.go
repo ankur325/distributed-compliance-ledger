@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	test_constants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -37,8 +38,9 @@ func TestHandler_AddTestingResult(t *testing.T) {
 
 	// add new testing result
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, vid, pid)
-	result := setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, testingResult)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query testing result
 	receivedTestingResult := queryTestingResult(setup, vid, pid)
@@ -61,8 +63,8 @@ func TestHandler_AddTestingResultByNonTestHouse(t *testing.T) {
 
 		// add new testing result by non TestHouse
 		testingResult := TestMsgAddTestingResult(test_constants.Address3, vid, pid)
-		result := setup.Handler(setup.Ctx, testingResult)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, testingResult)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -71,8 +73,8 @@ func TestHandler_AddTestingResultForUnknownModel(t *testing.T) {
 
 	// add new testing result
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, test_constants.VID, test_constants.PID)
-	result := setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, result.Code)
+	_, err := setup.Handler(setup.Ctx, testingResult)
+	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, err)
 }
 
 func TestHandler_AddSeveralTestingResultsForOneModel(t *testing.T) {
@@ -88,8 +90,9 @@ func TestHandler_AddSeveralTestingResultsForOneModel(t *testing.T) {
 
 		// add new testing result
 		testingResult := TestMsgAddTestingResult(th, vid, pid)
-		result := setup.Handler(setup.Ctx, testingResult)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		result, err := setup.Handler(setup.Ctx, testingResult)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 
 		// query testing result
 		receivedTestingResult := queryTestingResult(setup, vid, pid)
@@ -111,8 +114,9 @@ func TestHandler_AddSeveralTestingResultsForDifferentModels(t *testing.T) {
 
 		// add new testing result
 		testingResult := TestMsgAddTestingResult(setup.TestHouse, vid, pid)
-		result := setup.Handler(setup.Ctx, testingResult)
-		require.Equal(t, sdk.CodeOK, result.Code)
+		result, err := setup.Handler(setup.Ctx, testingResult)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 
 		// query testing result
 		receivedTestingResult := queryTestingResult(setup, vid, pid)
@@ -133,13 +137,15 @@ func TestHandler_AddTestingResultTwiceForSameModelAndSameTestHouse(t *testing.T)
 
 	// add new testing result
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, vid, pid)
-	result := setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, testingResult)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// add testing result second time
 	testingResult.TestResult = "Second Testing Result"
-	result = setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, testingResult)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query testing result
 	receivedTestingResult := queryTestingResult(setup, vid, pid)

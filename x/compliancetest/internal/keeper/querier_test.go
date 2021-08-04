@@ -58,5 +58,5 @@ func TestQuerier_QueryTestingResultForUnknown(t *testing.T) {
 		[]string{QueryTestingResult, fmt.Sprintf("%v", test_constants.VID), fmt.Sprintf("%v", test_constants.PID)},
 		abci.RequestQuery{},
 	)
-	require.Equal(t, types.CodeTestingResultsDoNotExist, err.Code())
+	require.Equal(t, types.CodeTestingResultsDoNotExist, err)
 }
