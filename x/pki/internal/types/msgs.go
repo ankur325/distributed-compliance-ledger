@@ -45,7 +45,7 @@ func (m MsgProposeAddX509RootCert) Type() string {
 	return "propose_add_x509_root_cert"
 }
 
-func (m MsgProposeAddX509RootCert) ValidateBasic() sdk.Error {
+func (m MsgProposeAddX509RootCert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -92,7 +92,7 @@ func (m MsgApproveAddX509RootCert) Type() string {
 	return "approve_add_x509_root_cert"
 }
 
-func (m MsgApproveAddX509RootCert) ValidateBasic() sdk.Error {
+func (m MsgApproveAddX509RootCert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -140,7 +140,7 @@ func (m MsgAddX509Cert) Type() string {
 	return "add_x509_cert"
 }
 
-func (m MsgAddX509Cert) ValidateBasic() sdk.Error {
+func (m MsgAddX509Cert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -187,7 +187,7 @@ func (m MsgProposeRevokeX509RootCert) Type() string {
 	return "propose_revoke_x509_root_cert"
 }
 
-func (m MsgProposeRevokeX509RootCert) ValidateBasic() sdk.Error {
+func (m MsgProposeRevokeX509RootCert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -238,7 +238,7 @@ func (m MsgApproveRevokeX509RootCert) Type() string {
 	return "approve_revoke_x509_root_cert"
 }
 
-func (m MsgApproveRevokeX509RootCert) ValidateBasic() sdk.Error {
+func (m MsgApproveRevokeX509RootCert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}
@@ -288,7 +288,7 @@ func (m MsgRevokeX509Cert) Type() string {
 	return "revoke_x509_cert"
 }
 
-func (m MsgRevokeX509Cert) ValidateBasic() sdk.Error {
+func (m MsgRevokeX509Cert) ValidateBasic() error {
 	if m.Signer.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Signer: it cannot be empty")
 	}

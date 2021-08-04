@@ -19,7 +19,6 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/internal/types"
 )
@@ -205,7 +204,7 @@ func getRevokedX509CertHandler(cliCtx context.CLIContext, storeName string) http
 }
 
 func chainCertificates(restCtx rest.RestContext, storeName string,
-	subject string, subjectKeyID string, chain *types.Certificates) (int64, sdk.Error) {
+	subject string, subjectKeyID string, chain *types.Certificates) (int64, error) {
 	res, height, err := restCtx.QueryStore(types.GetApprovedCertificateKey(subject, subjectKeyID), storeName)
 	if err != nil || res == nil {
 		return height, types.ErrCertificateDoesNotExist(subject, subjectKeyID)

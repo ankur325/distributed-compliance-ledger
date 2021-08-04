@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/internal/types"
 )
 
@@ -33,7 +32,7 @@ type X509Certificate struct {
 	Certificate    *x509.Certificate
 }
 
-func DecodeX509Certificate(pemCertificate string) (*X509Certificate, sdk.Error) {
+func DecodeX509Certificate(pemCertificate string) (*X509Certificate, error) {
 	block, _ := pem.Decode([]byte(pemCertificate))
 	if block == nil {
 		return nil, types.ErrCodeInvalidCertificate("Could not decode pem certificate")
@@ -69,7 +68,7 @@ func BytesToHex(bytes []byte) string {
 	return strings.Join(bytesHex, ":")
 }
 
-func (c X509Certificate) Verify(parent *X509Certificate) sdk.Error {
+func (c X509Certificate) Verify(parent *X509Certificate) error {
 	roots := x509.NewCertPool()
 	roots.AddCert(parent.Certificate)
 

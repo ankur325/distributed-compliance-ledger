@@ -60,7 +60,7 @@ func TestQuerier_QueryProposedX509RootCertForNotFound(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeProposedCertificateDoesNotExist, err.Code())
+	require.Equal(t, types.CodeProposedCertificateDoesNotExist, err)
 }
 
 func TestQuerier_QueryX509Cert(t *testing.T) {
@@ -101,7 +101,7 @@ func TestQuerier_QueryX509CertForNotFound(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeCertificateDoesNotExist, err.Code())
+	require.Equal(t, types.CodeCertificateDoesNotExist, err)
 }
 
 // nolint:dupl
@@ -362,7 +362,7 @@ func TestQuerier_QueryProposedX509RootCertRevocationForNotFound(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeProposedCertificateRevocationDoesNotExist, err.Code())
+	require.Equal(t, types.CodeProposedCertificateRevocationDoesNotExist, err)
 }
 
 func TestQuerier_QueryRevokedX509Cert(t *testing.T) {
@@ -404,7 +404,7 @@ func TestQuerier_QueryRevokedX509CertForNotFound(t *testing.T) {
 
 	// check
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeRevokedCertificateDoesNotExist, err.Code())
+	require.Equal(t, types.CodeRevokedCertificateDoesNotExist, err)
 }
 
 // nolint:dupl

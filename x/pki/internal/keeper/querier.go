@@ -133,16 +133,16 @@ func queryX509Cert(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	return res, nil
 }
 
-func queryAllX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAllX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	return queryX509Certs(ctx, req, keeper, true, false, "")
 }
 
-func queryAllX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAllX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	return queryX509Certs(ctx, req, keeper, false, false, "")
 }
 
 func queryAllSubjectX509Certs(ctx sdk.Context, path []string,
-	req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	subject := path[0]
 
 	return queryX509Certs(ctx, req, keeper, false, false, subject)
@@ -262,11 +262,11 @@ func queryProposedX509RootCertRevocation(ctx sdk.Context, path []string, keeper 
 	return res, nil
 }
 
-func queryAllRevokedX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAllRevokedX509Certs(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	return queryX509Certs(ctx, req, keeper, false, true, "")
 }
 
-func queryAllRevokedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryAllRevokedX509RootCerts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	return queryX509Certs(ctx, req, keeper, true, true, "")
 }
 
