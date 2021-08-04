@@ -72,9 +72,7 @@ func GetCmdProposeAddAccount(cdc *codec.Codec) *cobra.Command {
 					roles = append(roles, types.AccountRole(role))
 				}
 			}
-
 			msg := types.NewMsgProposeAddAccount(address, pubkey, roles, cliCtx.FromAddress())
-
 			return cliCtx.HandleWriteMessage(msg)
 		},
 	}

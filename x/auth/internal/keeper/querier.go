@@ -49,7 +49,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, err error) {
+func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params types.QueryAccountParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))
@@ -61,7 +61,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 
 	account := keeper.GetAccount(ctx, params.Address)
 
-	res := codec.MustMarshalJSONIndent(keeper.cdc, account)
+	res = codec.MustMarshalJSONIndent(keeper.cdc, account)
 
 	return res, nil
 }
@@ -140,7 +140,7 @@ func queryAllPendingAccounts(ctx sdk.Context, req abci.RequestQuery, keeper Keep
 
 // nolint:dupl
 func queryAllPendingAccountRevocations(ctx sdk.Context,
-	req abci.RequestQuery, keeper Keeper) (res []byte, error) {
+	req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	var params pagination.PaginationParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("failed to parse request params: %s", err))

@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	constants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -848,8 +849,9 @@ func TestHandler_ApproveRevokeX509RootCert_ForEnoughApprovals(t *testing.T) {
 	// propose revocation of x509 root certificate
 	proposeRevokeX509RootCert := types.NewMsgProposeRevokeX509RootCert(
 		constants.RootSubject, constants.RootSubjectKeyID, setup.Trustee)
-	result := setup.Handler(setup.Ctx, proposeRevokeX509RootCert)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, error := setup.Handler(setup.Ctx, proposeRevokeX509RootCert)
+	require.NoError(t, error)
+	require.NotNil(t, result)
 
 	// get certificate for further comparison
 	certificateBeforeRevocation, _ :=
@@ -863,8 +865,9 @@ func TestHandler_ApproveRevokeX509RootCert_ForEnoughApprovals(t *testing.T) {
 	// approve
 	approveRevokeX509RootCert := types.NewMsgApproveRevokeX509RootCert(
 		constants.RootSubject, constants.RootSubjectKeyID, constants.Address1)
-	result = setup.Handler(setup.Ctx, approveRevokeX509RootCert)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, error = setup.Handler(setup.Ctx, approveRevokeX509RootCert)
+	require.NoError(t, error)
+	require.NotNil(t, result)
 
 	// check that proposed certificate revocation does not exist anymore
 	_, err := queryProposedCertificateRevocation(&setup, constants.RootSubject, constants.RootSubjectKeyID)
@@ -892,8 +895,9 @@ func TestHandler_ApproveRevokeX509RootCert_ByNotTrustee(t *testing.T) {
 	// propose revocation of x509 root certificate
 	proposeRevokeX509RootCert := types.NewMsgProposeRevokeX509RootCert(
 		constants.RootSubject, constants.RootSubjectKeyID, setup.Trustee)
-	result := setup.Handler(setup.Ctx, proposeRevokeX509RootCert)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, error := setup.Handler(setup.Ctx, proposeRevokeX509RootCert)
+	require.NoError(t, error)
+	require.NotNil(t, result)
 
 	for _, role := range []auth.AccountRole{auth.TestHouse, auth.ZBCertificationCenter, auth.Vendor} {
 		// assign role
@@ -903,8 +907,8 @@ func TestHandler_ApproveRevokeX509RootCert_ByNotTrustee(t *testing.T) {
 		// approve
 		approveRevokeX509RootCert := types.NewMsgApproveRevokeX509RootCert(
 			constants.RootSubject, constants.RootSubjectKeyID, constants.Address1)
-		result = setup.Handler(setup.Ctx, approveRevokeX509RootCert)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		result, error = setup.Handler(setup.Ctx, approveRevokeX509RootCert)
+		require.Equal(t, errors.ErrUnauthorized, error)
 	}
 }
 

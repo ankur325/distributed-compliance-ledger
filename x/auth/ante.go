@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
@@ -27,7 +28,7 @@ import (
 
 // SignatureVerificationGasConsumer is the type of function that is used to both consume gas when verifying signatures
 // and also to accept or reject different types of PubKey's. This is where apps can define their own PubKey.
-type SignatureVerificationGasConsumer = func(meter sdk.GasMeter, pubkey crypto.PubKey) sdk.Result
+type SignatureVerificationGasConsumer = func(meter sdk.GasMeter, pubkey crypto.PubKey) error
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
 // numbers, checks signatures & account numbers.
@@ -35,7 +36,7 @@ type SignatureVerificationGasConsumer = func(meter sdk.GasMeter, pubkey crypto.P
 func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res sdk.Result, abort bool) {
+	) (newCtx sdk.Context, err error) {
 		// all transactions must be of type auth.StdTx.
 		stdTx, ok := tx.(auth.StdTx)
 		if !ok {
@@ -43,7 +44,7 @@ func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) 
 			// during runTx.
 			newCtx = SetGasMeter(simulate, ctx, 0)
 
-			return newCtx, sdk.ErrInternal("tx must be StdTx").Result(), true
+			return newCtx, errors.Wrap(errors.ErrInvalidRequest, "tx must be StdTx")
 		}
 
 		newCtx = SetGasMeter(simulate, ctx, stdTx.Fee.Gas)
@@ -60,11 +61,7 @@ func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) 
 						"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
 						rType.Descriptor, stdTx.Fee.Gas, newCtx.GasMeter().GasConsumed(),
 					)
-					res = sdk.ErrOutOfGas(log).Result()
-
-					res.GasWanted = stdTx.Fee.Gas
-					res.GasUsed = newCtx.GasMeter().GasConsumed()
-					abort = true
+					err = errors.Wrap(errors.ErrOutOfGas, log)
 				default:
 					panic(r)
 				}
@@ -72,13 +69,13 @@ func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) 
 		}()
 
 		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err.Result(), true
+			return newCtx, err
 		}
 
 		newCtx.GasMeter().ConsumeGas(types.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		if res := ValidateMemo(stdTx); !res.IsOK() {
-			return newCtx, res, true
+		if err = ValidateMemo(stdTx); err != nil {
+			return newCtx, err
 		}
 
 		// signatures contains the sequence number, account number, and signatures.
@@ -88,88 +85,86 @@ func NewAnteHandler(ak Keeper, sigGasConsumer SignatureVerificationGasConsumer) 
 		isGenesis := ctx.BlockHeight() == 0
 
 		for i, signature := range signatures {
-			account, res := GetSignerAcc(newCtx, ak, signers[i])
-			if !res.IsOK() {
-				return newCtx, res, true
+			account, error := GetSignerAcc(newCtx, ak, signers[i])
+			if error != nil {
+				return newCtx, error
 			}
 
 			// check signature, return account with incremented nonce.
 			signBytes := GetSignBytes(newCtx.ChainID(), stdTx, account, isGenesis)
-			account, res = processSig(newCtx, account, signature, signBytes, simulate, sigGasConsumer)
+			account, err = processSig(newCtx, account, signature, signBytes, simulate, sigGasConsumer)
 
-			if !res.IsOK() {
-				return newCtx, res, true
+			if err != nil {
+				return newCtx, err
 			}
 
 			ak.SetAccount(newCtx, account)
 		}
 
-		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
+		return newCtx, nil // continue...
 	}
 }
 
 // GetSignerAcc returns an account for a given address that is expected to sign a transaction.
-func GetSignerAcc(ctx sdk.Context, keeper Keeper, address sdk.AccAddress) (acc types.Account, res sdk.Result) {
+func GetSignerAcc(ctx sdk.Context, keeper Keeper, address sdk.AccAddress) (acc types.Account, err error) {
 	if !keeper.IsAccountPresent(ctx, address) {
-		return acc, types.ErrAccountDoesNotExist(address).Result()
+		return acc, types.ErrAccountDoesNotExist(address)
 	}
 
 	acc = keeper.GetAccount(ctx, address)
 
-	return acc, sdk.Result{}
+	return acc, nil
 }
 
 // ValidateMemo validates the memo size.
-func ValidateMemo(stdTx auth.StdTx) sdk.Result {
+func ValidateMemo(stdTx auth.StdTx) error {
 	memoLength := len(stdTx.GetMemo())
 	if uint64(memoLength) > types.MaxMemoCharacters {
-		return sdk.ErrMemoTooLarge(
+		return errors.Wrap(errors.ErrMemoTooLarge,
 			fmt.Sprintf(
 				"maximum number of characters is %d but received %d characters",
 				types.MaxMemoCharacters, memoLength,
 			),
-		).Result()
+		)
 	}
-
-	return sdk.Result{}
+	return nil
 }
 
 // verify the signature and increment the sequence.
 func processSig(
 	ctx sdk.Context, acc types.Account, sig auth.StdSignature, signBytes []byte, simulate bool,
 	sigGasConsumer SignatureVerificationGasConsumer,
-) (updatedAcc Account, res sdk.Result) {
-	if res := sigGasConsumer(ctx.GasMeter(), acc.PubKey); !res.IsOK() {
-		return acc, res
+) (updatedAcc Account, err error) {
+	if err := sigGasConsumer(ctx.GasMeter(), acc.PubKey); err != nil {
+		return acc, err
 	}
 
 	if !simulate && !acc.PubKey.VerifyBytes(signBytes, sig.Signature) {
-		return acc, sdk.ErrUnauthorized(
-			"Signature verification failed; verify correct account sequence and chain-id").Result()
+		return acc, errors.Wrap(errors.ErrUnauthorized, "Signature verification failed; verify correct account sequence and chain-id")
 	}
 
 	acc.Sequence++
 
-	return acc, res
+	return acc, nil
 }
 
 // DefaultSigVerificationGasConsumer is the default implementation of SignatureVerificationGasConsumer. It consumes gas
 // for signature verification based upon the public key type. The cost is fetched from the given params and is matched
 // by the concrete type.
-func DefaultSigVerificationGasConsumer(meter sdk.GasMeter, pubkey crypto.PubKey) sdk.Result {
+func DefaultSigVerificationGasConsumer(meter sdk.GasMeter, pubkey crypto.PubKey) error {
 	switch pubkey := pubkey.(type) {
 	case ed25519.PubKeyEd25519:
 		meter.ConsumeGas(types.DefaultSigVerifyCostED25519, "ante verify: ed25519")
 
-		return sdk.ErrInvalidPubKey("ED25519 public keys are unsupported").Result()
+		return errors.Wrap(errors.ErrInvalidPubKey, "ED25519 public keys are unsupported")
 
 	case secp256k1.PubKeySecp256k1:
 		meter.ConsumeGas(types.DefaultSigVerifyCostSecp256k1, "ante verify: secp256k1")
 
-		return sdk.Result{}
+		return nil
 
 	default:
-		return sdk.ErrInvalidPubKey(fmt.Sprintf("unrecognized public key type: %T", pubkey)).Result()
+		return errors.Wrap(errors.ErrInvalidPubKey, fmt.Sprintf("unrecognized public key type: %T", pubkey))
 	}
 }
 

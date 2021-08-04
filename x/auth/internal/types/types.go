@@ -40,7 +40,7 @@ const (
 
 var Roles = AccountRoles{Vendor, TestHouse, ZBCertificationCenter, Trustee, NodeAdmin}
 
-func (role AccountRole) Validate() sdk.Error {
+func (role AccountRole) Validate() error {
 	for _, r := range Roles {
 		if role == r {
 			return nil
@@ -57,7 +57,7 @@ func (role AccountRole) Validate() sdk.Error {
 type AccountRoles []AccountRole
 
 // Validate checks for errors on the account roles.
-func (roles AccountRoles) Validate() sdk.Error {
+func (roles AccountRoles) Validate() error {
 	for _, role := range roles {
 		if err := role.Validate(); err != nil {
 			return err
@@ -99,7 +99,7 @@ func (pendAcc PendingAccount) String() string {
 }
 
 // Validate checks for errors on the vesting and module account parameters.
-func (pendAcc PendingAccount) Validate() sdk.Error {
+func (pendAcc PendingAccount) Validate() error {
 	if pendAcc.Address == nil {
 		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Pending Account: Value: %s. Error: Missing Address", pendAcc.Address))
@@ -281,7 +281,7 @@ func (revoc PendingAccountRevocation) String() string {
 }
 
 // Validate checks for errors on the vesting and module account parameters.
-func (revoc PendingAccountRevocation) Validate() sdk.Error {
+func (revoc PendingAccountRevocation) Validate() error {
 	if revoc.Address == nil {
 		return errors.Wrap(errors.ErrInvalidRequest,
 			fmt.Sprintf("Invalid Pending Account Revocation: Value: %s. Error: Missing Address", revoc.Address))

@@ -49,7 +49,7 @@ func (m MsgProposeAddAccount) Type() string {
 	return "propose_add_account"
 }
 
-func (m MsgProposeAddAccount) ValidateBasic() sdk.Error {
+func (m MsgProposeAddAccount) ValidateBasic() error {
 	if m.Address.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
@@ -100,7 +100,7 @@ func (m MsgApproveAddAccount) Type() string {
 	return "approve_add_account"
 }
 
-func (m MsgApproveAddAccount) ValidateBasic() sdk.Error {
+func (m MsgApproveAddAccount) ValidateBasic() error {
 	if m.Address.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
@@ -143,7 +143,7 @@ func (m MsgProposeRevokeAccount) Type() string {
 	return "propose_revoke_account"
 }
 
-func (m MsgProposeRevokeAccount) ValidateBasic() sdk.Error {
+func (m MsgProposeRevokeAccount) ValidateBasic() error {
 	if m.Address.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
@@ -186,7 +186,7 @@ func (m MsgApproveRevokeAccount) Type() string {
 	return "approve_revoke_account"
 }
 
-func (m MsgApproveRevokeAccount) ValidateBasic() sdk.Error {
+func (m MsgApproveRevokeAccount) ValidateBasic() error {
 	if m.Address.Empty() {
 		return errors.Wrap(errors.ErrInvalidAddress, "Invalid Account Address: it cannot be empty")
 	}
