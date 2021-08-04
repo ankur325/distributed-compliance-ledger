@@ -49,7 +49,7 @@ func handleMsgAddModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper aut
 	}
 
 	// check sender has enough rights to add model
-	if _, err := checkAddModelRights(ctx, authKeeper, msg.Signer); err != nil {
+	if err := checkAddModelRights(ctx, authKeeper, msg.Signer); err != nil {
 		return nil, err
 	}
 
@@ -81,18 +81,18 @@ func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 	msg types.MsgUpdateModelInfo) (*sdk.Result, error) {
 	// check if model exists
 	if !keeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
+		return nil, types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	modelInfo := keeper.GetModelInfo(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to update model
 	if err := checkUpdateModelRights(modelInfo.Owner, msg.Signer); err != nil {
-		return err
+		return nil, err
 	}
 
 	if msg.OtaURL != "" && modelInfo.OtaURL == "" {
-		return types.ErrOtaURLCannotBeSet(msg.VID, msg.PID)
+		return nil, types.ErrOtaURLCannotBeSet(msg.VID, msg.PID)
 	}
 
 	// updates existing model value only if corresponding value in MsgUpdate is not empty
@@ -118,7 +118,7 @@ func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 	// store updated model
 	keeper.SetModelInfo(ctx, modelInfo)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 //nolint:unused,deadcode
@@ -126,14 +126,14 @@ func handleMsgDeleteModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 	msg types.MsgDeleteModelInfo) (*sdk.Result, error) {
 	// check if model exists
 	if !keeper.IsModelInfoPresent(ctx, msg.VID, msg.PID) {
-		return types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
+		return nil, types.ErrModelInfoDoesNotExist(msg.VID, msg.PID)
 	}
 
 	modelInfo := keeper.GetModelInfo(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to delete model
 	if err := checkUpdateModelRights(modelInfo.Owner, msg.Signer); err != nil {
-		return err
+		return nil, err
 	}
 
 	// remove model from the store
@@ -145,7 +145,7 @@ func handleMsgDeleteModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress) error {
 	// sender must have Vendor role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.Vendor) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelInfo transaction should be "+
+		return errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf("MsgAddModelInfo transaction should be "+
 			"signed by an account with the %s role", auth.Vendor))
 	}
 
@@ -155,7 +155,7 @@ func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.Acc
 func checkUpdateModelRights(owner sdk.AccAddress, signer sdk.AccAddress) error {
 	// sender must be equal to owner to edit model
 	if !signer.Equals(owner) {
-		return sdk.ErrUnauthorized("MsgUpdateModelInfo tx should be signed by owner")
+		return errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf("MsgUpdateModelInfo tx should be signed by owner"))
 	}
 
 	return nil

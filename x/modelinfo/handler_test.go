@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -33,8 +33,9 @@ func TestHandler_AddModel(t *testing.T) {
 
 	// add new model
 	modelInfo := TestMsgAddModelInfo(setup.Vendor)
-	result := setup.Handler(setup.Ctx, modelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, modelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query model
 	receivedModelInfo := queryModelInfo(setup, modelInfo.VID, modelInfo.PID)
@@ -62,17 +63,19 @@ func TestHandler_UpdateModel(t *testing.T) {
 
 	// try update not present model
 	msgUpdateModelInfo := TestMsgUpdateModelInfo(setup.Vendor)
-	result := setup.Handler(setup.Ctx, msgUpdateModelInfo)
-	require.Equal(t, types.CodeModelInfoDoesNotExist, result.Code)
+	result, err := setup.Handler(setup.Ctx, msgUpdateModelInfo)
+	require.Equal(t, types.CodeModelInfoDoesNotExist, err)
 
 	// add new model
 	msgAddModelInfo := TestMsgAddModelInfo(setup.Vendor)
-	result = setup.Handler(setup.Ctx, msgAddModelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, msgAddModelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// update existing model
-	result = setup.Handler(setup.Ctx, msgUpdateModelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, msgUpdateModelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query updated model
 	receivedModelInfo := queryModelInfo(setup, msgUpdateModelInfo.VID, msgUpdateModelInfo.PID)
@@ -100,8 +103,9 @@ func TestHandler_OnlyOwnerCanUpdateModel(t *testing.T) {
 
 	// add new model
 	msgAddModelInfo := TestMsgAddModelInfo(setup.Vendor)
-	result := setup.Handler(setup.Ctx, msgAddModelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, msgAddModelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	for _, role := range []auth.AccountRole{auth.Trustee, auth.TestHouse, auth.Vendor} {
 		// store account
@@ -110,14 +114,15 @@ func TestHandler_OnlyOwnerCanUpdateModel(t *testing.T) {
 
 		// update existing model by not owner
 		msgUpdateModelInfo := TestMsgUpdateModelInfo(testconstants.Address3)
-		result = setup.Handler(setup.Ctx, msgUpdateModelInfo)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		result, err = setup.Handler(setup.Ctx, msgUpdateModelInfo)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 
 	// owner update existing model
 	msgUpdateModelInfo := TestMsgUpdateModelInfo(setup.Vendor)
-	result = setup.Handler(setup.Ctx, msgUpdateModelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, msgUpdateModelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 }
 
 func TestHandler_AddModelWithEmptyOptionalFields(t *testing.T) {
@@ -132,8 +137,9 @@ func TestHandler_AddModelWithEmptyOptionalFields(t *testing.T) {
 	modelInfo.OtaChecksumType = "" // Set empty OtaChecksumType
 	modelInfo.Custom = ""          // Set empty Custom
 
-	result := setup.Handler(setup.Ctx, modelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, modelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query model
 	receivedModelInfo := queryModelInfo(setup, testconstants.VID, testconstants.PID)
@@ -157,8 +163,9 @@ func TestHandler_AddModelByNonVendor(t *testing.T) {
 
 		// add new model
 		modelInfo := TestMsgAddModelInfo(testconstants.Address3)
-		result := setup.Handler(setup.Ctx, modelInfo)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		result, err := setup.Handler(setup.Ctx, modelInfo)
+		require.NoError(t, err)
+		require.NotNil(t, result)
 	}
 }
 
@@ -167,7 +174,7 @@ func TestHandler_PartiallyUpdateModel(t *testing.T) {
 
 	// add new model
 	msgAddModelInfo := TestMsgAddModelInfo(setup.Vendor)
-	result := setup.Handler(setup.Ctx, msgAddModelInfo)
+	result, err := setup.Handler(setup.Ctx, msgAddModelInfo)
 
 	// owner update Description of existing model
 	msgUpdateModelInfo := TestMsgUpdateModelInfo(setup.Vendor)
@@ -176,8 +183,9 @@ func TestHandler_PartiallyUpdateModel(t *testing.T) {
 	msgUpdateModelInfo.OtaURL = ""
 	msgUpdateModelInfo.Custom = ""
 	msgUpdateModelInfo.TisOrTrpTestingCompleted = !testconstants.TisOrTrpTestingCompleted
-	result = setup.Handler(setup.Ctx, msgUpdateModelInfo)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err = setup.Handler(setup.Ctx, msgUpdateModelInfo)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// query model
 	receivedModelInfo := queryModelInfo(setup, msgUpdateModelInfo.VID, msgUpdateModelInfo.PID)
