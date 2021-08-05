@@ -60,7 +60,7 @@ func TestQuerier_QueryValidator_ForUnknown(t *testing.T) {
 	// check
 	require.Nil(t, result)
 	require.NotNil(t, err)
-	require.Equal(t, types.CodeValidatorDoesNotExist, err.Code())
+	require.Equal(t, types.CodeValidatorDoesNotExist, err)
 }
 
 func TestQuerier_QueryValidators(t *testing.T) {

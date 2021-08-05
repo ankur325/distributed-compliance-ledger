@@ -90,7 +90,7 @@ func queryValidators(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res
 	return res, nil
 }
 
-func queryValidator(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryValidator(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 	validatorAddr, err := sdk.ConsAddressFromBech32(path[0])
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrInvalidRequest, err.Error())

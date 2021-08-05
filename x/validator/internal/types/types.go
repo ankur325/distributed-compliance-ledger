@@ -157,7 +157,7 @@ const (
 )
 
 // Ensure the length of a validator's description.
-func (d Description) Validate() sdk.Error {
+func (d Description) Validate() error {
 	if len(d.Name) == 0 {
 		return errors.Wrap(errors.ErrInvalidRequest, "Invalid Description Name: it cannot be empty")
 	}

@@ -15,6 +15,7 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -57,8 +58,8 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 		Short: "Adds a new validator node",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			txBldr, msg, err := BuildCreateValidatorMsg(cliCtx.Context(), txBldr, false)
 			if err != nil {
