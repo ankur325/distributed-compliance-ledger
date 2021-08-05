@@ -27,7 +27,7 @@ import (
 )
 
 func NewHandler(k Keeper, authKeeper auth.Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
@@ -36,40 +36,40 @@ func NewHandler(k Keeper, authKeeper auth.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized validator Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg).Result()
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
 
 func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator,
-	k Keeper, authKeeper auth.Keeper) sdk.Result {
+	k Keeper, authKeeper auth.Keeper) (*sdk.Result, error) {
 	// check if sender has enough rights to create a validator node
 	if !authKeeper.HasRole(ctx, msg.Signer, auth.NodeAdmin) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("CreateValidator transaction should be "+
-			"signed by an account with the \"%s\" role", auth.NodeAdmin)).Result()
+		return nil, errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf("CreateValidator transaction should be "+
+			"signed by an account with the \"%s\" role", auth.NodeAdmin))
 	}
 
 	if k.AccountHasValidator(ctx, msg.Signer) {
-		return types.ErrAccountAlreadyHasNode(msg.Signer).Result()
+		return nil, types.ErrAccountAlreadyHasNode(msg.Signer)
 	}
 
 	// check if we has not reached the limit of nodes
 	if k.CountLastValidators(ctx) == types.MaxNodes {
-		return types.ErrPoolIsFull().Result()
+		return nil, types.ErrPoolIsFull()
 	}
 
 	// check if a validator with a given address already exists
 	if k.IsValidatorPresent(ctx, msg.Address) {
-		return types.ErrValidatorExists(msg.Address).Result()
+		return nil, types.ErrValidatorExists(msg.Address)
 	}
 
 	// check key type
 	if ctx.ConsensusParams() != nil {
 		tmPubKey := tmtypes.TM2PB.PubKey(msg.GetPubKey())
 		if !functions.StringInSlice(tmPubKey.Type, ctx.ConsensusParams().Validator.PubKeyTypes) {
-			return errors.Wrap(errors.ErrInvalidRequest,
+			return nil, errors.Wrap(errors.ErrInvalidRequest,
 				fmt.Sprintf("Validator pubkey type \"%s\" is not supported. Supported types: [%s]",
-					tmPubKey.Type, strings.Join(ctx.ConsensusParams().Validator.PubKeyTypes, ","))).Result()
+					tmPubKey.Type, strings.Join(ctx.ConsensusParams().Validator.PubKeyTypes, ",")))
 		}
 	}
 
@@ -90,5 +90,5 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator,
 		),
 	})
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

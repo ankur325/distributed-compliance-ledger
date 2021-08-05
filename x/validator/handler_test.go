@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	constants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
@@ -33,8 +34,9 @@ func TestHandler_CreateValidator(t *testing.T) {
 	// create validator
 	msgCreateValidator := types.NewMsgCreateValidator(constants.ValidatorAddress1, constants.ValidatorPubKey1,
 		types.Description{Name: constants.Name}, constants.Address1)
-	result := setup.Handler(setup.Ctx, msgCreateValidator)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, msgCreateValidator)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	events := result.Events.ToABCIEvents()
 	require.Equal(t, 2, len(events))
@@ -66,8 +68,8 @@ func TestHandler_CreateValidator_ByNotNodeAdmin(t *testing.T) {
 		setup.authKeeper.SetAccount(setup.Ctx, account)
 
 		// try to create validator
-		result := setup.Handler(setup.Ctx, msgCreateValidator)
-		require.Equal(t, sdk.CodeUnauthorized, result.Code)
+		_, err := setup.Handler(setup.Ctx, msgCreateValidator)
+		require.Equal(t, errors.ErrUnauthorized, err)
 	}
 }
 
@@ -77,8 +79,9 @@ func TestHandler_CreateValidator_TwiceForSameValidatorAddress(t *testing.T) {
 	// create validator
 	msgCreateValidator := types.NewMsgCreateValidator(constants.ValidatorAddress1, constants.ValidatorPubKey1,
 		types.Description{Name: constants.Name}, constants.Address1)
-	result := setup.Handler(setup.Ctx, msgCreateValidator)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, msgCreateValidator)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// create validator
 	account := auth.NewAccount(constants.Address2, constants.PubKey2, auth.AccountRoles{auth.NodeAdmin})
@@ -86,8 +89,8 @@ func TestHandler_CreateValidator_TwiceForSameValidatorAddress(t *testing.T) {
 
 	msgCreateValidator = types.NewMsgCreateValidator(constants.ValidatorAddress1, constants.ValidatorPubKey1,
 		types.Description{Name: constants.Name}, constants.Address2)
-	result = setup.Handler(setup.Ctx, msgCreateValidator)
-	require.Equal(t, types.CodeValidatorAlreadyExist, result.Code)
+	_, err = setup.Handler(setup.Ctx, msgCreateValidator)
+	require.Equal(t, types.CodeValidatorAlreadyExist, err)
 }
 
 func TestHandler_CreateValidator_TwiceForSameValidatorOwner(t *testing.T) {
@@ -96,17 +99,18 @@ func TestHandler_CreateValidator_TwiceForSameValidatorOwner(t *testing.T) {
 	// create validator
 	msgCreateValidator := types.NewMsgCreateValidator(constants.ValidatorAddress1, constants.ValidatorPubKey1,
 		types.Description{Name: constants.Name}, constants.Address1)
-	result := setup.Handler(setup.Ctx, msgCreateValidator)
-	require.Equal(t, sdk.CodeOK, result.Code)
+	result, err := setup.Handler(setup.Ctx, msgCreateValidator)
+	require.NoError(t, err)
+	require.NotNil(t, result)
 
 	// create validator with different address
 	msgCreateValidator2 := types.NewMsgCreateValidator(constants.ValidatorAddress2, constants.ValidatorPubKey2,
 		types.Description{Name: constants.Name}, constants.Address1)
-	result = setup.Handler(setup.Ctx, msgCreateValidator2)
-	require.Equal(t, types.CodeAccountAlreadyHasNode, result.Code)
+	_, err = setup.Handler(setup.Ctx, msgCreateValidator2)
+	require.Equal(t, types.CodeAccountAlreadyHasNode, err)
 }
 
-func queryValidator(setup TestSetup, address sdk.ConsAddress) (*types.Validator, sdk.Error) {
+func queryValidator(setup TestSetup, address sdk.ConsAddress) (*types.Validator, error) {
 	// query validator
 	result, err := setup.Querier(
 		setup.Ctx,
