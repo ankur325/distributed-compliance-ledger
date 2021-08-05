@@ -15,6 +15,7 @@
 package cli
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -143,13 +144,13 @@ func (ctx CliContext) QueryList(path string, params interface{}) error {
 	return ctx.PrintWithHeight(res, height)
 }
 
-func (ctx CliContext) HandleWriteMessage(msg sdk.Msg) error {
+func (ctx CliContext) HandleWriteMessage(msg sdk.Msg, cmd *cobra.Command) error {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return err
 	}
-
-	txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(ctx.context.Codec))
+	inBuf := bufio.NewReader(cmd.InOrStdin())
+	txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(ctx.context.Codec))
 
 	return utils.GenerateOrBroadcastMsgs(ctx.context, txBldr, []sdk.Msg{msg})
 }

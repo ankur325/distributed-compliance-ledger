@@ -76,7 +76,7 @@ func GetCmdAddTestingResult(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgAddTestingResult(vid, pid, testResult, testDate, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 

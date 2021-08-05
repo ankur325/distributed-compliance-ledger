@@ -73,7 +73,7 @@ func GetCmdProposeAddAccount(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 			msg := types.NewMsgProposeAddAccount(address, pubkey, roles, cliCtx.FromAddress())
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -104,7 +104,7 @@ func GetCmdApproveAddAccount(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgApproveAddAccount(address, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -130,7 +130,7 @@ func GetCmdProposeRevokeAccount(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgProposeRevokeAccount(address, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -156,7 +156,7 @@ func GetCmdApproveRevokeAccount(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgApproveRevokeAccount(address, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 

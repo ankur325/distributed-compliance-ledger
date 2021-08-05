@@ -18,11 +18,10 @@ import (
 	"fmt"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func ParseUInt16FromString(str string) (uint16, sdk.Error) {
+func ParseUInt16FromString(str string) (uint16, error) {
 	val, err := strconv.ParseUint(str, 10, 16)
 	if err != nil {
 		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Parsing Error: \"%v\" must be 16 bit unsigned integer", str))
@@ -31,10 +30,10 @@ func ParseUInt16FromString(str string) (uint16, sdk.Error) {
 	return uint16(val), nil
 }
 
-func ParseVID(str string) (uint16, sdk.Error) {
+func ParseVID(str string) (uint16, error) {
 	res, err := ParseUInt16FromString(str)
 	if err != nil {
-		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid VID: %v", err.Data()))
+		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid VID: %v", err))
 	}
 
 	if res == 0 {
@@ -44,10 +43,10 @@ func ParseVID(str string) (uint16, sdk.Error) {
 	return res, nil
 }
 
-func ParsePID(str string) (uint16, sdk.Error) {
+func ParsePID(str string) (uint16, error) {
 	res, err := ParseUInt16FromString(str)
 	if err != nil {
-		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid PID: %v", err.Data()))
+		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid PID: %v", err))
 	}
 
 	if res == 0 {
@@ -57,10 +56,10 @@ func ParsePID(str string) (uint16, sdk.Error) {
 	return res, nil
 }
 
-func ParseCID(str string) (uint16, sdk.Error) {
+func ParseCID(str string) (uint16, error) {
 	res, err := ParseUInt16FromString(str)
 	if err != nil {
-		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid CID: %v", err.Data()))
+		return 0, errors.Wrap(errors.ErrInvalidRequest, fmt.Sprintf("Invalid CID: %v", err))
 	}
 
 	return res, nil

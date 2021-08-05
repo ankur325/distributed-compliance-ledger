@@ -60,7 +60,7 @@ func GetCmdProposeAddX509RootCertificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgProposeAddX509RootCert(cert, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -85,7 +85,7 @@ func GetCmdApproveAddX509RootCertificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgApproveAddX509RootCert(subject, subjectKeyID, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -114,7 +114,7 @@ func GetCmdAddX509Certificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgAddX509Cert(cert, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -140,7 +140,7 @@ func GetCmdProposeRevokeX509RootCertificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgProposeRevokeX509RootCert(subject, subjectKeyID, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -167,7 +167,7 @@ func GetCmdApproveRevokeX509RootCertificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgApproveRevokeX509RootCert(subject, subjectKeyID, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -194,7 +194,7 @@ func GetCmdRevokeX509Certificate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgRevokeX509Cert(subject, subjectKeyID, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 

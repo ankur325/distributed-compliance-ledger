@@ -77,7 +77,7 @@ func GetCmdCertifyModel(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCertifyModel(vid, pid, certificationDate, certificationType, reason, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -128,7 +128,7 @@ func GetCmdRevokeModel(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgRevokeModel(vid, pid, revocationDate, certificationType, reason, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 

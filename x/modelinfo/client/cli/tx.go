@@ -110,7 +110,7 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 				hardwareVersion, firmwareVersion, otaURL, otaChecksum, otaChecksumType,
 				custom, tisOrTrpTestingCompleted, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -202,7 +202,7 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgUpdateModelInfo(vid, pid, cid, description,
 				otaURL, custom, tisOrTrpTestingCompleted, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
@@ -243,7 +243,7 @@ func GetCmdDeleteModel(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgDeleteModelInfo(vid, pid, cliCtx.FromAddress())
 
-			return cliCtx.HandleWriteMessage(msg)
+			return cliCtx.HandleWriteMessage(msg, cmd)
 		},
 	}
 
