@@ -18,9 +18,11 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	keys2 "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
 )
 
@@ -29,7 +31,7 @@ func KeysHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		restCtx := rest.NewRestContext(w, r).WithCodec(cliCtx.Codec)
 
-		kb, err := keys.NewKeyBaseFromHomeFlag()
+		kb, err := keys.NewKeyBaseFromDir(viper.GetString(flags.FlagHome))
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest, err.Error())
 
@@ -67,7 +69,7 @@ func KeyHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		keyName := vars[keyNameKey]
 
-		kb, err := keys.NewKeyBaseFromHomeFlag()
+		kb, err := keys.NewKeyBaseFromDir(viper.GetString(flags.FlagHome))
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest, err.Error())
 

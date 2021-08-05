@@ -21,7 +21,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
 )
 
@@ -32,7 +31,7 @@ func BlocksHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		err := restCtx.Request().ParseForm()
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest,
-				sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
+				"Bad Request")
 
 			return
 		}
@@ -65,7 +64,7 @@ func NodeStatusHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		err := restCtx.Request().ParseForm()
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest,
-				sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
+				"Bad Request")
 
 			return
 		}
@@ -91,7 +90,7 @@ func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		err := restCtx.Request().ParseForm()
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest,
-				sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
+				"Bad Request")
 
 			return
 		}
@@ -124,8 +123,8 @@ func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		if height_ == 0 {
 			height_ = chainHeight
 		}
-
-		output, err := rpc.GetValidators(cliCtx, &height_)
+		//TODO : FIX ME
+		output, err := rpc.GetValidators(cliCtx, &height_, 10, 10)
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusInternalServerError, err.Error())
 

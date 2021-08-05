@@ -22,7 +22,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	restTypes "github.com/cosmos/cosmos-sdk/types/rest"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/utils/rest"
@@ -110,7 +109,7 @@ func SignMessageHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		err := r.ParseForm()
 		if err != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest,
-				sdk.AppendMsgToErr("could not parse query parameters", err.Error()))
+				"Could not parse query parameters")
 
 			return
 		}
