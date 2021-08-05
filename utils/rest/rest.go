@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,7 +42,7 @@ type BasicReq struct {
 }
 
 type RestContext struct {
-	context        client.CLIContext
+	context        context.CLIContext
 	responseWriter http.ResponseWriter
 	request        *http.Request
 	baseReq        rest.BaseReq
@@ -62,7 +61,7 @@ func (ctx RestContext) Codec() *codec.Codec {
 	return ctx.context.Codec
 }
 
-func (ctx RestContext) Context() client.CLIContext {
+func (ctx RestContext) Context() context.CLIContext {
 	return ctx.context
 }
 
@@ -291,7 +290,8 @@ func (ctx RestContext) WriteErrorResponse(status int, err string) {
 }
 
 func (ctx RestContext) TxnBuilder() (types.TxBuilder, error) {
-	txBldr := auth.NewTxBuilderFromCLI()
+	// TODO - FIXME
+	txBldr := auth.NewTxBuilderFromCLI(nil)
 
 	accountNumber := ctx.baseReq.AccountNumber
 	sequence := ctx.baseReq.Sequence
