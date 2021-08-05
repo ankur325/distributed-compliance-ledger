@@ -43,7 +43,7 @@ func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
 		default:
 			errMsg := fmt.Sprintf("unrecognized pki Msg type: %v", msg.Type())
 
-			return errors.Wrap(errors.ErrInvalidRequest, errMsg)
+			return nil, errors.Wrap(errors.ErrInvalidRequest, errMsg)
 		}
 	}
 }
@@ -54,7 +54,7 @@ func handleMsgProposeAddX509RootCert(ctx sdk.Context, keeper keeper.Keeper, auth
 	// decode pem certificate
 	x509Certificate, err := x509.DecodeX509Certificate(msg.Cert)
 	if err != nil {
-		return nil, types.ErrCodeInvalidCertificate(err.Data())
+		return nil, types.ErrCodeInvalidCertificate(err)
 	}
 
 	// fail if certificate is not self-signed
@@ -174,16 +174,16 @@ func handleMsgApproveAddX509RootCert(ctx sdk.Context, keeper keeper.Keeper, auth
 }
 
 // nolint:funlen
-func handleMsgAddX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgAddX509Cert) sdk.Result {
+func handleMsgAddX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgAddX509Cert) (*sdk.Result, error) {
 	// decode pem certificate
 	x509Certificate, err := x509.DecodeX509Certificate(msg.Cert)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// fail if certificate is self-signed
 	if x509Certificate.IsSelfSigned() {
-		return types.ErrInappropriateCertificateType(
+		return nil, types.ErrInappropriateCertificateType(
 			"Inappropriate Certificate Type: Passed certificate is self-signed, " +
 				"so it cannot be added to the system as a non-root certificate. " +
 				"To propose adding a root certificate please use `PROPOSE_ADD_X509_ROOT_CERT` transaction.")
@@ -191,7 +191,7 @@ func handleMsgAddX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgAd
 
 	// check if certificate with Issuer/Serial Number combination already exists
 	if keeper.IsUniqueCertificateKeyPresent(ctx, x509Certificate.Issuer, x509Certificate.SerialNumber) {
-		return types.ErrCertificateAlreadyExists(x509Certificate.Issuer, x509Certificate.SerialNumber)
+		return nil, types.ErrCertificateAlreadyExists(x509Certificate.Issuer, x509Certificate.SerialNumber)
 	}
 
 	// Get list of certificates for Subject / Subject Key Id combination
@@ -203,25 +203,23 @@ func handleMsgAddX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgAd
 		// are not self-signed too, consequently are non-root certificates, before to match issuer and authorityKeyID.
 		if certificates.Items[0].IsRoot || x509Certificate.Issuer != certificates.Items[0].Issuer ||
 			x509Certificate.AuthorityKeyID != certificates.Items[0].AuthorityKeyID {
-			return sdk.ErrUnauthorized(
-				fmt.Sprintf("Issuer and authorityKeyID of new certificate with subject=%v and subjectKeyID=%v "+
-					"must be the same as ones of existing certificates with the same subject and subjectKeyID",
-					x509Certificate.Subject, x509Certificate.SubjectKeyID))
+			return nil, errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf("Issuer and authorityKeyID of new certificate with subject=%v and subjectKeyID=%v "+
+				"must be the same as ones of existing certificates with the same subject and subjectKeyID",
+				x509Certificate.Subject, x509Certificate.SubjectKeyID))
 		}
 
 		// signer must be same as owner of existing certificates
 		if !msg.Signer.Equals(certificates.Items[0].Owner) {
-			return sdk.ErrUnauthorized(
-				fmt.Sprintf("Only owner of existing certificates with subject=%v and subjectKeyID=%v "+
-					"can add new certificate with the same subject and subjectKeyID",
-					x509Certificate.Subject, x509Certificate.SubjectKeyID))
+			return nil, errors.Wrap(errors.ErrUnauthorized, fmt.Sprintf("Only owner of existing certificates with subject=%v and subjectKeyID=%v "+
+				"can add new certificate with the same subject and subjectKeyID",
+				x509Certificate.Subject, x509Certificate.SubjectKeyID))
 		}
 	}
 
 	// Valid certificate chain must be built for new certificate
 	rootCertificateSubject, rootCertificateSubjectKeyID, err := verifyCertificate(ctx, keeper, x509Certificate)
 	if err != nil {
-		return types.ErrCodeInvalidCertificate(
+		return nil, types.ErrCodeInvalidCertificate(
 			fmt.Sprintf("Cannot build valid certificate chain for certificate with subject=%v and subjectKeyID=%v",
 				x509Certificate.Subject, x509Certificate.SubjectKeyID))
 	}
@@ -250,7 +248,7 @@ func handleMsgAddX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgAd
 	// register the unique certificate key
 	keeper.SetUniqueCertificateKey(ctx, x509Certificate.Issuer, x509Certificate.SerialNumber)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func handleMsgProposeRevokeX509RootCert(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper,
@@ -336,22 +334,22 @@ func handleMsgApproveRevokeX509RootCert(ctx sdk.Context, keeper keeper.Keeper, a
 	return &sdk.Result{}, nil
 }
 
-func handleMsgRevokeX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgRevokeX509Cert) sdk.Result {
+func handleMsgRevokeX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgRevokeX509Cert) (*sdk.Result, error) {
 	if !keeper.IsApprovedCertificatesPresent(ctx, msg.Subject, msg.SubjectKeyID) {
-		return types.ErrCertificateDoesNotExist(msg.Subject, msg.SubjectKeyID)
+		return nil, types.ErrCertificateDoesNotExist(msg.Subject, msg.SubjectKeyID)
 	}
 
 	certificates := keeper.GetApprovedCertificates(ctx, msg.Subject, msg.SubjectKeyID)
 
 	if certificates.Items[0].IsRoot {
-		return types.ErrInappropriateCertificateType(
+		return nil, types.ErrInappropriateCertificateType(
 			fmt.Sprintf("Inappropriate Certificate Type: Certificate with subject=%v and subjectKeyID=%v "+
 				"is a root certificate. To propose revocation of a root certificate please use "+
 				"`PROPOSE_REVOKE_X509_ROOT_CERT` transaction.", msg.Subject, msg.SubjectKeyID))
 	}
 
 	if !msg.Signer.Equals(certificates.Items[0].Owner) {
-		return sdk.ErrUnauthorized("Only owner can revoke certificate using `REVOKE_X509_CERT`")
+		return nil, errors.Wrap(errors.ErrUnauthorized, "Only owner can revoke certificate using `REVOKE_X509_CERT`")
 	}
 
 	issuer := certificates.Items[0].Issuer
@@ -367,7 +365,7 @@ func handleMsgRevokeX509Cert(ctx sdk.Context, keeper keeper.Keeper, msg types.Ms
 
 	revokeChildCertificates(ctx, keeper, msg.Subject, msg.SubjectKeyID)
 
-	return sdk.Result{}
+	return &sdk.Result{}, nil
 }
 
 func revokeChildCertificates(ctx sdk.Context, keeper keeper.Keeper, issuer string, authorityKeyID string) {
@@ -434,7 +432,7 @@ func removeChildCertificateEntry(ctx sdk.Context, keeper keeper.Keeper, issuer s
 // Tries to build a valid certificate chain for the given certificate.
 // Returns the RootSubject/RootSubjectKeyID combination or an error in case no valid certificate chain can be built.
 func verifyCertificate(ctx sdk.Context, keeper keeper.Keeper,
-	x509Certificate *x509.X509Certificate) (string, string, sdk.Error) {
+	x509Certificate *x509.X509Certificate) (string, string, error) {
 	// nolint:nestif
 	if x509Certificate.IsSelfSigned() {
 		// in this system a certificate is self-signed if and only if it is a root certificate
