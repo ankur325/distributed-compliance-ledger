@@ -50,7 +50,7 @@ func CreateKey(accountName string) (KeyInfo, int) {
 
 	entropySeed, _ := bip39.NewEntropy(256)
 	mnemonic, _ := bip39.NewMnemonic(entropySeed)
-	_, _ = kb.CreateAccount(accountName, mnemonic, "", constants.Passphrase, 0, 0)
+	_, _ = kb.CreateAccount(accountName, mnemonic, "", constants.Passphrase, "0", "0")
 
 	return GetKeyInfo(accountName)
 }

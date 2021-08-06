@@ -18,13 +18,11 @@ import (
 	"net/http"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/rand"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/utils"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
 )
 
 //nolint:godox
@@ -122,7 +120,7 @@ func Test_AddModelinfo_ByNonVendor(t *testing.T) {
 	// try to publish model info
 	modelInfo := utils.NewMsgAddModelInfo(testAccount.Address)
 	res, _ := utils.SignAndBroadcastMessage(testAccount, modelInfo)
-	require.Equal(t, errors.ErrUnauthorized, sdk.CodeType(res.Code))
+	require.Equal(t, errors.ErrUnauthorized, res.Code)
 }
 
 func Test_AddModelinfo_Twice(t *testing.T) {
@@ -132,11 +130,11 @@ func Test_AddModelinfo_Twice(t *testing.T) {
 	// publish model info
 	modelInfo := utils.NewMsgAddModelInfo(testAccount.Address)
 	res, _ := utils.AddModelInfo(modelInfo, testAccount)
-	require.Equal(t, sdk.CodeOK, sdk.CodeType(res.Code))
+	require.Equal(t, 0, res.Code)
 
 	// publish second time
 	res, _ = utils.AddModelInfo(modelInfo, testAccount)
-	require.Equal(t, modelinfo.CodeModelInfoAlreadyExists, sdk.CodeType(res.Code))
+	require.Equal(t, 501, res.Code)
 }
 
 func Test_GetModelinfo_ForUnknown(t *testing.T) {

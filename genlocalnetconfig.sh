@@ -33,12 +33,12 @@ dclcli config chain-id dclchain
 dclcli config output json
 dclcli config indent true
 dclcli config trust-node false
-
-echo 'test1234' | dclcli keys add jack
-echo 'test1234' | dclcli keys add alice
-echo 'test1234' | dclcli keys add bob
-echo 'test1234' | dclcli keys add anna
-
+echo "Time to add the keys"
+echo 'test1234' | dclcli keys add jack --keyring-backend test
+echo 'test12341' | dclcli keys add alice --keyring-backend test
+echo 'test12342' | dclcli keys add bob --keyring-backend test
+echo 'test12343' | dclcli keys add anna --keyring-backend test
+echo "keys added"
 cp -r ~/.dclcli/* localnet/client
 
 # node 0
