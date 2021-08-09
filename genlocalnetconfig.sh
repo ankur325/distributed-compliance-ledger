@@ -22,31 +22,43 @@ if [ "$(uname)" == "Darwin" ]; then
 fi
 
 rm -rf ~/.dclcli
+rm -rf ~/.gaiacli
 rm -rf ~/.dcld
 
 rm -rf localnet
 mkdir localnet localnet/client localnet/node0 localnet/node1 localnet/node2 localnet/node3
 
 # client
-
+gaiacli config chain-id dclchain
 dclcli config chain-id dclchain
 dclcli config output json
 dclcli config indent true
 dclcli config trust-node false
-echo "Time to add the keys"
-echo 'test1234' | dclcli keys add jack --keyring-backend test
-echo 'test12341' | dclcli keys add alice --keyring-backend test
-echo 'test12342' | dclcli keys add bob --keyring-backend test
-echo 'test12343' | dclcli keys add anna --keyring-backend test
+
+echo "Time to add the keys..."
+#gaiacli keys add jack1
+#(echo 'test1234'; echo 'test1234') | gaiacli keys add jack
+# (echo 'test1234'; echo 'test1234') | gaiacli keys add bob
+# (echo 'test1234'; echo 'test1234') | gaiacli keys add anna
+
+echo 'test1234'; echo 'test1234' | gaiacli keys add jack 
+echo 'test1234'; echo 'test1234'  | gaiacli keys add alice 
+echo 'test1234'; echo 'test1234' | gaiacli keys add bob 
+echo 'test1234'; echo 'test1234'  | gaiacli keys add anna 
 echo "keys added"
 cp -r ~/.dclcli/* localnet/client
+cp -r ~/.gaiacli/* localnet/client
+# mkdir localnet/client/keys
+# cp -r ~/.gaiacli/keys/* localnet/client/keys
 
 # node 0
 
 dcld init node0 --chain-id dclchain
+echo "Checking the keys"
+jack_address=$(gaiacli keys show jack -a)
+jack_pubkey=$(gaiacli keys show jack -p )
 
-jack_address=$(dclcli keys show jack -a)
-jack_pubkey=$(dclcli keys show jack -p)
+echo "Yahoooooo!!!!!!!!"
 
 alice_address=$(dclcli keys show alice -a)
 alice_pubkey=$(dclcli keys show alice -p)

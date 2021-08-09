@@ -19,6 +19,7 @@ FROM golang:alpine AS builder
 
 # Build Delve - This is helpful if you want to do remote debugging by attaching to one of the docker containers remotely
 RUN go get github.com/go-delve/delve/cmd/dlv
+RUN go get github.com/cosmos/gaia/cmd/gaiacli
 
 # Git is required for fetching the dependencies,
 # make is required for building.

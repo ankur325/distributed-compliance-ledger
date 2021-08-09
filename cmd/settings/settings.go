@@ -16,7 +16,7 @@ package settings
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/store"
 )
 
 const (
@@ -25,4 +25,4 @@ const (
 )
 
 // PruningStrategy of the application: Store every state. Keep last two states.
-var PruningStrategy = types.NewPruningOptions(2, 1)
+var PruningStrategy = store.NewPruningOptionsFromString(store.PruningStrategyNothing)
