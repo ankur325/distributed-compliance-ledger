@@ -48,6 +48,15 @@ func ParseUInt32FromString(str string) (uint32, sdk.Error) {
 	return uint32(val), nil
 }
 
+func ParseUInt64FromString(str string) (uint64, sdk.Error) {
+	val, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return 0, sdk.ErrUnknownRequest(fmt.Sprintf("Parsing Error: \"%v\" must be 64 bit unsigned integer", str))
+	}
+
+	return uint64(val), nil
+}
+
 func ParseVID(str string) (uint16, sdk.Error) {
 	res, err := ParseUInt16FromString(str)
 	if err != nil {
@@ -69,6 +78,19 @@ func ParsePID(str string) (uint16, sdk.Error) {
 
 	if res == 0 {
 		return 0, sdk.ErrUnknownRequest("Invalid PID: it must be non zero 16-bit unsigned integer")
+	}
+
+	return res, nil
+}
+
+func ParseSoftwareVersion(str string) (uint32, sdk.Error) {
+	res, err := ParseUInt32FromString(str)
+	if err != nil {
+		return 0, sdk.ErrUnknownRequest(fmt.Sprintf("Invalid SoftwareVersion: %v", err.Data()))
+	}
+
+	if res == 0 {
+		return 0, sdk.ErrUnknownRequest("Invalid SoftwareVersion: it must be non zero 32-bit unsigned integer")
 	}
 
 	return res, nil
