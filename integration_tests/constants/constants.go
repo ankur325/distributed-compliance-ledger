@@ -36,11 +36,11 @@ var (
 	// Model Info.
 	VID                                        uint16 = 1
 	PID                                        uint16 = 22
-	CID                                        uint16 = 12345
+	DeviceTypeID                               uint16 = 12345
 	Version                                           = "1.0"
 	ProductName                                       = "Device Name"
-	Description                                       = "Device Description"
-	SKU                                               = "RCU2205A"
+	ProductLabel                                      = "Product Label and/or Product Description"
+	PartNumber                                        = "RCU2205A"
 	SoftwareVersion                            uint32 = 1
 	SoftwareVersionString                             = "1.0"
 	HardwareVersion                            uint32 = 21

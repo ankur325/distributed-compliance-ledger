@@ -113,10 +113,10 @@ func TestKeeper_VendorProductsUpdatesWithModelInfo(t *testing.T) {
 		setup.ModelinfoKeeper.SetModelInfo(setup.Ctx, modelInfo)
 
 		vendorProduct := types.Product{
-			PID:   modelInfo.Model.PID,
-			Name:  modelInfo.Model.ProductName,
-			SKU:   modelInfo.Model.SKU,
-			Owner: modelInfo.Owner,
+			PID:        modelInfo.Model.PID,
+			Name:       modelInfo.Model.ProductName,
+			PartNumber: modelInfo.Model.PartNumber,
+			Owner:      modelInfo.Owner,
 		}
 		PIDs = append(PIDs, vendorProduct)
 

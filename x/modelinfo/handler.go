@@ -55,33 +55,19 @@ func handleMsgAddModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper aut
 	model := types.Model{
 		VID:                                      msg.VID,
 		PID:                                      msg.PID,
-		CID:                                      msg.CID,
+		DeviceTypeID:                             msg.DeviceTypeID,
 		ProductName:                              msg.ProductName,
-		Description:                              msg.Description,
-		SKU:                                      msg.SKU,
-		SoftwareVersion:                          msg.SoftwareVersion,
-		SoftwareVersionString:                    msg.SoftwareVersionString,
-		HardwareVersion:                          msg.HardwareVersion,
-		HardwareVersionString:                    msg.HardwareVersionString,
-		CDVersionNumber:                          msg.CDVersionNumber,
-		FirmwareDigests:                          msg.FirmwareDigests,
-		Revoked:                                  msg.Revoked,
-		OtaURL:                                   msg.OtaURL,
-		OtaChecksum:                              msg.OtaChecksum,
-		OtaChecksumType:                          msg.OtaChecksumType,
-		OtaBlob:                                  msg.OtaBlob,
+		ProductLabel:                             msg.ProductLabel,
+		PartNumber:                               msg.PartNumber,
 		CommissioningCustomFlow:                  msg.CommissioningCustomFlow,
 		CommissioningCustomFlowURL:               msg.CommissioningCustomFlowURL,
 		CommissioningModeInitialStepsHint:        msg.CommissioningModeInitialStepsHint,
 		CommissioningModeInitialStepsInstruction: msg.CommissioningModeInitialStepsInstruction,
 		CommissioningModeSecondaryStepsHint:      msg.CommissioningModeSecondaryStepsHint,
 		CommissioningModeSecondaryStepsInstruction: msg.CommissioningModeSecondaryStepsInstruction,
-		ReleaseNotesURL: msg.ReleaseNotesURL,
-		UserManualURL:   msg.UserManualURL,
-		SupportURL:      msg.SupportURL,
-		ProductURL:      msg.ProductURL,
-		ChipBlob:        msg.ChipBlob,
-		VendorBlob:      msg.VendorBlob,
+		UserManualURL: msg.UserManualURL,
+		SupportURL:    msg.SupportURL,
+		ProductURL:    msg.ProductURL,
 	}
 	modelInfo := types.NewModelInfo(
 		model,
@@ -109,46 +95,18 @@ func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 		return err.Result()
 	}
 
-	if msg.OtaURL != "" && modelInfo.Model.OtaURL == "" {
-		return types.ErrOtaURLCannotBeSet(msg.VID, msg.PID).Result()
-	}
-
 	// updates existing model value only if corresponding value in MsgUpdate is not empty
 
-	if msg.CID != 0 {
-		modelInfo.Model.CID = msg.CID
+	if msg.DeviceTypeID != 0 {
+		modelInfo.Model.DeviceTypeID = msg.DeviceTypeID
 	}
 
-	if msg.Description != "" {
-		modelInfo.Model.Description = msg.Description
-	}
-
-	if msg.Revoked != modelInfo.Model.Revoked {
-		modelInfo.Model.Revoked = msg.Revoked
-	}
-
-	if msg.CDVersionNumber != 0 {
-		modelInfo.Model.CDVersionNumber = msg.CDVersionNumber
-	}
-
-	if msg.OtaURL != "" {
-		modelInfo.Model.OtaURL = msg.OtaURL
-	}
-
-	if msg.OtaChecksum != "" {
-		modelInfo.Model.OtaChecksum = msg.OtaChecksum
-	}
-
-	if msg.OtaChecksumType != "" {
-		modelInfo.Model.OtaChecksumType = msg.OtaChecksumType
+	if msg.ProductLabel != "" {
+		modelInfo.Model.ProductLabel = msg.ProductLabel
 	}
 
 	if msg.CommissioningCustomFlowURL != "" {
 		modelInfo.Model.CommissioningCustomFlowURL = msg.CommissioningCustomFlowURL
-	}
-
-	if msg.ReleaseNotesURL != "" {
-		modelInfo.Model.ReleaseNotesURL = msg.ReleaseNotesURL
 	}
 
 	if msg.UserManualURL != "" {
@@ -161,14 +119,6 @@ func handleMsgUpdateModelInfo(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 
 	if msg.ProductURL != "" {
 		modelInfo.Model.ProductURL = msg.ProductURL
-	}
-
-	if msg.ChipBlob != "" {
-		modelInfo.Model.ChipBlob = msg.ChipBlob
-	}
-
-	if msg.VendorBlob != "" {
-		modelInfo.Model.VendorBlob = msg.VendorBlob
 	}
 
 	// store updated model

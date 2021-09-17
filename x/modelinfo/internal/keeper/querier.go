@@ -95,7 +95,7 @@ func queryAllModels(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res 
 				VID:   modelInfo.Model.VID,
 				PID:   modelInfo.Model.PID,
 				Name:  modelInfo.Model.ProductName,
-				SKU:   modelInfo.Model.SKU,
+				SKU:   modelInfo.Model.PartNumber,
 				Owner: modelInfo.Owner,
 			}
 

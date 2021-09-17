@@ -60,41 +60,13 @@ func (m MsgAddModelInfo) ValidateBasic() sdk.Error {
 		return sdk.ErrUnknownRequest("Invalid ProductName: it cannot be empty")
 	}
 
-	if len(m.Description) == 0 {
-		return sdk.ErrUnknownRequest("Invalid Description: it cannot be empty")
+	if len(m.ProductLabel) == 0 {
+		return sdk.ErrUnknownRequest("Invalid ProductLabel: it cannot be empty")
 	}
 
-	if len(m.SKU) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SKU: it cannot be empty")
+	if len(m.PartNumber) == 0 {
+		return sdk.ErrUnknownRequest("Invalid PartNumber: it cannot be empty")
 	}
-
-	if m.SoftwareVersion == 0 {
-		return sdk.ErrUnknownRequest("Invalid SoftwareVersion: it must be non-zero 32-bit unsigned integer")
-	}
-
-	if len(m.SoftwareVersionString) == 0 {
-		return sdk.ErrUnknownRequest("Invalid SoftwareVersionString: it cannot be empty")
-	}
-
-	if m.HardwareVersion == 0 {
-		return sdk.ErrUnknownRequest("Invalid HardwareVersion: it must be non-zero 32-bit unsigned integer")
-	}
-
-	if len(m.HardwareVersionString) == 0 {
-		return sdk.ErrUnknownRequest("Invalid HardwareVersionString: it cannot be empty")
-	}
-
-	if m.CDVersionNumber == 0 {
-		return sdk.ErrUnknownRequest("Invalid CDVersionNumber: it must be non-zero 16-bit unsigned integer")
-	}
-
-	if m.OtaURL != "" || m.OtaChecksum != "" || m.OtaChecksumType != "" {
-		if m.OtaURL == "" || m.OtaChecksum == "" || m.OtaChecksumType == "" {
-			return sdk.ErrUnknownRequest("Invalid MsgAddModelInfo: the fields OtaURL, OtaChecksum and " +
-				"OtaChecksumType must be either specified together, or not specified together")
-		}
-	}
-
 	return nil
 }
 

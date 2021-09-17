@@ -33,51 +33,28 @@ func NewGenesisState() GenesisState {
 //nolint:cognit
 func ValidateGenesis(data GenesisState) error {
 	for _, record := range data.ModelInfoRecords {
-		if record.Model.VID == 0 {
+		if record.VID == 0 {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid VID. Value: %v", record))
 		}
 
-		if record.Model.PID == 0 {
+		if record.PID == 0 {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid PID. Value: %v", record))
 		}
 
-		if record.Model.ProductName == "" {
+		if record.ProductName == "" {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed ProductName. Value: %v", record))
 		}
 
-		if record.Model.Description == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Description. Value: %v", record))
+		if record.ProductLabel == "" {
+			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed ProductLabel. Value: %v", record))
 		}
 
-		if record.Model.SKU == "" {
+		if record.PartNumber == "" {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SKU. Value: %v", record))
-		}
-
-		if record.Model.HardwareVersion == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersion. Value: %v", record))
-		}
-
-		if record.Model.HardwareVersionString == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersionString. Value: %v", record))
-		}
-
-		if record.Model.SoftwareVersion == 0 {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SoftwareVersion. Value: %v", record))
-		}
-
-		if record.Model.SoftwareVersionString == "" {
-			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SoftwareVersionString. Value: %v", record))
 		}
 
 		if record.Owner.Empty() {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Owner. Value: %v", record))
-		}
-
-		if record.Model.OtaURL != "" || record.Model.OtaChecksum != "" || record.Model.OtaChecksumType != "" {
-			if record.Model.OtaURL == "" || record.Model.OtaChecksum == "" || record.Model.OtaChecksumType == "" {
-				return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: The fields OtaURL, OtaChecksum and "+
-					"OtaChecksumType must be either specified together, or not specified together. Value: %v", record))
-			}
 		}
 	}
 

@@ -42,7 +42,7 @@ func TestHandler_AddModel(t *testing.T) {
 	// check
 	require.Equal(t, receivedModelInfo.Model.VID, modelInfo.VID)
 	require.Equal(t, receivedModelInfo.Model.PID, modelInfo.PID)
-	require.Equal(t, receivedModelInfo.Model.CID, modelInfo.CID)
+	require.Equal(t, receivedModelInfo.Model.DeviceTypeID, modelInfo.DeviceTypeID)
 }
 
 func TestHandler_UpdateModel(t *testing.T) {
@@ -68,7 +68,7 @@ func TestHandler_UpdateModel(t *testing.T) {
 	// check
 	require.Equal(t, receivedModelInfo.Model.VID, msgAddModelInfo.VID)
 	require.Equal(t, receivedModelInfo.Model.PID, msgAddModelInfo.PID)
-	require.Equal(t, receivedModelInfo.Model.CID, msgUpdateModelInfo.CID)
+	require.Equal(t, receivedModelInfo.Model.DeviceTypeID, msgUpdateModelInfo.DeviceTypeID)
 }
 
 func TestHandler_OnlyOwnerCanUpdateModel(t *testing.T) {
@@ -101,10 +101,7 @@ func TestHandler_AddModelWithEmptyOptionalFields(t *testing.T) {
 
 	// add new model
 	modelInfo := TestMsgAddModelInfo(setup.Vendor)
-	modelInfo.CID = 0              // Set empty CID
-	modelInfo.OtaURL = ""          // Set empty OtaURL
-	modelInfo.OtaChecksum = ""     // Set empty OtaChecksum
-	modelInfo.OtaChecksumType = "" // Set empty OtaChecksumType
+	modelInfo.DeviceTypeID = 0 // Set empty CID
 
 	result := setup.Handler(setup.Ctx, modelInfo)
 	require.Equal(t, sdk.CodeOK, result.Code)
@@ -113,10 +110,8 @@ func TestHandler_AddModelWithEmptyOptionalFields(t *testing.T) {
 	receivedModelInfo := queryModelInfo(setup, testconstants.VID, testconstants.PID)
 
 	// check
-	require.Equal(t, receivedModelInfo.Model.CID, uint16(0))
-	require.Equal(t, receivedModelInfo.Model.OtaURL, "")
-	require.Equal(t, receivedModelInfo.Model.OtaChecksum, "")
-	require.Equal(t, receivedModelInfo.Model.OtaChecksumType, "")
+	require.Equal(t, receivedModelInfo.Model.DeviceTypeID, uint16(0))
+
 }
 
 func TestHandler_AddModelByNonVendor(t *testing.T) {
@@ -143,9 +138,8 @@ func TestHandler_PartiallyUpdateModel(t *testing.T) {
 
 	// owner update Description of existing model
 	msgUpdateModelInfo := TestMsgUpdateModelInfo(setup.Vendor)
-	msgUpdateModelInfo.CID = 0
-	msgUpdateModelInfo.Description = "New Description"
-	msgUpdateModelInfo.OtaURL = ""
+	msgUpdateModelInfo.DeviceTypeID = 0
+	msgUpdateModelInfo.ProductLabel = "New Description"
 	result = setup.Handler(setup.Ctx, msgUpdateModelInfo)
 	require.Equal(t, sdk.CodeOK, result.Code)
 
@@ -153,9 +147,8 @@ func TestHandler_PartiallyUpdateModel(t *testing.T) {
 	receivedModelInfo := queryModelInfo(setup, msgUpdateModelInfo.VID, msgUpdateModelInfo.PID)
 
 	// check
-	require.Equal(t, receivedModelInfo.Model.CID, msgAddModelInfo.CID)
-	require.Equal(t, receivedModelInfo.Model.Description, msgUpdateModelInfo.Description)
-	require.Equal(t, receivedModelInfo.Model.OtaURL, msgAddModelInfo.OtaURL)
+	require.Equal(t, receivedModelInfo.Model.DeviceTypeID, msgAddModelInfo.DeviceTypeID)
+	require.Equal(t, receivedModelInfo.Model.ProductLabel, msgUpdateModelInfo.ProductLabel)
 }
 
 func queryModelInfo(setup TestSetup, vid uint16, pid uint16) types.ModelInfo {

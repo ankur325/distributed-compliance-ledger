@@ -27,33 +27,19 @@ func getTestModel() Model {
 	return Model{
 		VID:                                      testconstants.VID,
 		PID:                                      testconstants.PID,
-		CID:                                      testconstants.CID,
+		DeviceTypeID:                             testconstants.DeviceTypeID,
 		ProductName:                              testconstants.ProductName,
-		Description:                              testconstants.Description,
-		SKU:                                      testconstants.SKU,
-		SoftwareVersion:                          testconstants.SoftwareVersion,
-		SoftwareVersionString:                    testconstants.SoftwareVersionString,
-		HardwareVersion:                          testconstants.HardwareVersion,
-		HardwareVersionString:                    testconstants.HardwareVersionString,
-		CDVersionNumber:                          testconstants.CDVersionNumber,
-		FirmwareDigests:                          testconstants.FirmwareDigests,
-		Revoked:                                  testconstants.Revoked,
-		OtaURL:                                   testconstants.OtaURL,
-		OtaChecksum:                              testconstants.OtaChecksum,
-		OtaChecksumType:                          testconstants.OtaChecksumType,
-		OtaBlob:                                  testconstants.OtaBlob,
+		ProductLabel:                             testconstants.ProductLabel,
+		PartNumber:                               testconstants.PartNumber,
 		CommissioningCustomFlow:                  testconstants.CommissioningCustomFlow,
 		CommissioningCustomFlowURL:               testconstants.CommissioningCustomFlowURL,
 		CommissioningModeInitialStepsHint:        testconstants.CommissioningModeInitialStepsHint,
 		CommissioningModeInitialStepsInstruction: testconstants.CommissioningModeInitialStepsInstruction,
 		CommissioningModeSecondaryStepsHint:      testconstants.CommissioningModeSecondaryStepsHint,
 		CommissioningModeSecondaryStepsInstruction: testconstants.CommissioningModeSecondaryStepsInstruction,
-		ReleaseNotesURL: testconstants.ReleaseNotesURL,
-		UserManualURL:   testconstants.UserManualURL,
-		SupportURL:      testconstants.SupportURL,
-		ProductURL:      testconstants.ProductURL,
-		ChipBlob:        testconstants.ChipBlob,
-		VendorBlob:      testconstants.VendorBlob,
+		UserManualURL: testconstants.UserManualURL,
+		SupportURL:    testconstants.SupportURL,
+		ProductURL:    testconstants.ProductURL,
 	}
 }
 
@@ -61,22 +47,12 @@ func getTestModelForUpdate() Model {
 	return Model{
 		VID:                        testconstants.VID,
 		PID:                        testconstants.PID,
-		CID:                        testconstants.CID,
-		Description:                testconstants.Description,
-		CDVersionNumber:            testconstants.CDVersionNumber,
-		FirmwareDigests:            testconstants.FirmwareDigests,
-		Revoked:                    testconstants.Revoked,
-		OtaURL:                     testconstants.OtaURL,
-		OtaChecksum:                testconstants.OtaChecksum,
-		OtaChecksumType:            testconstants.OtaChecksumType,
-		OtaBlob:                    testconstants.OtaBlob,
+		DeviceTypeID:               testconstants.DeviceTypeID,
+		ProductLabel:               testconstants.ProductLabel,
 		CommissioningCustomFlowURL: testconstants.CommissioningCustomFlowURL,
-		ReleaseNotesURL:            testconstants.ReleaseNotesURL,
 		UserManualURL:              testconstants.UserManualURL,
 		SupportURL:                 testconstants.SupportURL,
 		ProductURL:                 testconstants.ProductURL,
-		ChipBlob:                   testconstants.ChipBlob,
-		VendorBlob:                 testconstants.VendorBlob,
 	}
 }
 
@@ -103,9 +79,9 @@ func TestMsgAddModelInfoValidation(t *testing.T) {
 	model.PID = 0
 	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
 
-	// CID is optional
+	// DeviceTypeID is Mandator
 	model = getTestModel()
-	model.CID = 0
+	model.DeviceTypeID = 0
 	require.Nil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
 
 	// Name is mandatory
@@ -113,58 +89,15 @@ func TestMsgAddModelInfoValidation(t *testing.T) {
 	model.ProductName = ""
 	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
 
-	// Description is mandatory
+	// ProductLabel is mandatory
 	model = getTestModel()
-	model.Description = ""
+	model.ProductLabel = ""
 	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
 
-	// SKU is mandatory
+	// PartNumber is mandatory
 	model = getTestModel()
-	model.SKU = ""
+	model.PartNumber = ""
 	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// SoftwareVersion is mandatory
-	model = getTestModel()
-	model.SoftwareVersion = 0
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// SoftwareVersionString is mandatory
-	model = getTestModel()
-	model.SoftwareVersionString = ""
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// HardwareVersion is mandatory
-	model = getTestModel()
-	model.HardwareVersion = 0
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// HardwareVersionString is mandatory
-	model = getTestModel()
-	model.HardwareVersionString = ""
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// Ota Combination checks - Missing checksum
-	model = getTestModel()
-	model.OtaChecksum = ""
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// Ota Combination checks - Missing url and checksumType
-	model = getTestModel()
-	model.OtaURL = ""
-	model.OtaChecksum = ""
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// Ota Combination checks - Missing checksumType
-	model = getTestModel()
-	model.OtaChecksumType = ""
-	require.NotNil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
-
-	// Ota Combination checks - Missing all three
-	model = getTestModel()
-	model.OtaChecksum = ""
-	model.OtaChecksumType = ""
-	model.OtaURL = ""
-	require.Nil(t, NewMsgAddModelInfo(model, testconstants.Signer).ValidateBasic())
 
 	// Missing non mandatory
 	model = getTestModel()

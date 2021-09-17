@@ -223,7 +223,7 @@ func MakeModelinfoKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) mode
 
 func MakeModelversionKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) modelinfoversion.Keeper {
 	return modelinfoversion.NewKeeper(
-		keys[modelinfo.StoreKey],
+		keys[modelinfoversion.StoreKey],
 		app.cdc,
 	)
 }

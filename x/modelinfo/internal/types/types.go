@@ -20,12 +20,31 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+//nolint:maligned
+type Model struct {
+	VID                                        uint16 `json:"vid"`
+	PID                                        uint16 `json:"pid"`
+	DeviceTypeID                               uint16 `json:"deviceTypeID"`
+	ProductName                                string `json:"productName"`
+	ProductLabel                               string `json:"productLabel"`
+	PartNumber                                 string `json:"sku"`
+	CommissioningCustomFlow                    uint8  `json:"commissioningCustomFlow,omitempty"`
+	CommissioningCustomFlowURL                 string `json:"commissioningCustomFlowURL,omitempty"`
+	CommissioningModeInitialStepsHint          uint32 `json:"commissioningModeInitialStepsHint,omitempty"`
+	CommissioningModeInitialStepsInstruction   string `json:"commissioningModeInitialStepsInstruction,omitempty"`
+	CommissioningModeSecondaryStepsHint        uint32 `json:"commissioningModeSecondaryStepsHint,omitempty"`
+	CommissioningModeSecondaryStepsInstruction string `json:"commissioningModeSecondaryStepsInstruction,omitempty"`
+	UserManualURL                              string `json:"userManualURL,omitempty"`
+	SupportURL                                 string `json:"supportURL,omitempty"`
+	ProductURL                                 string `json:"productURL,omitempty"`
+}
+
 /*
 	Model Info stored in KVStore
 */
 //nolint:maligned
 type ModelInfo struct {
-	Model Model          `json:"model"`
+	Model
 	Owner sdk.AccAddress `json:"owner"`
 }
 
@@ -93,8 +112,8 @@ func (d VendorProducts) String() string {
 
 // Single Vendor Product.
 type Product struct {
-	PID   uint16         `json:"pid"`
-	Name  string         `json:"name"`
-	SKU   string         `json:"sku"`
-	Owner sdk.AccAddress `json:"owner"`
+	PID        uint16         `json:"pid"`
+	Name       string         `json:"name"`
+	PartNumber string         `json:"sku"`
+	Owner      sdk.AccAddress `json:"owner"`
 }

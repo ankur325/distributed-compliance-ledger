@@ -65,21 +65,12 @@ func Setup() TestSetup {
 
 func DefaultModelInfo() types.ModelInfo {
 	model := types.Model{
-		VID:                   testconstants.VID,
-		PID:                   testconstants.PID,
-		CID:                   testconstants.CID,
-		ProductName:           testconstants.ProductName,
-		Description:           testconstants.Description,
-		SKU:                   testconstants.SKU,
-		SoftwareVersion:       testconstants.SoftwareVersion,
-		SoftwareVersionString: testconstants.SoftwareVersionString,
-		HardwareVersion:       testconstants.HardwareVersion,
-		HardwareVersionString: testconstants.HardwareVersionString,
-		CDVersionNumber:       testconstants.CDVersionNumber,
-		OtaURL:                testconstants.OtaURL,
-		OtaChecksum:           testconstants.OtaChecksum,
-		OtaChecksumType:       testconstants.OtaChecksumType,
-		Revoked:               testconstants.Revoked,
+		VID:          testconstants.VID,
+		PID:          testconstants.PID,
+		DeviceTypeID: testconstants.DeviceTypeID,
+		ProductName:  testconstants.ProductName,
+		ProductLabel: testconstants.ProductLabel,
+		PartNumber:   testconstants.PartNumber,
 	}
 
 	return types.ModelInfo{

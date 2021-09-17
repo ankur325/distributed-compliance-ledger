@@ -27,7 +27,7 @@ import (
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	modelinfoTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Modelinfo transaction subcommands",
+		Short:                      "Modelinfo transaction subcommands....",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -61,9 +61,9 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var cid uint16
-			if cidStr := viper.GetString(FlagCID); len(cidStr) != 0 {
-				cid, err = conversions.ParseCID(cidStr)
+			var deviceTypeID uint16
+			if deviceTypeIDStr := viper.GetString(FlagDeviceTypeID); len(deviceTypeIDStr) != 0 {
+				deviceTypeID, err = conversions.ParseCID(deviceTypeIDStr)
 				if err != nil {
 					return err
 				}
@@ -71,48 +71,13 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 
 			productName := viper.GetString(FlagProductName)
 
-			description, err_ := cliCtx.ReadFromFile(viper.GetString(FlagDescription))
+			productLabel, err_ := cliCtx.ReadFromFile(viper.GetString(FlagProductLabel))
 			if err_ != nil {
 				return err_
 			}
 
-			sku := viper.GetString(FlagSKU)
+			partNumber := viper.GetString(FlagPartNumber)
 
-			var softwareVersion uint32
-			if softwareVersionStr := viper.GetString(FlagSoftwareVersion); len(softwareVersionStr) != 0 {
-				softwareVersion, err = conversions.ParseUInt32FromString(softwareVersionStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			softwareVersionString := viper.GetString(FlagSoftwareVersionString)
-
-			var hardwareVersion uint32
-			if hardwareVersionStr := viper.GetString(FlagHardwareVersion); len(hardwareVersionStr) != 0 {
-				hardwareVersion, err = conversions.ParseUInt32FromString(hardwareVersionStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			hardwareVersionString := viper.GetString(FlagHardwareVersionString)
-
-			var cdVersionNumber uint16
-			if cdVersionNumberStr := viper.GetString(FlagCDVersionNumber); len(cdVersionNumberStr) != 0 {
-				cdVersionNumber, err = conversions.ParseUInt16FromString(cdVersionNumberStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			firmwareDigests := viper.GetString(FlagFirmwareDigests)
-			// bool
-			revoked := viper.GetBool(FlagRevoked)
-			otaURL := viper.GetString(FlagOtaURL)
-			otaChecksum := viper.GetString(FlagOtaChecksum)
-			otaChecksumType := viper.GetString(FlagOtaChecksumType)
-			otaBlob := viper.GetString(FlagOtaBlob)
 			var commissioningCustomFlow uint8
 			if commissioningCustomFlowStr := viper.GetString(FlagCommissioningCustomFlow); len(commissioningCustomFlowStr) != 0 {
 				commissioningCustomFlow, err = conversions.ParseUInt8FromString(commissioningCustomFlowStr)
@@ -141,44 +106,26 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 			commissioningModeSecondaryStepsInstruction := viper.GetString(FlagCommissioningModeSecondaryStepsInstruction)
-			releaseNotesURL := viper.GetString(FlagReleaseNotesURL)
 			userManualURL := viper.GetString(FlagUserManualURL)
 			supportURL := viper.GetString(FlagSupportURL)
 			productURL := viper.GetString(FlagProductURL)
-			chipBlob := viper.GetString(FlagChipBlob)
-			vendorBlob := viper.GetString(FlagVendorBlob)
 
 			model := types.Model{
-
 				VID:                                      vid,
 				PID:                                      pid,
-				CID:                                      cid,
+				DeviceTypeID:                             deviceTypeID,
 				ProductName:                              productName,
-				Description:                              description,
-				SKU:                                      sku,
-				SoftwareVersion:                          softwareVersion,
-				SoftwareVersionString:                    softwareVersionString,
-				HardwareVersion:                          hardwareVersion,
-				HardwareVersionString:                    hardwareVersionString,
-				CDVersionNumber:                          cdVersionNumber,
-				FirmwareDigests:                          firmwareDigests,
-				Revoked:                                  revoked,
-				OtaURL:                                   otaURL,
-				OtaChecksum:                              otaChecksum,
-				OtaChecksumType:                          otaChecksumType,
-				OtaBlob:                                  otaBlob,
+				ProductLabel:                             productLabel,
+				PartNumber:                               partNumber,
 				CommissioningCustomFlow:                  commissioningCustomFlow,
 				CommissioningCustomFlowURL:               commissioningCustomFlowURL,
 				CommissioningModeInitialStepsHint:        commissioningModeInitialStepsHint,
 				CommissioningModeInitialStepsInstruction: commissioningModeInitialStepsInstruction,
 				CommissioningModeSecondaryStepsHint:      commissioningModeSecondaryStepsHint,
 				CommissioningModeSecondaryStepsInstruction: commissioningModeSecondaryStepsInstruction,
-				ReleaseNotesURL: releaseNotesURL,
-				UserManualURL:   userManualURL,
-				SupportURL:      supportURL,
-				ProductURL:      productURL,
-				ChipBlob:        chipBlob,
-				VendorBlob:      vendorBlob,
+				UserManualURL: userManualURL,
+				SupportURL:    supportURL,
+				ProductURL:    productURL,
 			}
 
 			msg := types.NewMsgAddModelInfo(model, cliCtx.FromAddress())
@@ -191,35 +138,14 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 		"Model vendor ID")
 	cmd.Flags().String(FlagPID, "",
 		"Model product ID")
-	cmd.Flags().String(FlagCID, "",
+	cmd.Flags().String(FlagDeviceTypeID, "",
 		"Model category ID")
 	cmd.Flags().StringP(FlagProductName, FlagProductNameShortcut, "",
 		"Model name")
-	cmd.Flags().StringP(FlagDescription, FlagDescriptionShortcut, "",
+	cmd.Flags().StringP(FlagProductLabel, FlagProductLabelShortcut, "",
 		"Model description (string or path to file containing data)")
-	cmd.Flags().String(FlagSKU, "",
-		"Model stock keeping unit")
-	cmd.Flags().StringP(FlagSoftwareVersion, FlagSoftwareVersionShortcut, "",
-		"Software Version of model (uint32)")
-	cmd.Flags().String(FlagSoftwareVersionString, "",
-		"Software Version String of model")
-	cmd.Flags().StringP(FlagHardwareVersion, FlagHardwareVersionShortcut, "",
-		"Version of model hardware")
-	cmd.Flags().String(FlagHardwareVersionString, "",
-		"Hardware Version String of model")
-	cmd.Flags().String(FlagCDVersionNumber, "",
-		"CD Version Number of the Certification")
-	cmd.Flags().String(FlagFirmwareDigests, "",
-		`FirmwareDigests field included in the Device Attestation response when this Software Image boots on the device`)
-	cmd.Flags().String(FlagRevoked, "",
-		"boolean flag to revoke the model")
-	cmd.Flags().String(FlagOtaURL, "", "Url for OTA")
-	cmd.Flags().String(FlagOtaChecksum, "",
-		`Digest of the entire contents of the associated OTA Software Update Image under the OtaUrl attribute, 
-	encoded in base64 string representation. The digest SHALL have been computed using 
-	the algorithm specified in OtaChecksumType`)
-	cmd.Flags().String(FlagOtaChecksumType, "", "Legal values for OtaChecksumType are : SHA-256")
-	cmd.Flags().String(FlagOtaBlob, "", "Metadata about OTA")
+	cmd.Flags().String(FlagPartNumber, "",
+		"Model Part Number (or sku)")
 	cmd.Flags().String(FlagCommissioningCustomFlow, "",
 		`A value of 1 indicates that user interaction with the device (pressing a button, for example) is 
 	required before commissioning can take place. When CommissioningCustomflow is set to a value of 2, 
@@ -250,29 +176,19 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 	of commissioningModeSecondaryStepsHint. Certain values of commissioningModeSecondaryStepsHint, 
 	as defined in the Pairing Hint Table, indicate a Pairing Instruction (PI) dependency, 
 	and for these values the commissioningModeSecondaryStepInstruction SHALL be set`)
-	cmd.Flags().String(FlagReleaseNotesURL, "",
-		`URL that contains product specific web page that contains release notes for the device model.`)
 	cmd.Flags().String(FlagUserManualURL, "",
 		"URL that contains product specific web page that contains user manual for the device model.")
 	cmd.Flags().String(FlagSupportURL, "",
 		"URL that contains product specific web page that contains support details for the device model.")
 	cmd.Flags().String(FlagProductURL, "",
 		"URL that contains product specific web page that contains details for the device model.")
-	cmd.Flags().String(FlagChipBlob, "",
-		"chipBlob SHALL identify CHIP specific configurations")
-	cmd.Flags().String(FlagVendorBlob, "",
-		"field for vendors to provide any additional metadata about the device model using a string, blob, or URL.")
 
 	_ = cmd.MarkFlagRequired(FlagVID)
 	_ = cmd.MarkFlagRequired(FlagPID)
+	_ = cmd.MarkFlagRequired(FlagDeviceTypeID)
 	_ = cmd.MarkFlagRequired(FlagProductName)
-	_ = cmd.MarkFlagRequired(FlagDescription)
-	_ = cmd.MarkFlagRequired(FlagSKU)
-	_ = cmd.MarkFlagRequired(FlagSoftwareVersion)
-	_ = cmd.MarkFlagRequired(FlagSoftwareVersionString)
-	_ = cmd.MarkFlagRequired(FlagHardwareVersion)
-	_ = cmd.MarkFlagRequired(FlagHardwareVersionString)
-	_ = cmd.MarkFlagRequired(FlagCDVersionNumber)
+	_ = cmd.MarkFlagRequired(FlagProductLabel)
+	_ = cmd.MarkFlagRequired(FlagPartNumber)
 
 	return cmd
 }
@@ -296,62 +212,25 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var cid uint16
-			if cidStr := viper.GetString(FlagCID); len(cidStr) != 0 {
-				cid, err = conversions.ParseCID(cidStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			description, err_ := cliCtx.ReadFromFile(viper.GetString(FlagDescription))
+			productLabel, err_ := cliCtx.ReadFromFile(viper.GetString(FlagProductLabel))
 			if err_ != nil {
 				return err_
 			}
 
-			var cdVersionNumber uint16
-			if cdVersionNumberStr := viper.GetString(FlagCDVersionNumber); len(cdVersionNumberStr) != 0 {
-				cdVersionNumber, err = conversions.ParseUInt16FromString(cdVersionNumberStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			// bool
-			revoked := viper.GetBool(FlagRevoked)
-			otaURL := viper.GetString(FlagOtaURL)
-			otaChecksum := viper.GetString(FlagOtaChecksum)
-			otaChecksumType := viper.GetString(FlagOtaChecksumType)
-			otaBlob := viper.GetString(FlagOtaBlob)
-
 			commissioningCustomFlowURL := viper.GetString(FlagCommissioningCustomFlowURL)
 
-			releaseNotesURL := viper.GetString(FlagReleaseNotesURL)
 			userManualURL := viper.GetString(FlagUserManualURL)
 			supportURL := viper.GetString(FlagSupportURL)
 			productURL := viper.GetString(FlagProductURL)
-			chipBlob := viper.GetString(FlagChipBlob)
-			vendorBlob := viper.GetString(FlagVendorBlob)
 
 			model := types.Model{
-
 				VID:                        vid,
 				PID:                        pid,
-				CID:                        cid,
-				Description:                description,
-				CDVersionNumber:            cdVersionNumber,
-				Revoked:                    revoked,
-				OtaURL:                     otaURL,
-				OtaChecksum:                otaChecksum,
-				OtaChecksumType:            otaChecksumType,
-				OtaBlob:                    otaBlob,
+				ProductLabel:               productLabel,
 				CommissioningCustomFlowURL: commissioningCustomFlowURL,
-				ReleaseNotesURL:            releaseNotesURL,
 				UserManualURL:              userManualURL,
 				SupportURL:                 supportURL,
 				ProductURL:                 productURL,
-				ChipBlob:                   chipBlob,
-				VendorBlob:                 vendorBlob,
 			}
 			msg := types.NewMsgUpdateModelInfo(model, cliCtx.FromAddress())
 
@@ -362,39 +241,21 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 		"Model vendor ID")
 	cmd.Flags().String(FlagPID, "",
 		"Model product ID")
-	cmd.Flags().StringP(FlagDescription, FlagDescriptionShortcut, "",
+	cmd.Flags().StringP(FlagProductLabel, FlagProductLabelShortcut, "",
 		"Model description (string or path to file containing data)")
 
-	cmd.Flags().String(FlagCDVersionNumber, "",
-		"CD Version Number of the Certification")
-	cmd.Flags().String(FlagRevoked, "",
-		"boolean flag to revoke the model")
-	cmd.Flags().String(FlagOtaURL, "", "Url for OTA")
-	cmd.Flags().String(FlagOtaChecksum, "",
-		`Digest of the entire contents of the associated OTA Software Update Image under the OtaUrl attribute, 
-	encoded in base64 string representation. The digest SHALL have been computed using 
-	the algorithm specified in OtaChecksumType`)
-	cmd.Flags().String(FlagOtaChecksumType, "", "Legal values for OtaChecksumType are : SHA-256")
-	cmd.Flags().String(FlagOtaBlob, "", "Metadata about OTA")
 	cmd.Flags().String(FlagCommissioningCustomFlowURL, "",
 		`commissioningCustomFlowURL SHALL identify a vendor specific commissioning URL for the 
 	device model when the commissioningCustomFlow field is set to '2'`)
-	cmd.Flags().String(FlagReleaseNotesURL, "",
-		`URL that contains product specific web page that contains release notes for the device model.`)
 	cmd.Flags().String(FlagUserManualURL, "",
 		"URL that contains product specific web page that contains user manual for the device model.")
 	cmd.Flags().String(FlagSupportURL, "",
 		"URL that contains product specific web page that contains support details for the device model.")
 	cmd.Flags().String(FlagProductURL, "",
 		"URL that contains product specific web page that contains details for the device model.")
-	cmd.Flags().String(FlagChipBlob, "",
-		"chipBlob SHALL identify CHIP specific configurations")
-	cmd.Flags().String(FlagVendorBlob, "",
-		"field for vendors to provide any additional metadata about the device model using a string, blob, or URL.")
 
 	_ = cmd.MarkFlagRequired(FlagVID)
 	_ = cmd.MarkFlagRequired(FlagPID)
-
 	return cmd
 }
 

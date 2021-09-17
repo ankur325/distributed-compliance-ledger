@@ -25,8 +25,8 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/client/cli"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/client/rest"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfoversion/client/cli"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfoversion/client/rest"
 )
 
 // type check to ensure the interface is properly implemented.
