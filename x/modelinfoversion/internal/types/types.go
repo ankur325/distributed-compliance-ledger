@@ -25,16 +25,16 @@ type ModelVersion struct {
 	VID                          uint16 `json:"vid"`
 	PID                          uint16 `json:"pid"`
 	SoftwareVersion              uint32 `json:"softwareVersion"`
-	SoftwareVersionString        string `json:"softwareVersionString"`
-	CDVersionNumber              uint16 `json:"CDVersionNumber"`
+	SoftwareVersionString        string `json:"softwareVersionString,omitempty"`
+	CDVersionNumber              uint16 `json:"CDVersionNumber,omitempty"`
 	FirmwareDigests              string `json:"firmwareDigests,omitempty"`
 	SoftwareVersionValid         bool   `json:"softwareVersionValid"`
 	OtaURL                       string `json:"otaURL,omitempty"`
-	OtaFileSize                  uint64 `json:"otaFileSize"`
+	OtaFileSize                  uint64 `json:"otaFileSize,omitempty"`
 	OtaChecksum                  string `json:"otaChecksum,omitempty"`
-	OtaChecksumType              uint16 `json:"otaChecksumType"`
-	MinApplicableSoftwareVersion uint32 `json:"minApplicableSoftwareVersion"`
-	MaxApplicableSoftwareVersion uint32 `json:"maxApplicableSoftwareVersion"`
+	OtaChecksumType              uint16 `json:"otaChecksumType,omitempty"`
+	MinApplicableSoftwareVersion uint32 `json:"minApplicableSoftwareVersion,omitempty"`
+	MaxApplicableSoftwareVersion uint32 `json:"maxApplicableSoftwareVersion,omitempty"`
 	ReleaseNotesURL              string `json:"releaseNotesURL,omitempty"`
 }
 

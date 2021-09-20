@@ -24,10 +24,10 @@ import (
 type Model struct {
 	VID                                        uint16 `json:"vid"`
 	PID                                        uint16 `json:"pid"`
-	DeviceTypeID                               uint16 `json:"deviceTypeID"`
-	ProductName                                string `json:"productName"`
-	ProductLabel                               string `json:"productLabel"`
-	PartNumber                                 string `json:"sku"`
+	DeviceTypeID                               uint16 `json:"deviceTypeID,omitempty"`
+	ProductName                                string `json:"productName,omitempty"`
+	ProductLabel                               string `json:"productLabel,omitempty"`
+	PartNumber                                 string `json:"sku,omitempty"`
 	CommissioningCustomFlow                    uint8  `json:"commissioningCustomFlow,omitempty"`
 	CommissioningCustomFlowURL                 string `json:"commissioningCustomFlowURL,omitempty"`
 	CommissioningModeInitialStepsHint          uint32 `json:"commissioningModeInitialStepsHint,omitempty"`
