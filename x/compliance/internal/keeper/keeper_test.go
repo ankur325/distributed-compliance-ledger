@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
+	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
 )
 
@@ -68,8 +68,8 @@ func TestKeeper_ComplianceInfoIterator(t *testing.T) {
 	var expectedRecords []types.ComplianceInfo
 
 	setup.CompliancetKeeper.IterateComplianceInfos(setup.Ctx, types.CertificationType(testconstants.CertificationType),
-		func(modelInfo types.ComplianceInfo) (stop bool) {
-			expectedRecords = append(expectedRecords, modelInfo)
+		func(model types.ComplianceInfo) (stop bool) {
+			expectedRecords = append(expectedRecords, model)
 
 			return false
 		})

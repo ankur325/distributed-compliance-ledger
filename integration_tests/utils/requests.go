@@ -1000,8 +1000,8 @@ func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
 	zb := CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter})
 
 	// Publish model info
-	modelInfo := NewMsgAddModel(vendor.Address)
-	_, _ = AddModel(modelInfo, vendor)
+	model := NewMsgAddModel(vendor.Address)
+	_, _ = AddModel(model, vendor)
 
 	// Get all certified models
 	inputCertifiedModels, _ := GetAllCertifiedModels()
@@ -1009,5 +1009,5 @@ func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
 	// Get all revoked models
 	inputRevokedModels, _ := GetAllRevokedModels()
 
-	return vendor, zb, modelInfo, inputCertifiedModels, inputRevokedModels
+	return vendor, zb, model, inputCertifiedModels, inputRevokedModels
 }

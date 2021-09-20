@@ -478,7 +478,7 @@ func queryComplianceInfoInState(setup TestSetup, vid uint16, pid uint16, state s
 }
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
-	modelInfo := model.Model{
+	model := model.Model{
 		Model: model.Model{
 			VID:          vid,
 			PID:          pid,
@@ -490,7 +490,7 @@ func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 		Owner: constants.Owner,
 	}
 
-	setup.ModelinfoKeeper.SetModel(setup.Ctx, modelInfo)
+	setup.ModelinfoKeeper.SetModel(setup.Ctx, model)
 
 	return vid, pid
 }

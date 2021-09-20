@@ -27,7 +27,7 @@ import (
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	modelinfoTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Modelinfo version transaction subcommands",
+		Short:                      "model version transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,

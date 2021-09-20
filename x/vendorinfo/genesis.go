@@ -99,8 +99,8 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.Valid
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	var records []VendorInfo
 
-	k.IterateVendorInfos(ctx, func(modelInfo types.VendorInfo) (stop bool) {
-		records = append(records, modelInfo)
+	k.IterateVendorInfos(ctx, func(model types.VendorInfo) (stop bool) {
+		records = append(records, model)
 
 		return false
 	})

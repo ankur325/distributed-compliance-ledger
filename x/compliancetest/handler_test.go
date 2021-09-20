@@ -162,7 +162,7 @@ func queryTestingResult(setup TestSetup, vid uint16, pid uint16) types.TestingRe
 }
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
-	modelInfo := model.Model{
+	model := model.Model{
 		Model: model.Model{
 			VID:          vid,
 			PID:          pid,
@@ -174,7 +174,7 @@ func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 		Owner: test_constants.Owner,
 	}
 
-	setup.ModelinfoKeeper.SetModel(setup.Ctx, modelInfo)
+	setup.ModelinfoKeeper.SetModel(setup.Ctx, model)
 
 	return vid, pid
 }

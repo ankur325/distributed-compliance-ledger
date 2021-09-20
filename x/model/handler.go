@@ -48,7 +48,7 @@ func handleMsgAddModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Ke
 	}
 
 	// check sender has enough rights to add model
-	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID, "msgAddModel"); err != nil {
 		return err.Result()
 	}
 
@@ -87,7 +87,7 @@ func handleMsgUpdateModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth
 	model := keeper.GetModel(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to update model
-	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID, "msgUpdateModel"); err != nil {
 		return err.Result()
 	}
 
@@ -132,7 +132,7 @@ func handleMsgDeleteModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth
 	}
 
 	// check if sender has enough rights to delete model
-	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID, "msgDeleteModel"); err != nil {
 		return err.Result()
 	}
 
@@ -142,15 +142,15 @@ func handleMsgDeleteModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth
 	return sdk.Result{}
 }
 
-func checkModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress, vid uint16) sdk.Error {
+func checkModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress, vid uint16, message string) sdk.Error {
 	// sender must have Vendor role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.Vendor) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModel transaction should be "+
-			"signed by an account with the %s role", auth.Vendor))
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s transaction should be "+
+			"signed by an account with the %s role", message, auth.Vendor))
 	}
 	if !authKeeper.HasVendorId(ctx, signer, vid) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModel transaction should be "+
-			"signed by an vendor account containing the vendorId %v ", vid))
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s transaction should be "+
+			"signed by an vendor account containing the vendorId %v ", message, vid))
 	}
 
 	return nil

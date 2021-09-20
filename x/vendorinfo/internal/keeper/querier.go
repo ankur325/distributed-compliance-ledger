@@ -54,9 +54,9 @@ func queryVendor(ctx sdk.Context, path []string, req abci.RequestQuery, keeper K
 		return nil, types.ErrVendorInfoDoesNotExist(vid)
 	}
 
-	modelInfo := keeper.GetVendorInfo(ctx, vid)
+	model := keeper.GetVendorInfo(ctx, vid)
 
-	res = codec.MustMarshalJSONIndent(keeper.cdc, modelInfo)
+	res = codec.MustMarshalJSONIndent(keeper.cdc, model)
 
 	return res, nil
 }

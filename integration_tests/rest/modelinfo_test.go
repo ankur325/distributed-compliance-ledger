@@ -23,7 +23,6 @@ import (
 	"github.com/tendermint/tendermint/libs/common"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/utils"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
 //nolint:godox
@@ -99,17 +98,17 @@ func TestModelinfoDemo_Prepare_Sign_Broadcast(t *testing.T) {
 	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
 
 	// Prepare model info
-	modelInfo := utils.NewMsgAddModel(vendor.Address)
+	model := utils.NewMsgAddModel(vendor.Address)
 
 	// Prepare Sing Broadcast
-	addModelTransaction, _ := utils.PrepareAddModelTransaction(modelInfo)
+	addModelTransaction, _ := utils.PrepareAddModelTransaction(model)
 	_, _ = utils.SignAndBroadcastTransaction(vendor, addModelTransaction)
 
 	// Check model is created
-	receivedModel, _ := utils.GetModel(modelInfo.VID, modelInfo.PID)
-	require.Equal(t, receivedModel.VID, modelInfo.VID)
-	require.Equal(t, receivedModel.PID, modelInfo.PID)
-	require.Equal(t, receivedModel.ProductName, modelInfo.ProductName)
+	receivedModel, _ := utils.GetModel(model.VID, model.PID)
+	require.Equal(t, receivedModel.VID, model.VID)
+	require.Equal(t, receivedModel.PID, model.PID)
+	require.Equal(t, receivedModel.ProductName, model.ProductName)
 }
 
 /* Error cases */
@@ -119,8 +118,8 @@ func Test_AddModelinfo_ByNonVendor(t *testing.T) {
 	testAccount := utils.CreateNewAccount(auth.AccountRoles{})
 
 	// try to publish model info
-	modelInfo := utils.NewMsgAddModel(testAccount.Address)
-	res, _ := utils.SignAndBroadcastMessage(testAccount, modelInfo)
+	model := utils.NewMsgAddModel(testAccount.Address)
+	res, _ := utils.SignAndBroadcastMessage(testAccount, model)
 	require.Equal(t, sdk.CodeUnauthorized, sdk.CodeType(res.Code))
 }
 
@@ -129,12 +128,12 @@ func Test_AddModelinfo_Twice(t *testing.T) {
 	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
 
 	// publish model info
-	modelInfo := utils.NewMsgAddModel(testAccount.Address)
-	res, _ := utils.AddModel(modelInfo, testAccount)
+	model := utils.NewMsgAddModel(testAccount.Address)
+	res, _ := utils.AddModel(model, testAccount)
 	require.Equal(t, sdk.CodeOK, sdk.CodeType(res.Code))
 
 	// publish second time
-	res, _ = utils.AddModel(modelInfo, testAccount)
+	res, _ = utils.AddModel(model, testAccount)
 	require.Equal(t, model.CodeModelAlreadyExists, sdk.CodeType(res.Code))
 }
 

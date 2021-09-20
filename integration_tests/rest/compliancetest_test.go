@@ -42,11 +42,11 @@ func TestCompliancetestDemo(t *testing.T) {
 	secondTestHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse})
 
 	// Publish model info
-	modelInfo := utils.NewMsgAddModel(vendor.Address)
-	_, _ = utils.AddModel(modelInfo, vendor)
+	model := utils.NewMsgAddModel(vendor.Address)
+	_, _ = utils.AddModel(model, vendor)
 
 	// Publish first testing result using Sign and Broadcast AddTestingResult message
-	firstTestingResult := utils.NewMsgAddTestingResult(modelInfo.VID, modelInfo.PID, testHouse.Address)
+	firstTestingResult := utils.NewMsgAddTestingResult(model.VID, model.PID, testHouse.Address)
 	utils.SignAndBroadcastMessage(testHouse, firstTestingResult)
 
 	// Check testing result is created
