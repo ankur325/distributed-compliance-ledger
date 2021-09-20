@@ -27,7 +27,7 @@ import (
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	modelinfoTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Modelinfo transaction subcommands....",
+		Short:                      "Modelinfo transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -63,7 +63,7 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 
 			var deviceTypeID uint16
 			if deviceTypeIDStr := viper.GetString(FlagDeviceTypeID); len(deviceTypeIDStr) != 0 {
-				deviceTypeID, err = conversions.ParseCID(deviceTypeIDStr)
+				deviceTypeID, err = conversions.ParseUInt16FromString(FlagDeviceTypeID, deviceTypeIDStr)
 				if err != nil {
 					return err
 				}
@@ -90,7 +90,7 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 			var commissioningModeInitialStepsHint uint32
 			commissioningModeInitialStepsHintStr := viper.GetString(FlagCommissioningModeInitialStepsHint)
 			if len(commissioningModeInitialStepsHintStr) != 0 {
-				commissioningModeInitialStepsHint, err = conversions.ParseUInt32FromString(commissioningModeInitialStepsHintStr)
+				commissioningModeInitialStepsHint, err = conversions.ParseUInt32FromString(FlagCommissioningModeInitialStepsHint, commissioningModeInitialStepsHintStr)
 				if err != nil {
 					return err
 				}
@@ -100,7 +100,7 @@ func GetCmdAddModel(cdc *codec.Codec) *cobra.Command {
 			var commissioningModeSecondaryStepsHint uint32
 			commissioningModeSecondaryStepsHintStr := viper.GetString(FlagCommissioningModeSecondaryStepsHint)
 			if len(commissioningModeSecondaryStepsHintStr) != 0 {
-				commissioningModeSecondaryStepsHint, err = conversions.ParseUInt32FromString(commissioningModeSecondaryStepsHintStr)
+				commissioningModeSecondaryStepsHint, err = conversions.ParseUInt32FromString(FlagCommissioningModeSecondaryStepsHint, commissioningModeSecondaryStepsHintStr)
 				if err != nil {
 					return err
 				}

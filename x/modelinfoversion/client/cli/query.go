@@ -58,7 +58,7 @@ func GetCmdModelVersion(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err_
 			}
 
-			softwareVersion, err_ := conversions.ParseUInt32FromString(viper.GetString(FlagSoftwareVersion))
+			softwareVersion, err_ := conversions.ParseUInt32FromString(FlagSoftwareVersion, viper.GetString(FlagSoftwareVersion))
 			if err_ != nil {
 				return err_
 			}
@@ -68,7 +68,7 @@ func GetCmdModelVersion(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return types.ErrModelVersionDoesNotExist(vid, pid, softwareVersion)
 			}
 
-			var modelVersion types.ModelVersion
+			var modelVersion types.ModelVersionInfo
 			cdc.MustUnmarshalBinaryBare(res, &modelVersion)
 
 			return cliCtx.EncodeAndPrintWithHeight(modelVersion, height)

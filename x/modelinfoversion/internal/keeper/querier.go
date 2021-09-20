@@ -51,7 +51,7 @@ func queryModelVersion(ctx sdk.Context, path []string, req abci.RequestQuery, ke
 		return nil, err
 	}
 
-	softwareVersion, err := conversions.ParseSoftwareVersion(path[2])
+	softwareVersion, err := conversions.ParseUInt32FromString("softwareVersion", path[2])
 	if err != nil {
 		return nil, err
 	}

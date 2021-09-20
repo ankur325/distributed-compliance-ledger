@@ -79,10 +79,9 @@ func getModelVersionHandler(cliCtx context.CLIContext, storeName string) http.Ha
 			return
 		}
 
-		softwareVersion, err_ := conversions.ParseSoftwareVersion(vars[softwareVersion])
+		softwareVersion, err_ := conversions.ParseUInt32FromString(softwareVersion, vars[softwareVersion])
 		if err_ != nil {
 			restCtx.WriteErrorResponse(http.StatusBadRequest, err_.Error())
-
 			return
 		}
 

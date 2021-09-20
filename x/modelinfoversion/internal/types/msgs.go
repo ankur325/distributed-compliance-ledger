@@ -30,7 +30,7 @@ func (m MsgAddModelVersion) Route() string {
 }
 
 func (m MsgAddModelVersion) Type() string {
-	return "add_model_info"
+	return "add_model_version"
 }
 
 func (m MsgAddModelVersion) ValidateBasic() sdk.Error {

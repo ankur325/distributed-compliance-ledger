@@ -28,7 +28,7 @@ const (
 
 var (
 	ModelInfoPrefix    = []byte{0x01} // prefix for each key to a model info (to get all versions for a given model)
-	ModelVersionPrefix = []byte{0x01} // prefix for each key to a model version
+	ModelVersionPrefix = []byte{0x02} // prefix for each key to a model version
 )
 
 // Key builder for Model Version.

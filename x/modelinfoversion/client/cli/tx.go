@@ -51,6 +51,9 @@ func GetCmdAddModelVersion(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
+			// by default the SoftwareVersion is valid, unless passed by user explicitly
+			viper.SetDefault(FlagSoftwareVersionValid, true)
+
 			vid, err := conversions.ParseVID(viper.GetString(FlagVID))
 			if err != nil {
 				return err
@@ -61,7 +64,7 @@ func GetCmdAddModelVersion(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			softwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagSoftwareVersion))
+			softwareVersion, err := conversions.ParseUInt32FromString(FlagSoftwareVersion, viper.GetString(FlagSoftwareVersion))
 			if err != nil {
 				return err
 			}
@@ -71,9 +74,12 @@ func GetCmdAddModelVersion(cdc *codec.Codec) *cobra.Command {
 				return types.ErrSoftwareVersionStringInvalid(softwareVersionString)
 			}
 
-			cdVersionNumber, err := conversions.ParseUInt16FromString(viper.GetString(FlagSoftwareVersionString))
-			if err != nil {
-				return types.ErrCDVersionNumberInvalid(cdVersionNumber)
+			var cdVersionNumber uint16
+			if len(viper.GetString(FlagCDVersionNumber)) != 0 {
+				cdVersionNumber, err = conversions.ParseUInt16FromString(FlagCDVersionNumber, viper.GetString(FlagCDVersionNumber))
+				if err != nil {
+					return types.ErrCDVersionNumberInvalid(cdVersionNumber)
+				}
 			}
 
 			firmwareDigests := viper.GetString(FlagFirmwareDigests)
@@ -88,15 +94,22 @@ func GetCmdAddModelVersion(cdc *codec.Codec) *cobra.Command {
 				types.ErrOtaURLInvalid(otaURL)
 			}
 
-			otaFileSize, err := conversions.ParseUInt64FromString(viper.GetString(FlagOtaFileSize))
-			if err != nil {
-				return err
+			var otaFileSize uint64
+			if len(viper.GetString(FlagOtaFileSize)) != 0 {
+				otaFileSize, err = conversions.ParseUInt64FromString(FlagOtaFileSize, viper.GetString(FlagOtaFileSize))
+				if err != nil {
+					return err
+				}
 			}
 
 			otaChecksum := viper.GetString(FlagOtaChecksum)
-			otaChecksumType, err := conversions.ParseUInt16FromString(viper.GetString(FlagOtaChecksumType))
-			if err != nil {
-				return err
+
+			var otaChecksumType uint16
+			if len(viper.GetString(FlagOtaChecksumType)) > 0 {
+				otaChecksumType, err = conversions.ParseUInt16FromString(FlagOtaChecksumType, viper.GetString(FlagOtaChecksumType))
+				if err != nil {
+					return err
+				}
 			}
 
 			if len(otaURL) > 1 {
@@ -105,12 +118,12 @@ func GetCmdAddModelVersion(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			minApplicableSoftwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagMinApplicableSoftwareVersion))
+			minApplicableSoftwareVersion, err := conversions.ParseUInt32FromString(FlagMinApplicableSoftwareVersion, viper.GetString(FlagMinApplicableSoftwareVersion))
 			if err != nil {
 				return err
 			}
 
-			maxApplicableSofwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagMaxApplicableSoftwareVersion))
+			maxApplicableSofwareVersion, err := conversions.ParseUInt32FromString(FlagMaxApplicableSoftwareVersion, viper.GetString(FlagMaxApplicableSoftwareVersion))
 			if err != nil {
 				return err
 			}
@@ -191,6 +204,8 @@ func GetCmdUpdateModelVersion(cdc *codec.Codec) *cobra.Command {
 		Short: "Update existing Model Version",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// by default the SoftwareVersion is valid, unless passed by user explicitly
+			viper.SetDefault(FlagSoftwareVersionValid, true)
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
 			vid, err := conversions.ParseVID(viper.GetString(FlagVID))
@@ -203,7 +218,7 @@ func GetCmdUpdateModelVersion(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			softwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagSoftwareVersion))
+			softwareVersion, err := conversions.ParseUInt32FromString(FlagSoftwareVersion, viper.GetString(FlagSoftwareVersion))
 			if err != nil {
 				return err
 			}
@@ -215,14 +230,20 @@ func GetCmdUpdateModelVersion(cdc *codec.Codec) *cobra.Command {
 				types.ErrOtaURLInvalid(otaURL)
 			}
 
-			minApplicableSoftwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagMinApplicableSoftwareVersion))
-			if err != nil {
-				return err
+			var minApplicableSoftwareVersion uint32
+			if len(viper.GetString(FlagMinApplicableSoftwareVersion)) > 0 {
+				minApplicableSoftwareVersion, err = conversions.ParseUInt32FromString(FlagMinApplicableSoftwareVersion, viper.GetString(FlagMinApplicableSoftwareVersion))
+				if err != nil {
+					return err
+				}
 			}
 
-			maxApplicableSofwareVersion, err := conversions.ParseUInt32FromString(viper.GetString(FlagMaxApplicableSoftwareVersion))
-			if err != nil {
-				return err
+			var maxApplicableSofwareVersion uint32
+			if len(viper.GetString(FlagMaxApplicableSoftwareVersion)) > 0 {
+				maxApplicableSofwareVersion, err = conversions.ParseUInt32FromString(FlagMaxApplicableSoftwareVersion, viper.GetString(FlagMaxApplicableSoftwareVersion))
+				if err != nil {
+					return err
+				}
 			}
 
 			releaseNotesURL := viper.GetString(FlagReleaseNotesURL)
@@ -240,7 +261,7 @@ func GetCmdUpdateModelVersion(cdc *codec.Codec) *cobra.Command {
 				MaxApplicableSoftwareVersion: maxApplicableSofwareVersion,
 				ReleaseNotesURL:              releaseNotesURL,
 			}
-			msg := types.MsgAddModelVersion{
+			msg := types.MsgUpdateModelVersion{
 				ModelVersion: modelVersion,
 				Signer:       cliCtx.FromAddress(),
 			}
