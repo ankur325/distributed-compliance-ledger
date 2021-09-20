@@ -26,14 +26,14 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
-func NewHandler(keeper keeper.Keeper, modelinfoKeeper model.Keeper,
+func NewHandler(keeper keeper.Keeper, modelKeeper model.Keeper,
 	compliancetestKeeper compliancetest.Keeper, authKeeper auth.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgCertifyModel:
-			return handleMsgCertifyModel(ctx, keeper, modelinfoKeeper, compliancetestKeeper, authKeeper, msg)
+			return handleMsgCertifyModel(ctx, keeper, modelKeeper, compliancetestKeeper, authKeeper, msg)
 		case types.MsgRevokeModel:
-			return handleMsgRevokeModel(ctx, keeper, modelinfoKeeper, authKeeper, msg)
+			return handleMsgRevokeModel(ctx, keeper, modelKeeper, authKeeper, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 
@@ -42,7 +42,7 @@ func NewHandler(keeper keeper.Keeper, modelinfoKeeper model.Keeper,
 	}
 }
 
-func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper model.Keeper,
+func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelKeeper model.Keeper,
 	compliancetestKeeper compliancetest.Keeper, authKeeper auth.Keeper,
 	msg types.MsgCertifyModel) sdk.Result {
 	// check if sender has enough rights to certify model
@@ -78,7 +78,7 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeepe
 	} else {
 		// Compliance is tracked on ledger. There is no compliance record yet.
 		// The corresponding Model Info and test results must be present on ledger.
-		if !modelinfoKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
+		if !modelKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
 			return model.ErrModelDoesNotExist(msg.VID, msg.PID).Result()
 		}
 
@@ -102,7 +102,7 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeepe
 	return sdk.Result{}
 }
 
-func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper model.Keeper,
+func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelKeeper model.Keeper,
 	authKeeper auth.Keeper, msg types.MsgRevokeModel) sdk.Result {
 	// check if sender has enough rights to revoke model
 	if err := checkZbCertificationRights(ctx, authKeeper, msg.Signer, msg.CertificationType); err != nil {
@@ -126,7 +126,7 @@ func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper
 
 			complianceInfo.UpdateComplianceInfo(msg.RevocationDate, msg.Reason)
 		}
-	} else if modelinfoKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
+	} else if modelKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
 		// Only revocation is tracked on the ledger. There is no compliance record yet.
 		// The corresponding Model Info and test results are not required to be on the ledger.
 		complianceInfo = types.NewRevokedComplianceInfo(

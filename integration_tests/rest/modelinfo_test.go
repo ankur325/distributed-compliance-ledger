@@ -34,7 +34,7 @@ import (
 	TODO: provide tests for error cases
 */
 
-func TestModelinfoDemo(t *testing.T) {
+func TestModelDemo(t *testing.T) {
 	// Register new Vendor account
 	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
 
@@ -71,8 +71,8 @@ func TestModelinfoDemo(t *testing.T) {
 	require.Equal(t, receivedModel.ProductLabel, secondModel.ProductLabel)
 
 	// Get all model infos
-	modelInfos, _ := utils.GetModels()
-	require.Equal(t, utils.ParseUint(inputModels.Total)+2, utils.ParseUint(modelInfos.Total))
+	models, _ := utils.GetModels()
+	require.Equal(t, utils.ParseUint(inputModels.Total)+2, utils.ParseUint(models.Total))
 
 	// Get all vendors
 	vendors, _ := utils.GetVendors()
@@ -93,7 +93,7 @@ func TestModelinfoDemo(t *testing.T) {
 	require.Equal(t, receivedModel.ProductLabel, secondModelUpdate.ProductLabel)
 }
 
-func TestModelinfoDemo_Prepare_Sign_Broadcast(t *testing.T) {
+func TestModelDemo_Prepare_Sign_Broadcast(t *testing.T) {
 	// Register new Vendor account
 	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
 
@@ -113,7 +113,7 @@ func TestModelinfoDemo_Prepare_Sign_Broadcast(t *testing.T) {
 
 /* Error cases */
 
-func Test_AddModelinfo_ByNonVendor(t *testing.T) {
+func Test_AddModel_ByNonVendor(t *testing.T) {
 	// register new account
 	testAccount := utils.CreateNewAccount(auth.AccountRoles{})
 
@@ -123,7 +123,7 @@ func Test_AddModelinfo_ByNonVendor(t *testing.T) {
 	require.Equal(t, sdk.CodeUnauthorized, sdk.CodeType(res.Code))
 }
 
-func Test_AddModelinfo_Twice(t *testing.T) {
+func Test_AddModel_Twice(t *testing.T) {
 	// register new account
 	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
 
@@ -137,12 +137,12 @@ func Test_AddModelinfo_Twice(t *testing.T) {
 	require.Equal(t, model.CodeModelAlreadyExists, sdk.CodeType(res.Code))
 }
 
-func Test_GetModelinfo_ForUnknown(t *testing.T) {
+func Test_GetModel_ForUnknown(t *testing.T) {
 	_, code := utils.GetModel(common.RandUint16(), common.RandUint16())
 	require.Equal(t, http.StatusNotFound, code)
 }
 
-func Test_GetModelinfo_ForInvalidVidPid(t *testing.T) {
+func Test_GetModel_ForInvalidVidPid(t *testing.T) {
 	// zero vid
 	_, code := utils.GetModel(0, common.RandUint16())
 	require.Equal(t, http.StatusBadRequest, code)

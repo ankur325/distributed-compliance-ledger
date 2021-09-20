@@ -34,7 +34,7 @@ type TestSetup struct {
 	CompliancetKeeper    Keeper
 	CompliancetestKeeper compliancetest.Keeper
 	authKeeper           auth.Keeper
-	ModelinfoKeeper      model.Keeper
+	ModelKeeper          model.Keeper
 	Handler              sdk.Handler
 	Querier              sdk.Querier
 	CertificationCenter  sdk.AccAddress
@@ -57,8 +57,8 @@ func Setup() TestSetup {
 	authKey := sdk.NewKVStoreKey(auth.StoreKey)
 	dbStore.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, nil)
 
-	modelinfoKey := sdk.NewKVStoreKey(model.StoreKey)
-	dbStore.MountStoreWithDB(modelinfoKey, sdk.StoreTypeIAVL, nil)
+	modelKey := sdk.NewKVStoreKey(model.StoreKey)
+	dbStore.MountStoreWithDB(modelKey, sdk.StoreTypeIAVL, nil)
 
 	compliancetestKey := sdk.NewKVStoreKey(compliancetest.StoreKey)
 	dbStore.MountStoreWithDB(compliancetestKey, sdk.StoreTypeIAVL, nil)
@@ -69,14 +69,14 @@ func Setup() TestSetup {
 	compliancetKeeper := NewKeeper(complianceKey, cdc)
 	compliancetestKeeper := compliancetest.NewKeeper(compliancetestKey, cdc)
 	authKeeper := auth.NewKeeper(authKey, cdc)
-	modelinfoKeeper := model.NewKeeper(modelinfoKey, cdc)
+	modelKeeper := model.NewKeeper(modelKey, cdc)
 
 	// Create context
 	ctx := sdk.NewContext(dbStore, abci.Header{ChainID: testconstants.ChainID}, false, log.NewNopLogger())
 
 	// Create Handler and Querier
 	querier := NewQuerier(compliancetKeeper)
-	handler := NewHandler(compliancetKeeper, modelinfoKeeper, compliancetestKeeper, authKeeper)
+	handler := NewHandler(compliancetKeeper, modelKeeper, compliancetestKeeper, authKeeper)
 
 	account := auth.NewAccount(testconstants.Address1, testconstants.PubKey1,
 		auth.AccountRoles{auth.ZBCertificationCenter}, testconstants.VendorId1)
@@ -88,7 +88,7 @@ func Setup() TestSetup {
 		Ctx:                  ctx,
 		CompliancetKeeper:    compliancetKeeper,
 		CompliancetestKeeper: compliancetestKeeper,
-		ModelinfoKeeper:      modelinfoKeeper,
+		ModelKeeper:          modelKeeper,
 		authKeeper:           authKeeper,
 		Handler:              handler,
 		Querier:              querier,

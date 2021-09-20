@@ -24,11 +24,11 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
-func NewHandler(keeper keeper.Keeper, modelinfoKeeper model.Keeper, authKeeper auth.Keeper) sdk.Handler {
+func NewHandler(keeper keeper.Keeper, modelKeeper model.Keeper, authKeeper auth.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgAddTestingResult:
-			return handleMsgAddTestingResult(ctx, keeper, modelinfoKeeper, authKeeper, msg)
+			return handleMsgAddTestingResult(ctx, keeper, modelKeeper, authKeeper, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized compliancetest Msg type: %v", msg.Type())
 
@@ -37,7 +37,7 @@ func NewHandler(keeper keeper.Keeper, modelinfoKeeper model.Keeper, authKeeper a
 	}
 }
 
-func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelinfoKeeper model.Keeper,
+func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelKeeper model.Keeper,
 	authKeeper auth.Keeper, msg types.MsgAddTestingResult) sdk.Result {
 	// check if sender has enough rights to add testing results
 	if err := checkAddTestingResultRights(ctx, authKeeper, msg.Signer); err != nil {
@@ -45,7 +45,7 @@ func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelinfoK
 	}
 
 	// check that corresponding model exists on the ledger
-	if !modelinfoKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
+	if !modelKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
 		return model.ErrModelDoesNotExist(msg.VID, msg.PID).Result()
 	}
 

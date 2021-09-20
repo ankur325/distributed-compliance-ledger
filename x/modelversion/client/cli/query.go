@@ -25,19 +25,19 @@ import (
 )
 
 func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	modelinfoVersionQueryCmd := &cobra.Command{
+	modelVersionQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the model version module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	modelinfoVersionQueryCmd.AddCommand(client.GetCommands(
+	modelVersionQueryCmd.AddCommand(client.GetCommands(
 		GetCmdModelVersion(storeKey, cdc),
 		GetCmdAllModelVersions(storeKey, cdc),
 	)...)
 
-	return modelinfoVersionQueryCmd
+	return modelVersionQueryCmd
 }
 
 func GetCmdModelVersion(queryRoute string, cdc *codec.Codec) *cobra.Command {

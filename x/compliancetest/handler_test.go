@@ -174,7 +174,7 @@ func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 		Owner: test_constants.Owner,
 	}
 
-	setup.ModelinfoKeeper.SetModel(setup.Ctx, model)
+	setup.ModelKeeper.SetModel(setup.Ctx, model)
 
 	return vid, pid
 }

@@ -25,7 +25,7 @@ import (
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	modelinfoTxCmd := &cobra.Command{
+	modelTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "model version transaction subcommands",
 		DisableFlagParsing:         true,
@@ -33,13 +33,13 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	modelinfoTxCmd.AddCommand(cli.SignedCommands(client.PostCommands(
+	modelTxCmd.AddCommand(cli.SignedCommands(client.PostCommands(
 		GetCmdAddModelVersion(cdc),
 		GetCmdUpdateModelVersion(cdc),
 		// GetCmdDeleteModelVersion(cdc), Disable deletion
 	)...)...)
 
-	return modelinfoTxCmd
+	return modelTxCmd
 }
 
 //nolint:funlen,gocognit

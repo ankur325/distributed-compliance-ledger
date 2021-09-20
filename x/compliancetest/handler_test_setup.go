@@ -36,7 +36,7 @@ type TestSetup struct {
 	Ctx                  sdk.Context
 	CompliancetestKeeper Keeper
 	authKeeper           auth.Keeper
-	ModelinfoKeeper      model.Keeper
+	ModelKeeper          model.Keeper
 	Handler              sdk.Handler
 	Querier              sdk.Querier
 	TestHouse            sdk.AccAddress
@@ -59,22 +59,22 @@ func Setup() TestSetup {
 	authKey := sdk.NewKVStoreKey(auth.StoreKey)
 	dbStore.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, nil)
 
-	modelinfoKey := sdk.NewKVStoreKey(model.StoreKey)
-	dbStore.MountStoreWithDB(modelinfoKey, sdk.StoreTypeIAVL, nil)
+	modelKey := sdk.NewKVStoreKey(model.StoreKey)
+	dbStore.MountStoreWithDB(modelKey, sdk.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
 	compliancetestKeeper := NewKeeper(complianceKey, cdc)
 	authKeeper := auth.NewKeeper(authKey, cdc)
-	modelinfoKeeper := model.NewKeeper(modelinfoKey, cdc)
+	modelKeeper := model.NewKeeper(modelKey, cdc)
 
 	// Create context
 	ctx := sdk.NewContext(dbStore, abci.Header{ChainID: testconstants.ChainID}, false, log.NewNopLogger())
 
 	// Create Handler and Querier
 	querier := NewQuerier(compliancetestKeeper)
-	handler := NewHandler(compliancetestKeeper, modelinfoKeeper, authKeeper)
+	handler := NewHandler(compliancetestKeeper, modelKeeper, authKeeper)
 
 	account := auth.NewAccount(testconstants.Address1, testconstants.PubKey1, auth.AccountRoles{auth.TestHouse}, testconstants.VendorId1)
 	account.AccountNumber = authKeeper.GetNextAccountNumber(ctx)
@@ -84,7 +84,7 @@ func Setup() TestSetup {
 		Cdc:                  cdc,
 		Ctx:                  ctx,
 		CompliancetestKeeper: compliancetestKeeper,
-		ModelinfoKeeper:      modelinfoKeeper,
+		ModelKeeper:          modelKeeper,
 		authKeeper:           authKeeper,
 		Handler:              handler,
 		Querier:              querier,

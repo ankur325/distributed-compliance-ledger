@@ -81,17 +81,17 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 	keeper               Keeper
-	modelinfoKeeper      model.Keeper
+	modelKeeper          model.Keeper
 	compliancetestKeeper compliancetest.Keeper
 	authKeeper           auth.Keeper
 }
 
-func NewAppModule(keeper Keeper, modelinfoKeeper model.Keeper,
+func NewAppModule(keeper Keeper, modelKeeper model.Keeper,
 	compliancetestKeeper compliancetest.Keeper, authKeeper auth.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic:       AppModuleBasic{},
 		keeper:               keeper,
-		modelinfoKeeper:      modelinfoKeeper,
+		modelKeeper:          modelKeeper,
 		compliancetestKeeper: compliancetestKeeper,
 		authKeeper:           authKeeper,
 	}
@@ -118,7 +118,7 @@ func (a AppModule) Route() string {
 }
 
 func (a AppModule) NewHandler() sdk.Handler {
-	return NewHandler(a.keeper, a.modelinfoKeeper, a.compliancetestKeeper, a.authKeeper)
+	return NewHandler(a.keeper, a.modelKeeper, a.compliancetestKeeper, a.authKeeper)
 }
 
 func (a AppModule) QuerierRoute() string {

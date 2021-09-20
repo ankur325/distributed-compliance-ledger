@@ -38,7 +38,7 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest"
 	compliancetestRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
-	modelinfoRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/model/client/rest"
+	modelRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/model/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki"
 	pkiRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/client/rest"
 )
@@ -284,7 +284,7 @@ func PrepareAddModelTransaction(model model.MsgAddModel) (types.StdTx, int) {
 }
 
 func SendAddModelRequest(model model.MsgAddModel, account string) ([]byte, int) {
-	request := modelinfoRest.AddModelRequest{
+	request := modelRest.AddModelRequest{
 		Model: model.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,
@@ -316,7 +316,7 @@ func PrepareUpdateModelTransaction(model model.MsgUpdateModel) (types.StdTx, int
 }
 
 func SendUpdateModelRequest(model model.MsgUpdateModel, account string) ([]byte, int) {
-	request := modelinfoRest.UpdateModelRequest{
+	request := modelRest.UpdateModelRequest{
 		Model: model.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,

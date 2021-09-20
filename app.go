@@ -185,8 +185,8 @@ func InitKeepers(app *dcLedgerApp, keys map[string]*sdk.KVStoreKey) {
 	// The Validator keeper
 	app.validatorKeeper = MakeValidatorKeeper(keys, app)
 
-	// The ModelinfoKeeper keeper
-	app.modelKeeper = MakeModelinfoKeeper(keys, app)
+	// The ModelKeeper keeper
+	app.modelKeeper = MakeModelKeeper(keys, app)
 
 	// The ModelversionKeeper keeper
 	app.modelversionKeeper = MakeModelversionKeeper(keys, app)
@@ -214,7 +214,7 @@ func MakeAuthKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) auth.Keep
 	)
 }
 
-func MakeModelinfoKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) model.Keeper {
+func MakeModelKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) model.Keeper {
 	return model.NewKeeper(
 		keys[model.StoreKey],
 		app.cdc,
