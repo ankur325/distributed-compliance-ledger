@@ -34,8 +34,8 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/genutil"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfoversion"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/validator"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/vendorinfo"
@@ -56,8 +56,8 @@ var ModuleBasics = module.NewBasicManager(
 	auth.AppModuleBasic{},
 	validator.AppModuleBasic{},
 	genutil.AppModuleBasic{},
-	modelinfo.AppModuleBasic{},
-	modelinfoversion.AppModuleBasic{},
+	model.AppModuleBasic{},
+	modelversion.AppModuleBasic{},
 	compliance.AppModuleBasic{},
 	compliancetest.AppModuleBasic{},
 	pki.AppModuleBasic{},
@@ -86,8 +86,8 @@ type dcLedgerApp struct {
 	// Keepers
 	authKeeper           auth.Keeper
 	validatorKeeper      validator.Keeper
-	modelinfoKeeper      modelinfo.Keeper
-	modelversionKeeper   modelinfoversion.Keeper
+	modelKeeper          model.Keeper
+	modelversionKeeper   modelversion.Keeper
 	pkiKeeper            pki.Keeper
 	complianceKeeper     compliance.Keeper
 	compliancetestKeeper compliancetest.Keeper
@@ -108,7 +108,7 @@ func NewDcLedgerApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.Ba
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, validator.StoreKey,
-		modelinfo.StoreKey, modelinfoversion.StoreKey, compliance.StoreKey, compliancetest.StoreKey, pki.StoreKey, vendorinfo.StoreKey)
+		model.StoreKey, modelversion.StoreKey, compliance.StoreKey, compliancetest.StoreKey, pki.StoreKey, vendorinfo.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -154,10 +154,10 @@ func InitModuleManager(app *dcLedgerApp) {
 		genutil.NewAppModule(app.authKeeper, app.validatorKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.authKeeper),
 		validator.NewAppModule(app.validatorKeeper, app.authKeeper),
-		modelinfo.NewAppModule(app.modelinfoKeeper, app.authKeeper),
-		modelinfoversion.NewAppModule(app.modelversionKeeper, app.authKeeper),
-		compliance.NewAppModule(app.complianceKeeper, app.modelinfoKeeper, app.compliancetestKeeper, app.authKeeper),
-		compliancetest.NewAppModule(app.compliancetestKeeper, app.authKeeper, app.modelinfoKeeper),
+		model.NewAppModule(app.modelKeeper, app.authKeeper),
+		modelversion.NewAppModule(app.modelversionKeeper, app.authKeeper),
+		compliance.NewAppModule(app.complianceKeeper, app.modelKeeper, app.compliancetestKeeper, app.authKeeper),
+		compliancetest.NewAppModule(app.compliancetestKeeper, app.authKeeper, app.modelKeeper),
 		pki.NewAppModule(app.pkiKeeper, app.authKeeper),
 		vendorinfo.NewAppModule(app.vendorinfoKeeper, app.authKeeper),
 	)
@@ -168,8 +168,8 @@ func InitModuleManager(app *dcLedgerApp) {
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName,
 		validator.ModuleName,
-		modelinfo.ModuleName,
-		modelinfoversion.ModuleName,
+		model.ModuleName,
+		modelversion.ModuleName,
 		compliance.ModuleName,
 		compliancetest.ModuleName,
 		pki.ModuleName,
@@ -186,7 +186,7 @@ func InitKeepers(app *dcLedgerApp, keys map[string]*sdk.KVStoreKey) {
 	app.validatorKeeper = MakeValidatorKeeper(keys, app)
 
 	// The ModelinfoKeeper keeper
-	app.modelinfoKeeper = MakeModelinfoKeeper(keys, app)
+	app.modelKeeper = MakeModelinfoKeeper(keys, app)
 
 	// The ModelversionKeeper keeper
 	app.modelversionKeeper = MakeModelversionKeeper(keys, app)
@@ -214,16 +214,16 @@ func MakeAuthKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) auth.Keep
 	)
 }
 
-func MakeModelinfoKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) modelinfo.Keeper {
-	return modelinfo.NewKeeper(
-		keys[modelinfo.StoreKey],
+func MakeModelinfoKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) model.Keeper {
+	return model.NewKeeper(
+		keys[model.StoreKey],
 		app.cdc,
 	)
 }
 
-func MakeModelversionKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) modelinfoversion.Keeper {
-	return modelinfoversion.NewKeeper(
-		keys[modelinfoversion.StoreKey],
+func MakeModelversionKeeper(keys map[string]*sdk.KVStoreKey, app *dcLedgerApp) modelversion.Keeper {
+	return modelversion.NewKeeper(
+		keys[modelversion.StoreKey],
 		app.cdc,
 	)
 }

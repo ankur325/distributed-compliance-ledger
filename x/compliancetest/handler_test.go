@@ -26,7 +26,7 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/types"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
 func TestHandler_AddTestingResult(t *testing.T) {
@@ -72,7 +72,7 @@ func TestHandler_AddTestingResultForUnknownModel(t *testing.T) {
 	// add new testing result
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, test_constants.VID, test_constants.PID)
 	result := setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, result.Code)
+	require.Equal(t, model.CodeModelDoesNotExist, result.Code)
 }
 
 func TestHandler_AddSeveralTestingResultsForOneModel(t *testing.T) {
@@ -162,8 +162,8 @@ func queryTestingResult(setup TestSetup, vid uint16, pid uint16) types.TestingRe
 }
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
-	modelInfo := modelinfo.ModelInfo{
-		Model: modelinfo.Model{
+	modelInfo := model.Model{
+		Model: model.Model{
 			VID:          vid,
 			PID:          pid,
 			DeviceTypeID: test_constants.DeviceTypeID,
@@ -174,7 +174,7 @@ func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 		Owner: test_constants.Owner,
 	}
 
-	setup.ModelinfoKeeper.SetModelInfo(setup.Ctx, modelInfo)
+	setup.ModelinfoKeeper.SetModel(setup.Ctx, modelInfo)
 
 	return vid, pid
 }

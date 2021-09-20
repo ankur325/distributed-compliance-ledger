@@ -27,7 +27,7 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/client/cli"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/client/rest"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
 // type check to ensure the interface is properly implemented.
@@ -81,10 +81,10 @@ type AppModule struct {
 	AppModuleBasic
 	keeper          Keeper
 	authKeeper      auth.Keeper
-	modelinfoKeeper modelinfo.Keeper
+	modelinfoKeeper model.Keeper
 }
 
-func NewAppModule(keeper Keeper, authKeeper auth.Keeper, modelinfoKeeper modelinfo.Keeper) AppModule {
+func NewAppModule(keeper Keeper, authKeeper auth.Keeper, modelinfoKeeper model.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{}, keeper: keeper,
 		authKeeper: authKeeper, modelinfoKeeper: modelinfoKeeper,

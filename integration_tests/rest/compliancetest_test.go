@@ -42,8 +42,8 @@ func TestCompliancetestDemo(t *testing.T) {
 	secondTestHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse})
 
 	// Publish model info
-	modelInfo := utils.NewMsgAddModelInfo(vendor.Address)
-	_, _ = utils.AddModelInfo(modelInfo, vendor)
+	modelInfo := utils.NewMsgAddModel(vendor.Address)
+	_, _ = utils.AddModel(modelInfo, vendor)
 
 	// Publish first testing result using Sign and Broadcast AddTestingResult message
 	firstTestingResult := utils.NewMsgAddTestingResult(modelInfo.VID, modelInfo.PID, testHouse.Address)
@@ -59,11 +59,11 @@ func TestCompliancetestDemo(t *testing.T) {
 	require.Equal(t, receivedTestingResult.Results[0].Owner, firstTestingResult.Signer)
 
 	// Publish second model info
-	secondModelInfo := utils.NewMsgAddModelInfo(vendor.Address)
-	_, _ = utils.AddModelInfo(secondModelInfo, vendor)
+	secondModel := utils.NewMsgAddModel(vendor.Address)
+	_, _ = utils.AddModel(secondModel, vendor)
 
 	// Publish second testing result using POST
-	secondTestingResult := utils.NewMsgAddTestingResult(secondModelInfo.VID, secondModelInfo.PID, testHouse.Address)
+	secondTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID, testHouse.Address)
 	_, _ = utils.PublishTestingResult(secondTestingResult, testHouse)
 
 	// Check testing result is created
@@ -76,7 +76,7 @@ func TestCompliancetestDemo(t *testing.T) {
 	require.Equal(t, receivedTestingResult.Results[0].Owner, secondTestingResult.Signer)
 
 	// Publish new testing result for second model
-	thirdTestingResult := utils.NewMsgAddTestingResult(secondModelInfo.VID, secondModelInfo.PID, secondTestHouse.Address)
+	thirdTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID, secondTestHouse.Address)
 	_, _ = utils.PublishTestingResult(thirdTestingResult, secondTestHouse)
 
 	// Check testing result is created

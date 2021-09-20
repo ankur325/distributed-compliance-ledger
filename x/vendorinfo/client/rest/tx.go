@@ -28,7 +28,7 @@ type AddVendorInfoRequest struct {
 	BaseReq    restTypes.BaseReq `json:"base_req"`
 }
 
-type UpdateModelInfoRequest struct {
+type UpdateModelRequest struct {
 	VendorInfo types.VendorInfo  `json:"vendor"`
 	BaseReq    restTypes.BaseReq `json:"base_req"`
 }
@@ -70,7 +70,7 @@ func updateVendorHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		restCtx := rest.NewRestContext(w, r).WithCodec(cliCtx.Codec)
 
-		var req UpdateModelInfoRequest
+		var req UpdateModelRequest
 		if !restCtx.ReadRESTReq(&req) {
 			return
 		}

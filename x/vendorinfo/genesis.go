@@ -34,48 +34,48 @@ func ValidateGenesis(data GenesisState) error {
 
 	// for _, record := range data.VendorInfoRecords {
 	// 	if record.Model.VID == 0 {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid VID. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Invalid VID. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.PID == 0 {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Invalid PID. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Invalid PID. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.ProductName == "" {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed ProductName. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed ProductName. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.Description == "" {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Description. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed Description. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.SKU == "" {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SKU. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SKU. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.HardwareVersion == 0 {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersion. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed HardwareVersion. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.HardwareVersionString == "" {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed HardwareVersionString. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed HardwareVersionString. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.SoftwareVersion == 0 {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SoftwareVersion. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SoftwareVersion. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.SoftwareVersionString == "" {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed SoftwareVersionString. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SoftwareVersionString. Value: %v", record))
 	// 	}
 
 	// 	if record.Owner.Empty() {
-	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: Missed Owner. Value: %v", record))
+	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed Owner. Value: %v", record))
 	// 	}
 
 	// 	if record.Model.OtaURL != "" || record.Model.OtaChecksum != "" || record.Model.OtaChecksumType != "" {
 	// 		if record.Model.OtaURL == "" || record.Model.OtaChecksum == "" || record.Model.OtaChecksumType == "" {
-	// 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid ModelInfo: The fields OtaURL, OtaChecksum and "+
+	// 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: The fields OtaURL, OtaChecksum and "+
 	// 				"OtaChecksumType must be either specified together, or not specified together. Value: %v", record))
 	// 		}
 	// 	}

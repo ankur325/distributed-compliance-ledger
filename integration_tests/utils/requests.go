@@ -37,8 +37,8 @@ import (
 	complianceRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest"
 	compliancetestRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/client/rest"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
-	modelinfoRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo/client/rest"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
+	modelinfoRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/model/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki"
 	pkiRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/client/rest"
 )
@@ -267,24 +267,24 @@ func BroadcastMessage(message interface{}) (TxnResponse, int) {
 	return parseWriteTxnResponse(response, code)
 }
 
-func AddModelInfo(model modelinfo.MsgAddModelInfo, sender KeyInfo) (TxnResponse, int) {
+func AddModel(model model.MsgAddModel, sender KeyInfo) (TxnResponse, int) {
 	println("Add Model Info")
 
-	response, code := SendAddModelInfoRequest(model, sender.Name)
+	response, code := SendAddModelRequest(model, sender.Name)
 
 	return parseWriteTxnResponse(response, code)
 }
 
-func PrepareAddModelInfoTransaction(model modelinfo.MsgAddModelInfo) (types.StdTx, int) {
+func PrepareAddModelTransaction(model model.MsgAddModel) (types.StdTx, int) {
 	println("Prepare Add Model Info Transaction")
 
-	response, code := SendAddModelInfoRequest(model, "")
+	response, code := SendAddModelRequest(model, "")
 
 	return parseStdTxn(response, code)
 }
 
-func SendAddModelInfoRequest(model modelinfo.MsgAddModelInfo, account string) ([]byte, int) {
-	request := modelinfoRest.AddModelInfoRequest{
+func SendAddModelRequest(model model.MsgAddModel, account string) ([]byte, int) {
+	request := modelinfoRest.AddModelRequest{
 		Model: model.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,
@@ -294,29 +294,29 @@ func SendAddModelInfoRequest(model modelinfo.MsgAddModelInfo, account string) ([
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s", modelinfo.RouterKey, "models")
+	uri := fmt.Sprintf("%s/%s", model.RouterKey, "models")
 
 	return SendPostRequest(uri, body, account, constants.Passphrase)
 }
 
-func UpdateModelInfo(model modelinfo.MsgUpdateModelInfo, sender KeyInfo) (TxnResponse, int) {
+func UpdateModel(model model.MsgUpdateModel, sender KeyInfo) (TxnResponse, int) {
 	println("Update Model Info")
 
-	response, code := SendUpdateModelInfoRequest(model, sender.Name)
+	response, code := SendUpdateModelRequest(model, sender.Name)
 
 	return parseWriteTxnResponse(response, code)
 }
 
-func PrepareUpdateModelInfoTransaction(model modelinfo.MsgUpdateModelInfo) (types.StdTx, int) {
+func PrepareUpdateModelTransaction(model model.MsgUpdateModel) (types.StdTx, int) {
 	println("Prepare Update Model Info Transaction")
 
-	response, code := SendUpdateModelInfoRequest(model, "")
+	response, code := SendUpdateModelRequest(model, "")
 
 	return parseStdTxn(response, code)
 }
 
-func SendUpdateModelInfoRequest(model modelinfo.MsgUpdateModelInfo, account string) ([]byte, int) {
-	request := modelinfoRest.UpdateModelInfoRequest{
+func SendUpdateModelRequest(model model.MsgUpdateModel, account string) ([]byte, int) {
+	request := modelinfoRest.UpdateModelRequest{
 		Model: model.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,
@@ -326,31 +326,31 @@ func SendUpdateModelInfoRequest(model modelinfo.MsgUpdateModelInfo, account stri
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s", modelinfo.RouterKey, "models")
+	uri := fmt.Sprintf("%s/%s", model.RouterKey, "models")
 
 	return SendPutRequest(uri, body, account, constants.Passphrase)
 }
 
-func GetModelInfo(vid uint16, pid uint16) (modelinfo.ModelInfo, int) {
+func GetModel(vid uint16, pid uint16) (model.Model, int) {
 	println(fmt.Sprintf("Get Model Info with VID:%v PID:%v", vid, pid))
 
-	uri := fmt.Sprintf("%s/%s/%v/%v", modelinfo.RouterKey, "models", vid, pid)
+	uri := fmt.Sprintf("%s/%s/%v/%v", model.RouterKey, "models", vid, pid)
 	response, code := SendGetRequest(uri)
 
-	var result modelinfo.ModelInfo
+	var result model.Model
 
 	parseGetReqResponse(removeResponseWrapper(response), &result, code)
 
 	return result, code
 }
 
-func GetModelInfos() (ModelInfoHeadersResult, int) {
+func GetModels() (ModelHeadersResult, int) {
 	println("Get the list of model infos")
 
-	uri := fmt.Sprintf("%s/%s", modelinfo.RouterKey, "models")
+	uri := fmt.Sprintf("%s/%s", model.RouterKey, "models")
 	response, code := SendGetRequest(uri)
 
-	var result ModelInfoHeadersResult
+	var result ModelHeadersResult
 
 	parseGetReqResponse(removeResponseWrapper(response), &result, code)
 
@@ -360,7 +360,7 @@ func GetModelInfos() (ModelInfoHeadersResult, int) {
 func GetVendors() (VendorItemHeadersResult, int) {
 	println("Get the list of vendors")
 
-	uri := fmt.Sprintf("%s/%s", modelinfo.RouterKey, "vendors")
+	uri := fmt.Sprintf("%s/%s", model.RouterKey, "vendors")
 	response, code := SendGetRequest(uri)
 
 	var result VendorItemHeadersResult
@@ -370,13 +370,13 @@ func GetVendors() (VendorItemHeadersResult, int) {
 	return result, code
 }
 
-func GetVendorModels(vid uint16) (modelinfo.VendorProducts, int) {
+func GetVendorModels(vid uint16) (model.VendorProducts, int) {
 	println("Get the list of models for VID:", vid)
 
-	uri := fmt.Sprintf("%s/%s/%v", modelinfo.RouterKey, "models", vid)
+	uri := fmt.Sprintf("%s/%s/%v", model.RouterKey, "models", vid)
 	response, code := SendGetRequest(uri)
 
-	var result modelinfo.VendorProducts
+	var result model.VendorProducts
 
 	parseGetReqResponse(removeResponseWrapper(response), &result, code)
 
@@ -902,8 +902,8 @@ func getProposedCertificateRevocations(uri string) (ProposedCertificateRevocatio
 	return result, code
 }
 
-func NewMsgAddModelInfo(owner sdk.AccAddress) modelinfo.MsgAddModelInfo {
-	model := modelinfo.Model{
+func NewMsgAddModel(owner sdk.AccAddress) model.MsgAddModel {
+	model := model.Model{
 
 		VID:                                      common.RandUint16(),
 		PID:                                      common.RandUint16(),
@@ -922,14 +922,14 @@ func NewMsgAddModelInfo(owner sdk.AccAddress) modelinfo.MsgAddModelInfo {
 		ProductURL:    constants.ProductURL,
 	}
 
-	return modelinfo.NewMsgAddModelInfo(
+	return model.NewMsgAddModel(
 		model,
 		owner,
 	)
 }
 
-func NewMsgUpdateModelInfo(vid uint16, pid uint16, owner sdk.AccAddress) modelinfo.MsgUpdateModelInfo {
-	model := modelinfo.Model{
+func NewMsgUpdateModel(vid uint16, pid uint16, owner sdk.AccAddress) model.MsgUpdateModel {
+	model := model.Model{
 		VID:                        vid,
 		PID:                        pid,
 		DeviceTypeID:               constants.DeviceTypeID + 1,
@@ -940,7 +940,7 @@ func NewMsgUpdateModelInfo(vid uint16, pid uint16, owner sdk.AccAddress) modelin
 		ProductURL:                 constants.ProductURL + "/new",
 	}
 
-	return modelinfo.NewMsgUpdateModelInfo(
+	return model.NewMsgUpdateModel(
 		model,
 		owner,
 	)
@@ -991,7 +991,7 @@ func parseGetReqResponse(response []byte, entity interface{}, code int) {
 	}
 }
 
-func InitStartData() (KeyInfo, KeyInfo, modelinfo.MsgAddModelInfo,
+func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
 	ComplianceInfosHeadersResult, ComplianceInfosHeadersResult) {
 	// Register new Vendor account
 	vendor := CreateNewAccount(auth.AccountRoles{auth.Vendor})
@@ -1000,8 +1000,8 @@ func InitStartData() (KeyInfo, KeyInfo, modelinfo.MsgAddModelInfo,
 	zb := CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter})
 
 	// Publish model info
-	modelInfo := NewMsgAddModelInfo(vendor.Address)
-	_, _ = AddModelInfo(modelInfo, vendor)
+	modelInfo := NewMsgAddModel(vendor.Address)
+	_, _ = AddModel(modelInfo, vendor)
 
 	// Get all certified models
 	inputCertifiedModels, _ := GetAllCertifiedModels()

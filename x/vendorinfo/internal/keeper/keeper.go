@@ -32,7 +32,7 @@ func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{storeKey: storeKey, cdc: cdc}
 }
 
-// Gets the entire ModelInfo struct for a ModelInfoID.
+// Gets the entire Model struct for a ModelID.
 func (k Keeper) GetVendorInfo(ctx sdk.Context, vid uint16) types.VendorInfo {
 	if !k.IsVendorInfoPresent(ctx, vid) {
 		panic("VendorInfo does not exist")

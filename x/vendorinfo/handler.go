@@ -30,8 +30,8 @@ func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
 			return handleMsgAddVendorInfo(ctx, keeper, authKeeper, msg)
 		case types.MsgUpdateVendorInfo:
 			return handleMsgUpdateVendorInfo(ctx, keeper, authKeeper, msg)
-			/*		case type.MsgDeleteModelInfo:
-					return handleMsgDeleteModelInfo(ctx, keeper, authKeeper, msg)*/
+			/*		case type.MsgDeleteModel:
+					return handleMsgDeleteModel(ctx, keeper, authKeeper, msg)*/
 		default:
 			errMsg := fmt.Sprintf("unrecognized nameservice Msg type: %v", msg.Type())
 

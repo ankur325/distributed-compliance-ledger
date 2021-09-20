@@ -28,7 +28,7 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelinfo"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 )
 
 func TestHandler_CertifyModel(t *testing.T) {
@@ -83,7 +83,7 @@ func TestHandler_CertifyModelForUnknownModel(t *testing.T) {
 	// try to certify model
 	certifyModelMsg := msgCertifyModel(setup.CertificationCenter, constants.VID, constants.PID)
 	result := setup.Handler(setup.Ctx, certifyModelMsg)
-	require.Equal(t, modelinfo.CodeModelInfoDoesNotExist, result.Code)
+	require.Equal(t, model.CodeModelDoesNotExist, result.Code)
 }
 
 func TestHandler_CertifyModelForModelWithoutTestingResults(t *testing.T) {
@@ -391,7 +391,7 @@ func TestHandler_CertifyRevokedModelForTrackRevocationStrategy(t *testing.T) {
 	revokedModelMsg := msgRevokedModel(setup.CertificationCenter, constants.VID, constants.PID)
 	revokedModelMsg.RevocationDate = time.Now().UTC()
 	result := setup.Handler(setup.Ctx, revokedModelMsg)
-	require.Equal(t, types.CodeModelInfoDoesNotExist, result.Code)
+	require.Equal(t, types.CodeModelDoesNotExist, result.Code)
 
 	// add model
 	vid, pid := addModel(setup, constants.VID, constants.PID)
@@ -478,8 +478,8 @@ func queryComplianceInfoInState(setup TestSetup, vid uint16, pid uint16, state s
 }
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
-	modelInfo := modelinfo.ModelInfo{
-		Model: modelinfo.Model{
+	modelInfo := model.Model{
+		Model: model.Model{
 			VID:          vid,
 			PID:          pid,
 			DeviceTypeID: constants.DeviceTypeID,
@@ -490,7 +490,7 @@ func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 		Owner: constants.Owner,
 	}
 
-	setup.ModelinfoKeeper.SetModelInfo(setup.Ctx, modelInfo)
+	setup.ModelinfoKeeper.SetModel(setup.Ctx, modelInfo)
 
 	return vid, pid
 }

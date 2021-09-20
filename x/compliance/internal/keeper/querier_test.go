@@ -23,7 +23,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
+	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliance/internal/types"
 )
 
@@ -310,10 +310,10 @@ func getAll(setup TestSetup, params types.ListQueryParams, state string) types.L
 		abci.RequestQuery{Data: setup.Cdc.MustMarshalJSON(params)},
 	)
 
-	var receiveModelInfos types.ListComplianceInfoItems
-	_ = setup.Cdc.UnmarshalJSON(result, &receiveModelInfos)
+	var receiveModels types.ListComplianceInfoItems
+	_ = setup.Cdc.UnmarshalJSON(result, &receiveModels)
 
-	return receiveModelInfos
+	return receiveModels
 }
 
 func getAllInState(setup TestSetup, params types.ListQueryParams, state string) types.ListComplianceInfoKeyItems {
@@ -323,8 +323,8 @@ func getAllInState(setup TestSetup, params types.ListQueryParams, state string) 
 		abci.RequestQuery{Data: setup.Cdc.MustMarshalJSON(params)},
 	)
 
-	var receiveModelInfos types.ListComplianceInfoKeyItems
-	_ = setup.Cdc.UnmarshalJSON(result, &receiveModelInfos)
+	var receiveModels types.ListComplianceInfoKeyItems
+	_ = setup.Cdc.UnmarshalJSON(result, &receiveModels)
 
-	return receiveModelInfos
+	return receiveModels
 }

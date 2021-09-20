@@ -57,8 +57,8 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 	inputRevokedModels, _ := utils.GetAllRevokedModels()
 
 	// Publish model info
-	modelInfo := utils.NewMsgAddModelInfo(vendor.Address)
-	_, _ = utils.AddModelInfo(modelInfo, vendor)
+	modelInfo := utils.NewMsgAddModel(vendor.Address)
+	_, _ = utils.AddModel(modelInfo, vendor)
 
 	// Check if model either certified or revoked before Compliance record was created
 	modelIsCertified, _ := utils.GetCertifiedModel(modelInfo.VID, modelInfo.PID, compliance.ZbCertificationType)
