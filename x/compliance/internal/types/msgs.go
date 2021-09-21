@@ -96,29 +96,27 @@ func (m MsgCertifyModel) GetSigners() []sdk.AccAddress {
 }
 
 type MsgRevokeModel struct {
-	VID                   uint16            `json:"vid"`
-	PID                   uint16            `json:"pid"`
-	SoftwareVersion       uint32            `json:"softwareVersion"`
-	SoftwareVersionString string            `json:"softwareVersionString"`
-	RevocationDate        time.Time         `json:"revocation_date"` // rfc3339 encoded date
-	CertificationType     CertificationType `json:"certification_type"`
-	Reason                string            `json:"reason,omitempty"`
-	Signer                sdk.AccAddress    `json:"signer"`
+	VID               uint16            `json:"vid"`
+	PID               uint16            `json:"pid"`
+	SoftwareVersion   uint32            `json:"softwareVersion"`
+	RevocationDate    time.Time         `json:"revocation_date"` // rfc3339 encoded date
+	CertificationType CertificationType `json:"certification_type"`
+	Reason            string            `json:"reason,omitempty"`
+	Signer            sdk.AccAddress    `json:"signer"`
 }
 
 func NewMsgRevokeModel(vid uint16, pid uint16,
-	softwareVersion uint32, softwareVersionString string,
+	softwareVersion uint32,
 	revocationDate time.Time, certificationType CertificationType,
 	revocationReason string, signer sdk.AccAddress) MsgRevokeModel {
 	return MsgRevokeModel{
-		VID:                   vid,
-		PID:                   pid,
-		SoftwareVersion:       softwareVersion,
-		SoftwareVersionString: softwareVersionString,
-		RevocationDate:        revocationDate,
-		CertificationType:     certificationType,
-		Reason:                revocationReason,
-		Signer:                signer,
+		VID:               vid,
+		PID:               pid,
+		SoftwareVersion:   softwareVersion,
+		RevocationDate:    revocationDate,
+		CertificationType: certificationType,
+		Reason:            revocationReason,
+		Signer:            signer,
 	}
 }
 
