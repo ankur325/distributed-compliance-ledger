@@ -24,11 +24,10 @@ import (
 type ComplianceState uint8
 
 const (
-	DevTest     ComplianceState = 0
+	NoStatus    ComplianceState = 0
 	Provisional ComplianceState = 1
 	Certified   ComplianceState = 2
 	Revoked     ComplianceState = 3
-	NoStatus    ComplianceState = 5
 )
 
 type CertificationType string
@@ -54,31 +53,39 @@ type ComplianceInfo struct {
 	History               []ComplianceHistoryItem `json:"history,omitempty"`
 }
 
-func NewCertifiedComplianceInfo(vid uint16, pid uint16, certificationType CertificationType,
+func NewCertifiedComplianceInfo(vid uint16, pid uint16,
+	softwareVersion uint32, softwareVersionString string,
+	certificationType CertificationType,
 	date time.Time, reason string, owner sdk.AccAddress) ComplianceInfo {
 	return ComplianceInfo{
-		VID:               vid,
-		PID:               pid,
-		State:             Certified,
-		Date:              date,
-		CertificationType: certificationType,
-		Reason:            reason,
-		Owner:             owner,
-		History:           []ComplianceHistoryItem{},
+		VID:                   vid,
+		PID:                   pid,
+		SoftwareVersion:       softwareVersion,
+		SoftwareVersionString: softwareVersionString,
+		State:                 Certified,
+		Date:                  date,
+		CertificationType:     certificationType,
+		Reason:                reason,
+		Owner:                 owner,
+		History:               []ComplianceHistoryItem{},
 	}
 }
 
-func NewRevokedComplianceInfo(vid uint16, pid uint16, certificationType CertificationType,
+func NewRevokedComplianceInfo(vid uint16, pid uint16,
+	certificationType CertificationType,
+	softwareVersion uint32, softwareVersionString string,
 	date time.Time, reason string, owner sdk.AccAddress) ComplianceInfo {
 	return ComplianceInfo{
-		VID:               vid,
-		PID:               pid,
-		State:             Revoked,
-		Date:              date,
-		CertificationType: certificationType,
-		Reason:            reason,
-		Owner:             owner,
-		History:           []ComplianceHistoryItem{},
+		VID:                   vid,
+		PID:                   pid,
+		SoftwareVersion:       softwareVersion,
+		SoftwareVersionString: softwareVersionString,
+		State:                 Revoked,
+		Date:                  date,
+		CertificationType:     certificationType,
+		Reason:                reason,
+		Owner:                 owner,
+		History:               []ComplianceHistoryItem{},
 	}
 }
 
@@ -135,5 +142,6 @@ func (d ComplianceHistoryItem) String() string {
 type ComplianceInfoKey struct {
 	VID               uint16            `json:"vid"`
 	PID               uint16            `json:"pid"`
+	SoftwareVersion   uint32            `json:"softwareVersion"`
 	CertificationType CertificationType `json:"certification_type"`
 }
