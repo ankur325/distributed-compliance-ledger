@@ -44,7 +44,7 @@ func ValidateGenesis(data GenesisState) error {
 					"Error: Invalid PID: it cannot be 0", record.PID))
 		}
 
-		if len(record.State) == 0 {
+		if record.State == types.NoStatus {
 			return sdk.ErrUnknownRequest(
 				fmt.Sprintf("Invalid CertifiedModelRecord: value: %d."+
 					" Error: Invalid State: it cannot be empty", record.PID))

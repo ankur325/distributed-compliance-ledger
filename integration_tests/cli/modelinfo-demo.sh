@@ -27,7 +27,7 @@ vid=$RANDOM
 pid=$RANDOM
 productName="Device #1"
 echo "Add Model with VID: $vid PID: $pid"
-result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --supportURL="https://originalsupporturl.test" --productName="$productName" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from $vendor_account --yes)
+result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --supportURL="https://originalsupporturl.test" --productName="$productName" --productLabel="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from $vendor_account --yes)
 check_response "$result" "\"success\": true"
 echo "$result"
 
@@ -56,7 +56,7 @@ echo "$result"
 
 echo "Update Model with VID: ${vid} PID: ${pid} with new description"
 description="New Device Description"
-result=$(echo "test1234" | dclcli tx model update-model --vid=$vid --pid=$pid --cdVersionNumber="32" --from $vendor_account --yes --description "$description")
+result=$(echo "test1234" | dclcli tx model update-model --vid=$vid --pid=$pid --cdVersionNumber="32" --from $vendor_account --yes --productLabel "$description")
 check_response "$result" "\"success\": true"
 echo "$result"
 

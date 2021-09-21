@@ -80,3 +80,26 @@ create_new_account(){
   echo "$result"
 }
 
+create_new_vendor_account(){
+
+  name=$1
+  vid=$2
+  echo "Account name: $name"
+
+  echo "Generate key for $name"
+  echo $passphrase | dclcli keys add "$name"
+
+  address=$(dclcli keys show $name -a)
+  pubkey=$(dclcli keys show $name -p)
+
+  echo "Jack proposes account for \"$name\" with Vendor role"
+  result=$(echo $passphrase | dclcli tx auth propose-add-account --address="$address" --pubkey="$pubkey" --roles=Vendor --vid=$vid --from jack --yes)
+  check_response "$result" "\"success\": true"
+  echo "$result"
+
+  echo "Alice approve account for \"$name\" with Vendor role"
+  result=$(echo $passphrase | dclcli tx auth approve-add-account --address="$address" --from alice --yes)
+  check_response "$result" "\"success\": true"
+  echo "$result"
+}
+

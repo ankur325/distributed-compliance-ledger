@@ -64,6 +64,8 @@ var (
 	ProductURL                                        = "https://url.producturl.dclmodel"
 	ChipBlob                                          = "Chip Blob Text"
 	VendorBlob                                        = "Vendor Blob Text"
+	MinApplicableSoftwareVersion               uint32 = 1
+	MaxApplicableSoftwareVersion               uint32 = 1000
 	Owner                                             = Address1
 
 	// Compliance.

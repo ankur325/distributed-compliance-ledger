@@ -23,16 +23,16 @@ import (
 )
 
 type GenesisState struct {
-	ModelVersionInfoRecords []ModelVersionInfo `json:"model_info_version_records"`
+	ModelVersionRecords []ModelVersion `json:"model_version_records"`
 }
 
 func NewGenesisState() GenesisState {
-	return GenesisState{ModelVersionInfoRecords: []ModelVersionInfo{}}
+	return GenesisState{ModelVersionRecords: []ModelVersion{}}
 }
 
 //nolint:cognit
 func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.ModelVersionInfoRecords {
+	for _, record := range data.ModelVersionRecords {
 		if record.VID == 0 {
 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Invalid VID. Value: %v", record))
 		}
@@ -67,7 +67,7 @@ func DefaultGenesisState() GenesisState {
 }
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.ModelVersionInfoRecords {
+	for _, record := range data.ModelVersionRecords {
 		keeper.SetModelVersion(ctx, record)
 	}
 
@@ -75,13 +75,13 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.Valid
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	var records []ModelVersionInfo
+	var records []ModelVersion
 
-	k.IterateModelVersionInfos(ctx, func(modelVersionInfo types.ModelVersionInfo) (stop bool) {
+	k.IterateModelVersionInfos(ctx, func(modelVersionInfo types.ModelVersion) (stop bool) {
 		records = append(records, modelVersionInfo)
 
 		return false
 	})
 
-	return GenesisState{ModelVersionInfoRecords: records}
+	return GenesisState{ModelVersionRecords: records}
 }

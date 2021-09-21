@@ -34,6 +34,9 @@ func TestHandler_AddTestingResult(t *testing.T) {
 
 	// add model
 	vid, pid := addModel(setup, test_constants.VID, test_constants.PID)
+	// add model version
+	softwareVersion, softwareVersionString :=
+		addModelVersion(setup, test_constants.VID, test_constants.PID, test_constants.SoftwareVersion)
 
 	// add new testing result
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, vid, pid)
@@ -162,6 +165,21 @@ func queryTestingResult(setup TestSetup, vid uint16, pid uint16) types.TestingRe
 }
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
+	model := model.Model{
+		VID:          vid,
+		PID:          pid,
+		DeviceTypeID: test_constants.DeviceTypeID,
+		ProductName:  test_constants.ProductName,
+		ProductLabel: test_constants.ProductLabel,
+		PartNumber:   test_constants.PartNumber,
+	}
+
+	setup.ModelKeeper.SetModel(setup.Ctx, model)
+
+	return vid, pid
+}
+
+func addModelVersion(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 	model := model.Model{
 		VID:          vid,
 		PID:          pid,

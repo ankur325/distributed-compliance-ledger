@@ -68,7 +68,7 @@ func GetCmdModelVersion(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return types.ErrModelVersionDoesNotExist(vid, pid, softwareVersion)
 			}
 
-			var modelVersion types.ModelVersionInfo
+			var modelVersion types.ModelVersion
 			cdc.MustUnmarshalBinaryBare(res, &modelVersion)
 
 			return cliCtx.EncodeAndPrintWithHeight(modelVersion, height)

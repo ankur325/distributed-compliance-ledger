@@ -62,6 +62,13 @@ func GetCmdAddTestingResult(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			softwareVersion, err := conversions.ParseUInt32FromString("softwareVersion", viper.GetString(FlagSoftwareVersion))
+			if err != nil {
+				return err
+			}
+
+			softwareVersionString := viper.GetString(FlagSoftwareVersionString)
+
 			testResult, err_ := cliCtx.ReadFromFile(viper.GetString(FlagTestResult))
 			if err_ != nil {
 				return err_
@@ -73,7 +80,8 @@ func GetCmdAddTestingResult(cdc *codec.Codec) *cobra.Command {
 					"it must be RFC3339 encoded date", viper.GetString(FlagTestDate)))
 			}
 
-			msg := types.NewMsgAddTestingResult(vid, pid, testResult, testDate, cliCtx.FromAddress())
+			msg := types.NewMsgAddTestingResult(vid, pid, softwareVersion, softwareVersionString,
+				testResult, testDate, cliCtx.FromAddress())
 
 			return cliCtx.HandleWriteMessage(msg)
 		},

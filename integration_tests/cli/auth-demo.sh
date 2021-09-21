@@ -32,7 +32,7 @@ vid=$RANDOM
 pid=$RANDOM
 
 echo "Jack proposes account for $user"
-result=$(echo $passphrase | dclcli tx auth propose-add-account --address="$user_address" --pubkey="$user_pubkey" --roles="Vendor" --vendorId="$vid" --from jack --yes)
+result=$(echo $passphrase | dclcli tx auth propose-add-account --address="$user_address" --pubkey="$user_pubkey" --roles="Vendor" --vid="$vid" --from jack --yes)
 check_response "$result" "\"success\": true"
 echo "$result"
 
@@ -79,15 +79,19 @@ echo "$result"
 
 productName="Device #1"
 echo "$user adds Model with VID: $vid PID: $pid"
-result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --productName="$productName" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from=$user_address --yes)
+result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --productName="$productName" --productLabel="Device Description"   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12 --from=$user_address --yes)
 check_response "$result" "\"success\": true"
 echo "$result"
 
 vidPlusOne=$((vid+1))
 echo "$user adds Model with a VID: $vidPlusOne PID: $pid, This fails with Permission denied as the VID is not associated with this vendor account."
-result=$(echo "test1234" | dclcli tx model add-model --vid=$vidPlusOne --pid=$pid --productName="$productName" --description="Device Description" --sku="SKU12FS" --softwareVersion="10123" --softwareVersionString="1.0b123"  --hardwareVersion="5123" --hardwareVersionString="5.1.23"  --cdVersionNumber="32" --from=$user_address --yes 2>&1) || true
+result=$(echo "test1234" | dclcli tx model add-model --vid=$vidPlusOne --pid=$pid --productName="$productName" --productLabel="Device Description"   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12 --from=$user_address --yes 2>&1) || true
 echo "$result"
 check_response_and_report "$result" "transaction should be signed by an vendor account containing the vendorId $vidPlusOne"
+
+echo "$user updates Model with VID: $vid PID: $pid"
+result=$(echo "test1234" | dclcli tx model update-model --vid=$vid --pid=$pid --productName="$productName" --productLabel="Device Description" --partNumber=12 --from=$user_address --yes 2>&1) || true
+check_response_and_report "$result" "\"success\": true"
 
 echo "Get Model with VID: $vid PID: $pid"
 result=$(dclcli query model model --vid=$vid --pid=$pid)
@@ -144,5 +148,7 @@ check_response_and_report "$result" "No account associated with the address"
 pid=$RANDOM
 productName="Device #2"
 echo "$user adds Model with VID: $vid PID: $pid"
-result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --productName="$productName" --description="Device Description" --sku="SKU12FS" --softwareVersion=10 --softwareVersionString="1.0b123"  --hardwareVersion=5 --hardwareVersionString="5.1.23"  --cdVersionNumber=32 --from=$user_address --yes 2>&1) || true
+result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid --productName="$productName" --productLabel="Device Description" --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12 --from=$user_address --yes 2>&1) || true
 check_response_and_report "$result" "No account associated with the address"
+
+

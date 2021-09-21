@@ -37,7 +37,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryComplianceInfo:
-			return queryComplianceInfo(ctx, path[1:], keeper, "")
+			return queryComplianceInfo(ctx, path[1:], keeper, types.NoStatus)
 		case QueryAllComplianceInfoRecords:
 			return queryAllComplianceInfoRecords(ctx, req, keeper)
 		case QueryCertifiedModel:
@@ -74,7 +74,7 @@ func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
 
 	complianceInfo := keeper.GetComplianceInfo(ctx, certificationType, vid, pid)
 
-	if len(requestedState) != 0 {
+	if requestedState != types.NoStatus {
 		if complianceInfo.State != requestedState {
 			return nil, types.ErrComplianceInfoDoesNotExist(vid, pid, certificationType)
 		}
@@ -136,7 +136,7 @@ func queryAllComplianceInfoInStateRecords(ctx sdk.Context, req abci.RequestQuery
 	skipped := 0
 
 	keeper.IterateComplianceInfos(ctx, params.CertificationType, func(complianceInfo types.ComplianceInfo) (stop bool) {
-		if len(requestedState) != 0 && complianceInfo.State != requestedState {
+		if requestedState != types.NoStatus && complianceInfo.State != requestedState {
 			return false
 		}
 

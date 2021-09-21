@@ -16,8 +16,6 @@ package types
 
 import (
 	"encoding/json"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 //nolint:maligned
@@ -38,26 +36,17 @@ type ModelVersion struct {
 	ReleaseNotesURL              string `json:"releaseNotesURL,omitempty"`
 }
 
-type ModelVersions struct {
-	VID              uint16   `json:"vid"`
-	PID              uint16   `json:"pid"`
-	SoftwareVersions []uint32 `json:"softwareVersions"`
-}
-
-/*
-	Model Version Info stored in KVStore
-*/
-//nolint:maligned
-type ModelVersionInfo struct {
-	ModelVersion
-	Owner sdk.AccAddress `json:"owner"`
-}
-
-func (d ModelVersionInfo) String() string {
+func (d ModelVersion) String() string {
 	bytes, err := json.Marshal(d)
 	if err != nil {
 		panic(err)
 	}
 
 	return string(bytes)
+}
+
+type ModelVersions struct {
+	VID              uint16   `json:"vid"`
+	PID              uint16   `json:"pid"`
+	SoftwareVersions []uint32 `json:"softwareVersions"`
 }

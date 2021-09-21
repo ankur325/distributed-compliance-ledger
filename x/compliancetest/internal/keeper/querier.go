@@ -30,7 +30,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryTestingResult:
-			return queryTestingResult(ctx, path[1:], keeper)
+			return queryTestingResult(ctx, path[2:], keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown compliancetest query endpoint")
 		}
@@ -48,11 +48,16 @@ func queryTestingResult(ctx sdk.Context, path []string, keeper Keeper) (res []by
 		return nil, err
 	}
 
-	if !keeper.IsTestingResultsPresents(ctx, vid, pid) {
+	softwareVersion, err := conversions.ParseUInt32FromString("softwareVersion", path[2])
+	if err != nil {
+		return nil, err
+	}
+
+	if !keeper.IsTestingResultsPresents(ctx, vid, pid, softwareVersion) {
 		return nil, types.ErrTestingResultDoesNotExist(vid, pid)
 	}
 
-	testingResult := keeper.GetTestingResults(ctx, vid, pid)
+	testingResult := keeper.GetTestingResults(ctx, vid, pid, softwareVersion)
 
 	res = codec.MustMarshalJSONIndent(keeper.cdc, testingResult)
 

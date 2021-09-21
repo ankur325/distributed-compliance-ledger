@@ -21,11 +21,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type ComplianceState string
+type ComplianceState uint8
 
 const (
-	Certified ComplianceState = "certified"
-	Revoked   ComplianceState = "revoked"
+	DevTest     ComplianceState = 0
+	Provisional ComplianceState = 1
+	Certified   ComplianceState = 2
+	Revoked     ComplianceState = 3
+	NoStatus    ComplianceState = 5
 )
 
 type CertificationType string
@@ -38,14 +41,17 @@ const (
 	Compliance info stored into KVStore
 */
 type ComplianceInfo struct {
-	VID               uint16                  `json:"vid"`
-	PID               uint16                  `json:"pid"`
-	State             ComplianceState         `json:"state"`
-	Date              time.Time               `json:"date"` // rfc3339 encoded date
-	CertificationType CertificationType       `json:"certification_type"`
-	Reason            string                  `json:"reason,omitempty"`
-	Owner             sdk.AccAddress          `json:"owner"`
-	History           []ComplianceHistoryItem `json:"history,omitempty"`
+	VID                   uint16                  `json:"vid"`
+	PID                   uint16                  `json:"pid"`
+	SoftwareVersion       uint32                  `json:"softwareVersion"`
+	SoftwareVersionString string                  `json:"softwareVersionString,omitempty"`
+	CDVersionNumber       uint32                  `json:"CDVersionNumber,omitempty"`
+	State                 ComplianceState         `json:"state"`
+	Date                  time.Time               `json:"date"` // rfc3339 encoded date
+	CertificationType     CertificationType       `json:"certification_type"`
+	Reason                string                  `json:"reason,omitempty"`
+	Owner                 sdk.AccAddress          `json:"owner"`
+	History               []ComplianceHistoryItem `json:"history,omitempty"`
 }
 
 func NewCertifiedComplianceInfo(vid uint16, pid uint16, certificationType CertificationType,

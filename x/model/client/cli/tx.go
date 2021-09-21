@@ -212,10 +212,14 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			productName := viper.GetString(FlagProductName)
+
 			productLabel, err_ := cliCtx.ReadFromFile(viper.GetString(FlagProductLabel))
 			if err_ != nil {
 				return err_
 			}
+
+			partNumber := viper.GetString(FlagPartNumber)
 
 			commissioningCustomFlowURL := viper.GetString(FlagCommissioningCustomFlowURL)
 
@@ -226,7 +230,9 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 			model := types.Model{
 				VID:                        vid,
 				PID:                        pid,
+				ProductName:                productName,
 				ProductLabel:               productLabel,
+				PartNumber:                 partNumber,
 				CommissioningCustomFlowURL: commissioningCustomFlowURL,
 				UserManualURL:              userManualURL,
 				SupportURL:                 supportURL,
@@ -241,9 +247,12 @@ func GetCmdUpdateModel(cdc *codec.Codec) *cobra.Command {
 		"Model vendor ID")
 	cmd.Flags().String(FlagPID, "",
 		"Model product ID")
+	cmd.Flags().StringP(FlagProductName, FlagProductNameShortcut, "",
+		"Model name")
 	cmd.Flags().StringP(FlagProductLabel, FlagProductLabelShortcut, "",
 		"Model description (string or path to file containing data)")
-
+	cmd.Flags().String(FlagPartNumber, "",
+		"Model Part Number (or sku)")
 	cmd.Flags().String(FlagCommissioningCustomFlowURL, "",
 		`commissioningCustomFlowURL SHALL identify a vendor specific commissioning URL for the 
 	device model when the commissioningCustomFlow field is set to '2'`)

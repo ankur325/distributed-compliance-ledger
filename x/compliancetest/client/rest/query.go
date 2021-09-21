@@ -43,7 +43,13 @@ func getTestingResultHandler(cliCtx context.CLIContext, storeName string) http.H
 			return
 		}
 
-		res, height, err := restCtx.QueryStore(types.GetTestingResultsKey(vid, pid), storeName)
+		softwareVersion, err_ := conversions.ParseUInt32FromString("softwareVersion", vars[softwareVersion])
+		if err_ != nil {
+			restCtx.WriteErrorResponse(http.StatusBadRequest, err_.Error())
+			return
+		}
+
+		res, height, err := restCtx.QueryStore(types.GetTestingResultsKey(vid, pid, softwareVersion), storeName)
 		if err != nil || res == nil {
 			restCtx.WriteErrorResponse(http.StatusNotFound, types.ErrTestingResultDoesNotExist(vid, pid).Error())
 

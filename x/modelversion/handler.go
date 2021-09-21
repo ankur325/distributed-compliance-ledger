@@ -43,7 +43,7 @@ func handleMsgAddModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 	msg types.MsgAddModelVersion) sdk.Result {
 
 	// check sender has enough rights to add model
-	if err := checkAddModelRights(ctx, authKeeper, msg.Signer, msg.VID); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID); err != nil {
 		return err.Result()
 	}
 
@@ -73,14 +73,9 @@ func handleMsgAddModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 		MaxApplicableSoftwareVersion: msg.MaxApplicableSoftwareVersion,
 		ReleaseNotesURL:              msg.ReleaseNotesURL,
 	}
-	modelVersionInfo := ModelVersionInfo{
-		ModelVersion: modelVersion,
-		Owner:        msg.Signer,
-	}
 
 	// store new model
-	keeper.SetModelVersion(ctx, modelVersionInfo)
-
+	keeper.SetModelVersion(ctx, modelVersion)
 	return sdk.Result{}
 }
 
@@ -95,7 +90,7 @@ func handleMsgUpdateModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeep
 	modelVersion := keeper.GetModelVersion(ctx, msg.VID, msg.PID, msg.SoftwareVersion)
 
 	// check if sender has enough rights to update model
-	if err := checkUpdateModelRights(modelVersion.Owner, msg.Signer); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID); err != nil {
 		return err.Result()
 	}
 
@@ -132,24 +127,15 @@ func handleMsgUpdateModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeep
 	return sdk.Result{}
 }
 
-func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress, vid uint16) sdk.Error {
+func checkModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress, vid uint16) sdk.Error {
 	// sender must have Vendor role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.Vendor) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelVersion transaction should be "+
+		return sdk.ErrUnauthorized(fmt.Sprintf("ModelVersion Add/Update transaction should be "+
 			"signed by an account with the %s role", auth.Vendor))
 	}
 	if !authKeeper.HasVendorId(ctx, signer, vid) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelVersion transaction should be "+
+		return sdk.ErrUnauthorized(fmt.Sprintf("ModelVersion Add/Update transaction should be "+
 			"signed by an vendor account containing the vendorId %v ", vid))
-	}
-
-	return nil
-}
-
-func checkUpdateModelRights(owner sdk.AccAddress, signer sdk.AccAddress) sdk.Error {
-	// sender must be equal to owner to edit model
-	if !signer.Equals(owner) {
-		return sdk.ErrUnauthorized("MsgUpdateModel tx should be signed by owner")
 	}
 
 	return nil

@@ -33,7 +33,7 @@ func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 }
 
 // Gets the entire ModelVersion struct for a vid/pid/softwareVersion.
-func (k Keeper) GetModelVersion(ctx sdk.Context, vid uint16, pid uint16, softwareVersion uint32) types.ModelVersionInfo {
+func (k Keeper) GetModelVersion(ctx sdk.Context, vid uint16, pid uint16, softwareVersion uint32) types.ModelVersion {
 	if !k.IsModelVersionPresent(ctx, vid, pid, softwareVersion) {
 		panic("Model Version does not exist")
 	}
@@ -41,7 +41,7 @@ func (k Keeper) GetModelVersion(ctx sdk.Context, vid uint16, pid uint16, softwar
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetModelVersionKey(vid, pid, softwareVersion))
 
-	var modelVersion types.ModelVersionInfo
+	var modelVersion types.ModelVersion
 
 	k.cdc.MustUnmarshalBinaryBare(bz, &modelVersion)
 
@@ -65,18 +65,18 @@ func (k Keeper) GetModelVersions(ctx sdk.Context, vid uint16, pid uint16) types.
 }
 
 // Sets the entire Model metadata struct for a ModelID.
-func (k Keeper) SetModelVersion(ctx sdk.Context, modelVersionInfo types.ModelVersionInfo) {
+func (k Keeper) SetModelVersion(ctx sdk.Context, modelVersion types.ModelVersion) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetModelVersionKey(modelVersionInfo.VID,
-		modelVersionInfo.PID,
-		modelVersionInfo.SoftwareVersion), k.cdc.MustMarshalBinaryBare(modelVersionInfo))
+	store.Set(types.GetModelVersionKey(modelVersion.VID,
+		modelVersion.PID,
+		modelVersion.SoftwareVersion), k.cdc.MustMarshalBinaryBare(modelVersion))
 
 	// Add the Version to the ModelVersions Array
-	k.AppendModelVersion(ctx, modelVersionInfo.VID, modelVersionInfo.PID, modelVersionInfo.SoftwareVersion)
+	k.AppendModelVersion(ctx, modelVersion.VID, modelVersion.PID, modelVersion.SoftwareVersion)
 }
 
 // Iterate over all Models.
-func (k Keeper) IterateModelVersionInfos(ctx sdk.Context, process func(info types.ModelVersionInfo) (stop bool)) {
+func (k Keeper) IterateModelVersionInfos(ctx sdk.Context, process func(info types.ModelVersion) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iter := sdk.KVStorePrefixIterator(store, types.ModelVersionPrefix)
@@ -89,11 +89,11 @@ func (k Keeper) IterateModelVersionInfos(ctx sdk.Context, process func(info type
 
 		val := iter.Value()
 
-		var modelVersionInfo types.ModelVersionInfo
+		var modelVersion types.ModelVersion
 
-		k.cdc.MustUnmarshalBinaryBare(val, &modelVersionInfo)
+		k.cdc.MustUnmarshalBinaryBare(val, &modelVersion)
 
-		if process(modelVersionInfo) {
+		if process(modelVersion) {
 			return
 		}
 

@@ -52,7 +52,7 @@ func GetCmdVendor(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
-			vendorId, vidErr := conversions.ParseVID(viper.GetString(FlagVendorId))
+			vendorId, vidErr := conversions.ParseVID(viper.GetString(FlagVID))
 			if vidErr != nil {
 				return vidErr
 			}
@@ -72,9 +72,9 @@ func GetCmdVendor(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(FlagVendorId, "", "Unique ID assigned to the vendor")
+	cmd.Flags().String(FlagVID, "", "Unique ID assigned to the vendor")
 
-	_ = cmd.MarkFlagRequired(FlagVendorId)
+	_ = cmd.MarkFlagRequired(FlagVID)
 
 	return cmd
 }

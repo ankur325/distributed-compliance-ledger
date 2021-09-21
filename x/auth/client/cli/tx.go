@@ -74,9 +74,9 @@ func GetCmdProposeAddAccount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var vendorId uint16
-			if viper.GetString(FlagVendorId) != "" {
+			if viper.GetString(FlagVID) != "" {
 				var err_ sdk.Error
-				vendorId, err_ = conversions.ParsePID(viper.GetString(FlagVendorId))
+				vendorId, err_ = conversions.ParseVID(viper.GetString(FlagVID))
 				if err_ != nil {
 					return err_
 				}
@@ -94,7 +94,7 @@ func GetCmdProposeAddAccount(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(FlagRoles, "",
 		fmt.Sprintf("The list of roles, comma-separated, assigning to the account (supported roles: %v)",
 			types.Roles))
-	cmd.Flags().String(FlagVendorId, "", "Vendor ID associated with this account. Required only for Vendor Roles")
+	cmd.Flags().String(FlagVID, "", "Vendor ID associated with this account. Required only for Vendor Roles")
 
 	_ = cmd.MarkFlagRequired(FlagAddress)
 	_ = cmd.MarkFlagRequired(FlagPubKey)

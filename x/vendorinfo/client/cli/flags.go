@@ -15,7 +15,7 @@
 package cli
 
 const (
-	FlagVendorId             = "vendorId"
+	FlagVID                  = "vid"
 	FlagVendorName           = "vendorName"
 	FlagCompanyLegalName     = "companyLegalName"
 	FlagCompanyPreferredName = "companyPreferredName"

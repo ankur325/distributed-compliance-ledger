@@ -51,7 +51,7 @@ func GetCmdAddVendor(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
-			vendorId, err := conversions.ParseVID(viper.GetString(FlagVendorId))
+			vendorId, err := conversions.ParseVID(viper.GetString(FlagVID))
 			if err != nil {
 				return err
 			}
@@ -75,7 +75,7 @@ func GetCmdAddVendor(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(FlagVendorId, "",
+	cmd.Flags().String(FlagVID, "",
 		"Vendor ID")
 	cmd.Flags().String(FlagVendorName, "",
 		"Vendor Name")
@@ -85,7 +85,7 @@ func GetCmdAddVendor(cdc *codec.Codec) *cobra.Command {
 		"Company Preferred Name")
 	cmd.Flags().String(FlagVendorLandingPageUrl, "",
 		"Landing Page URL for the Vendor")
-	_ = cmd.MarkFlagRequired(FlagVendorId)
+	_ = cmd.MarkFlagRequired(FlagVID)
 	_ = cmd.MarkFlagRequired(FlagVendorName)
 	_ = cmd.MarkFlagRequired(FlagCompanyLegalName)
 	return cmd
@@ -100,7 +100,7 @@ func GetCmdUpdateVendor(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
-			vendorId, err := conversions.ParseVID(viper.GetString(FlagVendorId))
+			vendorId, err := conversions.ParseVID(viper.GetString(FlagVID))
 			if err != nil {
 				return err
 			}
@@ -122,7 +122,7 @@ func GetCmdUpdateVendor(cdc *codec.Codec) *cobra.Command {
 			return cliCtx.HandleWriteMessage(msg)
 		},
 	}
-	cmd.Flags().String(FlagVendorId, "",
+	cmd.Flags().String(FlagVID, "",
 		"Vendor ID")
 	cmd.Flags().String(FlagVendorName, "",
 		"Vendor Name")
@@ -133,7 +133,7 @@ func GetCmdUpdateVendor(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(FlagVendorLandingPageUrl, "",
 		"Landing Page URL for the Vendor")
 
-	_ = cmd.MarkFlagRequired(FlagVendorId)
+	_ = cmd.MarkFlagRequired(FlagVID)
 
 	return cmd
 }

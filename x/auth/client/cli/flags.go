@@ -19,6 +19,6 @@ const (
 	FlagAddressUsage = "Bench32 encoded account address"
 	FlagPubKey       = "pubkey"
 	FlagRoles        = "roles"
-	FlagVendorId     = "vendorId"
+	FlagVID          = "vid"
 	FlagRolesUsage   = "amount of accounts to take"
 )

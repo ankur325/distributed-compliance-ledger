@@ -21,14 +21,14 @@ import (
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/internal/types"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion"
 )
 
-func NewHandler(keeper keeper.Keeper, modelKeeper model.Keeper, authKeeper auth.Keeper) sdk.Handler {
+func NewHandler(keeper keeper.Keeper, modelversionKeeper modelversion.Keeper, authKeeper auth.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgAddTestingResult:
-			return handleMsgAddTestingResult(ctx, keeper, modelKeeper, authKeeper, msg)
+			return handleMsgAddTestingResult(ctx, keeper, modelversionKeeper, authKeeper, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized compliancetest Msg type: %v", msg.Type())
 
@@ -37,7 +37,7 @@ func NewHandler(keeper keeper.Keeper, modelKeeper model.Keeper, authKeeper auth.
 	}
 }
 
-func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelKeeper model.Keeper,
+func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelversionKeeper modelversion.Keeper,
 	authKeeper auth.Keeper, msg types.MsgAddTestingResult) sdk.Result {
 	// check if sender has enough rights to add testing results
 	if err := checkAddTestingResultRights(ctx, authKeeper, msg.Signer); err != nil {
@@ -45,13 +45,15 @@ func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelKeepe
 	}
 
 	// check that corresponding model exists on the ledger
-	if !modelKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
-		return model.ErrModelDoesNotExist(msg.VID, msg.PID).Result()
+	if !modelversionKeeper.IsModelVersionPresent(ctx, msg.VID, msg.PID, msg.SoftwareVersion) {
+		return modelversion.ErrModelVersionDoesNotExist(msg.VID, msg.PID, msg.SoftwareVersion).Result()
 	}
 
 	testingResult := types.NewTestingResult(
 		msg.VID,
 		msg.PID,
+		msg.SoftwareVersion,
+		msg.SoftwareVersionString,
 		msg.Signer,
 		msg.TestResult,
 		msg.TestDate,
