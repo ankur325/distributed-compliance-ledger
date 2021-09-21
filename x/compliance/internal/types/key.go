@@ -34,6 +34,8 @@ func GetComplianceInfoKey(certificationType CertificationType, vid uint16, pid u
 	var key []byte
 
 	key = append(key, ComplianceInfoPrefix...)
+	key = append(key, []byte(certificationType)...)
+
 	v := make([]byte, 2)
 	binary.LittleEndian.PutUint16(v, vid)
 	key = append(key, v...)

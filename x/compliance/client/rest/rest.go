@@ -41,27 +41,27 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 		getComplianceInfosHandler(cliCtx, storeName),
 	).Methods("GET")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s/{%s}/{%s}/{%s}/{%s}", storeName, types.Certified, vid, pid, softwareVersion, certificationType),
+		fmt.Sprintf("/%s/%v/{%s}/{%s}/{%s}/{%s}", storeName, types.Certified, vid, pid, softwareVersion, certificationType),
 		certifyModelHandler(cliCtx),
 	).Methods("PUT")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s/{%s}/{%s}/{%s}/{%s}", storeName, types.Certified, vid, pid, softwareVersion, certificationType),
+		fmt.Sprintf("/%s/%v/{%s}/{%s}/{%s}/{%s}", storeName, types.Certified, vid, pid, softwareVersion, certificationType),
 		getCertifiedModelHandler(cliCtx, storeName),
 	).Methods("GET")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s", storeName, types.Certified),
+		fmt.Sprintf("/%s/%v", storeName, types.Certified),
 		getCertifiedModelsHandler(cliCtx, storeName),
 	).Methods("GET")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s/{%s}/{%s}/{%s}/{%s}", storeName, types.Revoked, vid, pid, softwareVersion, certificationType),
+		fmt.Sprintf("/%s/%v/{%s}/{%s}/{%s}/{%s}", storeName, types.Revoked, vid, pid, softwareVersion, certificationType),
 		revokeModelHandler(cliCtx),
 	).Methods("PUT")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s/{%s}/{%s}/{%s}/{%s}", storeName, types.Revoked, vid, pid, softwareVersion, certificationType),
+		fmt.Sprintf("/%s/%v/{%s}/{%s}/{%s}/{%s}", storeName, types.Revoked, vid, pid, softwareVersion, certificationType),
 		getRevokedModelHandler(cliCtx, storeName),
 	).Methods("GET")
 	r.HandleFunc(
-		fmt.Sprintf("/%s/%s", storeName, types.Revoked),
+		fmt.Sprintf("/%s/%v", storeName, types.Revoked),
 		getRevokedModelsHandler(cliCtx, storeName),
 	).Methods("GET")
 }

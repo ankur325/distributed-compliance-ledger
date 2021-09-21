@@ -96,9 +96,11 @@ func (m MsgCertifyModel) GetSigners() []sdk.AccAddress {
 }
 
 type MsgRevokeModel struct {
-	VID               uint16            `json:"vid"`
-	PID               uint16            `json:"pid"`
-	SoftwareVersion   uint32            `json:"softwareVersion"`
+	VID                   uint16 `json:"vid"`
+	PID                   uint16 `json:"pid"`
+	SoftwareVersion       uint32 `json:"softwareVersion"`
+	SoftwareVersionString string `json:"softwareVersionString"`
+
 	RevocationDate    time.Time         `json:"revocation_date"` // rfc3339 encoded date
 	CertificationType CertificationType `json:"certification_type"`
 	Reason            string            `json:"reason,omitempty"`

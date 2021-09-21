@@ -64,7 +64,7 @@ func GetCmdTestingResult(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, height, err := cliCtx.QueryStore(types.GetTestingResultsKey(vid, pid, softwareVersion), queryRoute)
 			if err != nil || res == nil {
-				return types.ErrTestingResultDoesNotExist(vid, pid)
+				return types.ErrTestingResultDoesNotExist(vid, pid, softwareVersion)
 			}
 
 			var testingResult types.TestingResults

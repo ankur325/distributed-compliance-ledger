@@ -72,8 +72,8 @@ func NewCertifiedComplianceInfo(vid uint16, pid uint16,
 }
 
 func NewRevokedComplianceInfo(vid uint16, pid uint16,
-	certificationType CertificationType,
 	softwareVersion uint32, softwareVersionString string,
+	certificationType CertificationType,
 	date time.Time, reason string, owner sdk.AccAddress) ComplianceInfo {
 	return ComplianceInfo{
 		VID:                   vid,

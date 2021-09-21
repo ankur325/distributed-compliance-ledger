@@ -156,8 +156,8 @@ func InitModuleManager(app *dcLedgerApp) {
 		validator.NewAppModule(app.validatorKeeper, app.authKeeper),
 		model.NewAppModule(app.modelKeeper, app.authKeeper),
 		modelversion.NewAppModule(app.modelversionKeeper, app.authKeeper, app.modelKeeper),
-		compliance.NewAppModule(app.complianceKeeper, app.modelKeeper, app.compliancetestKeeper, app.authKeeper),
-		compliancetest.NewAppModule(app.compliancetestKeeper, app.authKeeper, app.modelKeeper),
+		compliance.NewAppModule(app.complianceKeeper, app.modelversionKeeper, app.compliancetestKeeper, app.authKeeper),
+		compliancetest.NewAppModule(app.compliancetestKeeper, app.authKeeper, app.modelversionKeeper),
 		pki.NewAppModule(app.pkiKeeper, app.authKeeper),
 		vendorinfo.NewAppModule(app.vendorinfoKeeper, app.authKeeper),
 	)

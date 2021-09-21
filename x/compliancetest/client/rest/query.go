@@ -51,7 +51,7 @@ func getTestingResultHandler(cliCtx context.CLIContext, storeName string) http.H
 
 		res, height, err := restCtx.QueryStore(types.GetTestingResultsKey(vid, pid, softwareVersion), storeName)
 		if err != nil || res == nil {
-			restCtx.WriteErrorResponse(http.StatusNotFound, types.ErrTestingResultDoesNotExist(vid, pid).Error())
+			restCtx.WriteErrorResponse(http.StatusNotFound, types.ErrTestingResultDoesNotExist(vid, pid, softwareVersion).Error())
 
 			return
 		}
