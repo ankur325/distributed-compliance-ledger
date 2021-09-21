@@ -163,15 +163,12 @@ func queryTestingResult(setup TestSetup, vid uint16, pid uint16) types.TestingRe
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 	model := model.Model{
-		Model: model.Model{
-			VID:          vid,
-			PID:          pid,
-			DeviceTypeID: test_constants.DeviceTypeID,
-			ProductName:  test_constants.ProductName,
-			ProductLabel: test_constants.ProductLabel,
-			PartNumber:   test_constants.PartNumber,
-		},
-		Owner: test_constants.Owner,
+		VID:          vid,
+		PID:          pid,
+		DeviceTypeID: test_constants.DeviceTypeID,
+		ProductName:  test_constants.ProductName,
+		ProductLabel: test_constants.ProductLabel,
+		PartNumber:   test_constants.PartNumber,
 	}
 
 	setup.ModelKeeper.SetModel(setup.Ctx, model)

@@ -479,15 +479,12 @@ func queryComplianceInfoInState(setup TestSetup, vid uint16, pid uint16, state s
 
 func addModel(setup TestSetup, vid uint16, pid uint16) (uint16, uint16) {
 	model := model.Model{
-		Model: model.Model{
-			VID:          vid,
-			PID:          pid,
-			DeviceTypeID: constants.DeviceTypeID,
-			ProductName:  constants.ProductName,
-			ProductLabel: constants.ProductLabel,
-			PartNumber:   constants.PartNumber,
-		},
-		Owner: constants.Owner,
+		VID:          vid,
+		PID:          pid,
+		DeviceTypeID: constants.DeviceTypeID,
+		ProductName:  constants.ProductName,
+		ProductLabel: constants.ProductLabel,
+		PartNumber:   constants.PartNumber,
 	}
 
 	setup.ModelKeeper.SetModel(setup.Ctx, model)

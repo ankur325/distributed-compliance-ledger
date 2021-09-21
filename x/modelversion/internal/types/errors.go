@@ -33,6 +33,7 @@ const (
 	CodeNoModelVersionExist          sdk.CodeType = 518
 	CodeModelVersionAlreadyExists    sdk.CodeType = 519
 	CodeOtaURLCannotBeSet            sdk.CodeType = 520
+	CodeModelDoesNotExist            sdk.CodeType = 521
 )
 
 func ErrSoftwareVersionStringInvalid(softwareVersion interface{}) sdk.Error {
@@ -83,4 +84,9 @@ func ErrOtaURLCannotBeSet(vid interface{}, pid interface{}, softwareVersion inte
 	return sdk.NewError(Codespace, CodeOtaURLCannotBeSet,
 		fmt.Sprintf("OTA URL cannot be set for model version associated with vid=%v, pid=%v "+
 			"and softwareVersion=%v because OTA was not set for this model info initially", vid, pid, softwareVersion))
+}
+
+func ErrModelDoesNotExist(vid interface{}, pid interface{}) sdk.Error {
+	return sdk.NewError(Codespace, CodeModelDoesNotExist,
+		fmt.Sprintf("No model associated with vid=%v and pid=%v exist on the ledger", vid, pid))
 }

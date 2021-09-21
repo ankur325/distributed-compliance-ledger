@@ -33,39 +33,39 @@ func ValidateGenesis(data GenesisState) error {
 	//TODO ADD validation
 
 	// for _, record := range data.VendorInfoRecords {
-	// 	if record.Model.VID == 0 {
+	// 	if record.VID == 0 {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Invalid VID. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.PID == 0 {
+	// 	if record.PID == 0 {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Invalid PID. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.ProductName == "" {
+	// 	if record.ProductName == "" {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed ProductName. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.Description == "" {
+	// 	if record.Description == "" {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed Description. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.SKU == "" {
+	// 	if record.SKU == "" {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SKU. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.HardwareVersion == 0 {
+	// 	if record.HardwareVersion == 0 {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed HardwareVersion. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.HardwareVersionString == "" {
+	// 	if record.HardwareVersionString == "" {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed HardwareVersionString. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.SoftwareVersion == 0 {
+	// 	if record.SoftwareVersion == 0 {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SoftwareVersion. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.SoftwareVersionString == "" {
+	// 	if record.SoftwareVersionString == "" {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed SoftwareVersionString. Value: %v", record))
 	// 	}
 
@@ -73,8 +73,8 @@ func ValidateGenesis(data GenesisState) error {
 	// 		return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: Missed Owner. Value: %v", record))
 	// 	}
 
-	// 	if record.Model.OtaURL != "" || record.Model.OtaChecksum != "" || record.Model.OtaChecksumType != "" {
-	// 		if record.Model.OtaURL == "" || record.Model.OtaChecksum == "" || record.Model.OtaChecksumType == "" {
+	// 	if record.OtaURL != "" || record.OtaChecksum != "" || record.OtaChecksumType != "" {
+	// 		if record.OtaURL == "" || record.OtaChecksum == "" || record.OtaChecksumType == "" {
 	// 			return sdk.ErrUnknownRequest(fmt.Sprintf("Invalid Model: The fields OtaURL, OtaChecksum and "+
 	// 				"OtaChecksumType must be either specified together, or not specified together. Value: %v", record))
 	// 		}

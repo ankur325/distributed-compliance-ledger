@@ -40,9 +40,9 @@ func TestHandler_AddModel(t *testing.T) {
 	receivedModel := queryModel(setup, model.VID, model.PID)
 
 	// check
-	require.Equal(t, receivedModel.Model.VID, model.VID)
-	require.Equal(t, receivedModel.Model.PID, model.PID)
-	require.Equal(t, receivedModel.Model.DeviceTypeID, model.DeviceTypeID)
+	require.Equal(t, receivedModel.VID, model.VID)
+	require.Equal(t, receivedModel.PID, model.PID)
+	require.Equal(t, receivedModel.DeviceTypeID, model.DeviceTypeID)
 }
 
 func TestHandler_UpdateModel(t *testing.T) {
@@ -66,9 +66,9 @@ func TestHandler_UpdateModel(t *testing.T) {
 	receivedModel := queryModel(setup, msgUpdateModel.VID, msgUpdateModel.PID)
 
 	// check
-	require.Equal(t, receivedModel.Model.VID, msgAddModel.VID)
-	require.Equal(t, receivedModel.Model.PID, msgAddModel.PID)
-	require.Equal(t, receivedModel.Model.DeviceTypeID, msgUpdateModel.DeviceTypeID)
+	require.Equal(t, receivedModel.VID, msgAddModel.VID)
+	require.Equal(t, receivedModel.PID, msgAddModel.PID)
+	require.Equal(t, receivedModel.DeviceTypeID, msgUpdateModel.DeviceTypeID)
 }
 
 func TestHandler_OnlyOwnerCanUpdateModel(t *testing.T) {
@@ -110,7 +110,7 @@ func TestHandler_AddModelWithEmptyOptionalFields(t *testing.T) {
 	receivedModel := queryModel(setup, testconstants.VID, testconstants.PID)
 
 	// check
-	require.Equal(t, receivedModel.Model.DeviceTypeID, uint16(0))
+	require.Equal(t, receivedModel.DeviceTypeID, uint16(0))
 
 }
 
@@ -147,8 +147,8 @@ func TestHandler_PartiallyUpdateModel(t *testing.T) {
 	receivedModel := queryModel(setup, msgUpdateModel.VID, msgUpdateModel.PID)
 
 	// check
-	require.Equal(t, receivedModel.Model.DeviceTypeID, msgAddModel.DeviceTypeID)
-	require.Equal(t, receivedModel.Model.ProductLabel, msgUpdateModel.ProductLabel)
+	require.Equal(t, receivedModel.DeviceTypeID, msgAddModel.DeviceTypeID)
+	require.Equal(t, receivedModel.ProductLabel, msgUpdateModel.ProductLabel)
 }
 
 func queryModel(setup TestSetup, vid uint16, pid uint16) types.Model {

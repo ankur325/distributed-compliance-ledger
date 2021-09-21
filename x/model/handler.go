@@ -48,7 +48,7 @@ func handleMsgAddModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Ke
 	}
 
 	// check sender has enough rights to add model
-	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID, "msgAddModel"); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID, "msgAddModel"); err != nil {
 		return err.Result()
 	}
 
@@ -87,7 +87,7 @@ func handleMsgUpdateModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth
 	model := keeper.GetModel(ctx, msg.VID, msg.PID)
 
 	// check if sender has enough rights to update model
-	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.Model.VID, "msgUpdateModel"); err != nil {
+	if err := checkModelRights(ctx, authKeeper, msg.Signer, msg.VID, "msgUpdateModel"); err != nil {
 		return err.Result()
 	}
 

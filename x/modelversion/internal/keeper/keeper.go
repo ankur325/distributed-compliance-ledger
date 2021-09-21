@@ -110,7 +110,7 @@ func (k Keeper) IsModelVersionPresent(ctx sdk.Context, vid uint16, pid uint16, s
 	return k.isRecordPresent(ctx, types.GetModelVersionKey(vid, pid, softwareVersion))
 }
 
-// Check if the ModelVersion is present in the store or not.
+// Check if the Model is present in the modelversion store or not.
 func (k Keeper) IsModelPresent(ctx sdk.Context, vid uint16, pid uint16) bool {
 	return k.isRecordPresent(ctx, types.GetModelKey(vid, pid))
 }

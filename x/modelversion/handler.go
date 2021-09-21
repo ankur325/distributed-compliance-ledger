@@ -19,15 +19,16 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion/internal/keeper"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion/internal/types"
 )
 
-func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
+func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper, modelKeeper model.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgAddModelVersion:
-			return handleMsgAddModelVersion(ctx, keeper, authKeeper, msg)
+			return handleMsgAddModelVersion(ctx, keeper, authKeeper, modelKeeper, msg)
 		case types.MsgUpdateModelVersion:
 			return handleMsgUpdateModelVersion(ctx, keeper, authKeeper, msg)
 		default:
@@ -38,16 +39,22 @@ func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgAddModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper,
+func handleMsgAddModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Keeper, modelKeeper model.Keeper,
 	msg types.MsgAddModelVersion) sdk.Result {
-	// check if model already exists
-	if keeper.IsModelVersionPresent(ctx, msg.VID, msg.PID, msg.SoftwareVersion) {
-		return types.ErrModelVersionAlreadyExists(msg.VID, msg.PID, msg.SoftwareVersion).Result()
-	}
 
 	// check sender has enough rights to add model
 	if err := checkAddModelRights(ctx, authKeeper, msg.Signer, msg.VID); err != nil {
 		return err.Result()
+	}
+
+	// check if model exists
+	if !modelKeeper.IsModelPresent(ctx, msg.VID, msg.PID) {
+		return types.ErrModelDoesNotExist(msg.VID, msg.PID).Result()
+	}
+
+	// check if model version already exists
+	if keeper.IsModelVersionPresent(ctx, msg.VID, msg.PID, msg.SoftwareVersion) {
+		return types.ErrModelVersionAlreadyExists(msg.VID, msg.PID, msg.SoftwareVersion).Result()
 	}
 
 	modelVersion := types.ModelVersion{
@@ -128,11 +135,11 @@ func handleMsgUpdateModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeep
 func checkAddModelRights(ctx sdk.Context, authKeeper auth.Keeper, signer sdk.AccAddress, vid uint16) sdk.Error {
 	// sender must have Vendor role to add new model
 	if !authKeeper.HasRole(ctx, signer, auth.Vendor) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModel transaction should be "+
+		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelVersion transaction should be "+
 			"signed by an account with the %s role", auth.Vendor))
 	}
 	if !authKeeper.HasVendorId(ctx, signer, vid) {
-		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModel transaction should be "+
+		return sdk.ErrUnauthorized(fmt.Sprintf("MsgAddModelVersion transaction should be "+
 			"signed by an vendor account containing the vendorId %v ", vid))
 	}
 

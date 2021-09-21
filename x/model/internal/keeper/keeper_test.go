@@ -45,7 +45,8 @@ func TestKeeper_ModelGetSet(t *testing.T) {
 	model := setup.ModelKeeper.GetModel(setup.Ctx, testconstants.VID, testconstants.PID)
 	require.NotNil(t, model)
 	require.Equal(t, testconstants.ProductName, model.ProductName)
-	require.Equal(t, testconstants.Owner, model.Owner)
+	require.Equal(t, testconstants.VID, model.VID)
+	require.Equal(t, testconstants.PID, model.PID)
 }
 
 func TestKeeper_ModelIterator(t *testing.T) {
@@ -116,7 +117,6 @@ func TestKeeper_VendorProductsUpdatesWithModel(t *testing.T) {
 			PID:        model.PID,
 			Name:       model.ProductName,
 			PartNumber: model.PartNumber,
-			Owner:      model.Owner,
 		}
 		PIDs = append(PIDs, vendorProduct)
 

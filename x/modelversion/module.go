@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion/client/cli"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion/client/rest"
 )
@@ -78,12 +79,13 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper     Keeper
-	authKeeper auth.Keeper
+	keeper      Keeper
+	authKeeper  auth.Keeper
+	modelKeeper model.Keeper
 }
 
-func NewAppModule(keeper Keeper, authKeeper auth.Keeper) AppModule {
-	return AppModule{AppModuleBasic: AppModuleBasic{}, keeper: keeper, authKeeper: authKeeper}
+func NewAppModule(keeper Keeper, authKeeper auth.Keeper, modelKeeper model.Keeper) AppModule {
+	return AppModule{AppModuleBasic: AppModuleBasic{}, keeper: keeper, authKeeper: authKeeper, modelKeeper: modelKeeper}
 }
 
 func (a AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
@@ -107,7 +109,7 @@ func (a AppModule) Route() string {
 }
 
 func (a AppModule) NewHandler() sdk.Handler {
-	return NewHandler(a.keeper, a.authKeeper)
+	return NewHandler(a.keeper, a.authKeeper, a.modelKeeper)
 }
 
 func (a AppModule) QuerierRoute() string {
