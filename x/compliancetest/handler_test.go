@@ -81,7 +81,7 @@ func TestHandler_AddTestingResultForUnknownModel(t *testing.T) {
 	testingResult := TestMsgAddTestingResult(setup.TestHouse, test_constants.VID, test_constants.PID,
 		test_constants.SoftwareVersion, test_constants.SoftwareVersionString)
 	result := setup.Handler(setup.Ctx, testingResult)
-	require.Equal(t, model.CodeModelDoesNotExist, result.Code)
+	require.Equal(t, modelversion.CodeModelVersionDoesNotExist, result.Code)
 }
 
 func TestHandler_AddSeveralTestingResultsForOneModel(t *testing.T) {
@@ -122,7 +122,7 @@ func TestHandler_AddSeveralTestingResultsForDifferentModels(t *testing.T) {
 		vid, pid := addModel(setup, i, i)
 		// add model version
 		_, _, softwareVersion, softwareVersionString :=
-			addModelVersion(setup, i, i, uint32(i), string(i))
+			addModelVersion(setup, i, i, uint32(i), fmt.Sprint(i))
 
 		// add new testing result
 		testingResult := TestMsgAddTestingResult(setup.TestHouse, vid, pid, softwareVersion, softwareVersionString)
