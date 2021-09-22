@@ -54,7 +54,7 @@ func TestAuthDemo(t *testing.T) {
 	bobKeyInfo, _ := utils.GetKeyInfo(testconstants.BobAccount)
 
 	// Jack proposes new account
-	utils.ProposeAddAccount(testAccountKeyInfo, jackKeyInfo, auth.AccountRoles{auth.Vendor})
+	utils.ProposeAddAccount(testAccountKeyInfo, jackKeyInfo, auth.AccountRoles{auth.Vendor}, testconstants.VID)
 
 	// Query all active accounts
 	receivedAccounts, _ := utils.GetAccounts()
@@ -89,7 +89,7 @@ func TestAuthDemo(t *testing.T) {
 	require.Equal(t, auth.AccountRoles{auth.Vendor}, testAccount.Roles)
 
 	// Publish model info by test account
-	model := utils.NewMsgAddModel(testAccountKeyInfo.Address)
+	model := utils.NewMsgAddModel(testAccountKeyInfo.Address, testconstants.VID)
 	_, _ = utils.AddModel(model, testAccountKeyInfo)
 
 	// Check model is created
@@ -134,7 +134,7 @@ func TestAuthDemo(t *testing.T) {
 
 	// Try to publish another model info by test account.
 	// Ensure that the request is responded with not OK status code.
-	model = utils.NewMsgAddModel(testAccountKeyInfo.Address)
+	model = utils.NewMsgAddModel(testAccountKeyInfo.Address, testconstants.VID)
 	_, code = utils.AddModel(model, testAccountKeyInfo)
 	require.NotEqual(t, http.StatusOK, code)
 }

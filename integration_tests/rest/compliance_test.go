@@ -39,13 +39,13 @@ import (
 //nolint:funlen
 func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 	// Register new Vendor account
-	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
+	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID)
 
 	// Register new TestHouse account
-	testHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse})
+	testHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse}, 0)
 
 	// Register new ZBCertificationCenter account
-	zb := utils.CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter})
+	zb := utils.CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter}, 0)
 
 	// Get all compliance infos
 	inputComplianceInfos, _ := utils.GetComplianceInfos()
@@ -56,9 +56,14 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 	// Get all revoked models
 	inputRevokedModels, _ := utils.GetAllRevokedModels()
 
-	// Publish model info
-	model := utils.NewMsgAddModel(vendor.Address)
+	// Publish model
+	model := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
 	_, _ = utils.AddModel(model, vendor)
+
+	// Publish modelVersion
+	modelVersion := utils.NewMsgAddModelVersion(model.VID, model.PID,
+		testconstants.SoftwareVersion, testconstants.SoftwareVersionString, vendor.Address)
+	_, _ = utils.AddModelVersion(modelVersion, vendor)
 
 	// Check if model either certified or revoked before Compliance record was created
 	modelIsCertified, _ := utils.GetCertifiedModel(model.VID, model.PID, compliance.ZbCertificationType)

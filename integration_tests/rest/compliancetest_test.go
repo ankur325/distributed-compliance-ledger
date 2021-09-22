@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/utils"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 )
@@ -33,16 +34,16 @@ import (
 
 func TestCompliancetestDemo(t *testing.T) {
 	// Register new Vendor account
-	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor})
+	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID)
 
 	// Register new TestHouse account
-	testHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse})
+	testHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse}, 0)
 
 	// Register new TestHouse account
-	secondTestHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse})
+	secondTestHouse := utils.CreateNewAccount(auth.AccountRoles{auth.TestHouse}, 0)
 
 	// Publish model info
-	model := utils.NewMsgAddModel(vendor.Address)
+	model := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
 	_, _ = utils.AddModel(model, vendor)
 
 	// Publish first testing result using Sign and Broadcast AddTestingResult message

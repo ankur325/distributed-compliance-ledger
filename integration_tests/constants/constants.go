@@ -49,8 +49,9 @@ var (
 	FirmwareDigests                                   = "Firmware Digest String"
 	Revoked                                           = false
 	OtaURL                                            = "http://ota.firmware.com"
+	OtaFileSize                                uint64 = 12345678
 	OtaChecksum                                       = "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" //nolint:lll
-	OtaChecksumType                                   = "SHA-256"
+	OtaChecksumType                            uint16 = 1
 	OtaBlob                                           = "OTABlob Text"
 	CommissioningCustomFlow                    uint8  = 1
 	CommissioningCustomFlowURL                        = "https://sampleflowurl.dclmodel"

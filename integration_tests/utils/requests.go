@@ -39,6 +39,8 @@ import (
 	compliancetestRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 	modelRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/model/client/rest"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion"
+	modelVersionRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion/client/rest"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/pki"
 	pkiRest "github.com/zigbee-alliance/distributed-compliance-ledger/x/pki/client/rest"
 )
@@ -68,7 +70,7 @@ func GetKeyInfo(accountName string) (KeyInfo, int) {
 	return keyInfo, code
 }
 
-func ProposeAddAccount(keyInfo KeyInfo, signer KeyInfo, roles auth.AccountRoles) (TxnResponse, int) {
+func ProposeAddAccount(keyInfo KeyInfo, signer KeyInfo, roles auth.AccountRoles, vendorId uint16) (TxnResponse, int) {
 	println("Propose Add Account for: ", keyInfo.Name)
 
 	request := authRest.ProposeAddAccountRequest{
@@ -76,9 +78,10 @@ func ProposeAddAccount(keyInfo KeyInfo, signer KeyInfo, roles auth.AccountRoles)
 			ChainID: constants.ChainID,
 			From:    signer.Address.String(),
 		},
-		Address: keyInfo.Address,
-		Pubkey:  keyInfo.PublicKey,
-		Roles:   roles,
+		Address:  keyInfo.Address,
+		Pubkey:   keyInfo.PublicKey,
+		Roles:    roles,
+		VendorId: vendorId,
 	}
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
@@ -200,7 +203,7 @@ func GetProposedAccountsToRevoke() (ProposedAccountToRevokeHeadersResult, int) {
 	return result, code
 }
 
-func CreateNewAccount(roles auth.AccountRoles) KeyInfo {
+func CreateNewAccount(roles auth.AccountRoles, vendorId uint16) KeyInfo {
 	name := RandString()
 	println("Register new account on the ledger: ", name)
 
@@ -209,7 +212,7 @@ func CreateNewAccount(roles auth.AccountRoles) KeyInfo {
 
 	keyInfo, _ := CreateKey(name)
 
-	ProposeAddAccount(keyInfo, jackKeyInfo, roles)
+	ProposeAddAccount(keyInfo, jackKeyInfo, roles, vendorId)
 	ApproveAddAccount(keyInfo, aliceKeyInfo)
 
 	return keyInfo
@@ -275,6 +278,14 @@ func AddModel(model model.MsgAddModel, sender KeyInfo) (TxnResponse, int) {
 	return parseWriteTxnResponse(response, code)
 }
 
+func AddModelVersion(modelVersion modelversion.MsgAddModelVersion, sender KeyInfo) (TxnResponse, int) {
+	println("Add Model Version")
+
+	response, code := SendAddModelVersionRequest(modelVersion, sender.Name)
+
+	return parseWriteTxnResponse(response, code)
+}
+
 func PrepareAddModelTransaction(model model.MsgAddModel) (types.StdTx, int) {
 	println("Prepare Add Model Info Transaction")
 
@@ -283,18 +294,34 @@ func PrepareAddModelTransaction(model model.MsgAddModel) (types.StdTx, int) {
 	return parseStdTxn(response, code)
 }
 
-func SendAddModelRequest(model model.MsgAddModel, account string) ([]byte, int) {
+func SendAddModelRequest(msgAddModel model.MsgAddModel, account string) ([]byte, int) {
 	request := modelRest.AddModelRequest{
-		Model: model.Model,
+		Model: msgAddModel.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,
-			From:    model.Signer.String(),
+			From:    msgAddModel.Signer.String(),
 		},
 	}
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
 	uri := fmt.Sprintf("%s/%s", model.RouterKey, "models")
+
+	return SendPostRequest(uri, body, account, constants.Passphrase)
+}
+
+func SendAddModelVersionRequest(msgAddModelVersion modelversion.MsgAddModelVersion, account string) ([]byte, int) {
+	request := modelVersionRest.AddModelVersionRequest{
+		ModelVersion: msgAddModelVersion.ModelVersion,
+		BaseReq: restTypes.BaseReq{
+			ChainID: constants.ChainID,
+			From:    msgAddModelVersion.Signer.String(),
+		},
+	}
+
+	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
+
+	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "model/version")
 
 	return SendPostRequest(uri, body, account, constants.Passphrase)
 }
@@ -315,12 +342,12 @@ func PrepareUpdateModelTransaction(model model.MsgUpdateModel) (types.StdTx, int
 	return parseStdTxn(response, code)
 }
 
-func SendUpdateModelRequest(model model.MsgUpdateModel, account string) ([]byte, int) {
+func SendUpdateModelRequest(msgUpdateModel model.MsgUpdateModel, account string) ([]byte, int) {
 	request := modelRest.UpdateModelRequest{
-		Model: model.Model,
+		Model: msgUpdateModel.Model,
 		BaseReq: restTypes.BaseReq{
 			ChainID: constants.ChainID,
-			From:    model.Signer.String(),
+			From:    msgUpdateModel.Signer.String(),
 		},
 	}
 
@@ -902,10 +929,10 @@ func getProposedCertificateRevocations(uri string) (ProposedCertificateRevocatio
 	return result, code
 }
 
-func NewMsgAddModel(owner sdk.AccAddress) model.MsgAddModel {
-	model := model.Model{
+func NewMsgAddModel(owner sdk.AccAddress, vid uint16) model.MsgAddModel {
+	newModel := model.Model{
 
-		VID:                                      common.RandUint16(),
+		VID:                                      vid,
 		PID:                                      common.RandUint16(),
 		DeviceTypeID:                             constants.DeviceTypeID,
 		ProductName:                              RandString(),
@@ -923,13 +950,13 @@ func NewMsgAddModel(owner sdk.AccAddress) model.MsgAddModel {
 	}
 
 	return model.NewMsgAddModel(
-		model,
+		newModel,
 		owner,
 	)
 }
 
 func NewMsgUpdateModel(vid uint16, pid uint16, owner sdk.AccAddress) model.MsgUpdateModel {
-	model := model.Model{
+	newModel := model.Model{
 		VID:                        vid,
 		PID:                        pid,
 		DeviceTypeID:               constants.DeviceTypeID + 1,
@@ -941,15 +968,60 @@ func NewMsgUpdateModel(vid uint16, pid uint16, owner sdk.AccAddress) model.MsgUp
 	}
 
 	return model.NewMsgUpdateModel(
-		model,
+		newModel,
 		owner,
 	)
 }
 
-func NewMsgAddTestingResult(vid uint16, pid uint16, owner sdk.AccAddress) compliancetest.MsgAddTestingResult {
+func NewMsgAddModelVersion(vid uint16, pid uint16,
+	softwareVersion uint32, softwareVersionString string, owner sdk.AccAddress) modelversion.MsgAddModelVersion {
+	newModelVersion := modelversion.ModelVersion{
+
+		VID:                          vid,
+		PID:                          pid,
+		SoftwareVersion:              softwareVersion,
+		SoftwareVersionString:        softwareVersionString,
+		FirmwareDigests:              constants.FirmwareDigests,
+		OtaURL:                       constants.OtaURL,
+		OtaFileSize:                  constants.OtaFileSize,
+		OtaChecksum:                  constants.OtaChecksum,
+		OtaChecksumType:              constants.OtaChecksumType,
+		CDVersionNumber:              constants.CDVersionNumber,
+		MinApplicableSoftwareVersion: constants.MinApplicableSoftwareVersion,
+		MaxApplicableSoftwareVersion: constants.MaxApplicableSoftwareVersion,
+		ReleaseNotesURL:              constants.ReleaseNotesURL,
+	}
+
+	return modelversion.NewMsgAddModelVersion(
+		newModelVersion,
+		owner,
+	)
+}
+
+func NewMsgUpdateModelVersion(vid uint16, pid uint16,
+	softwareVersion uint32, softwareVersionString string, owner sdk.AccAddress) modelversion.MsgUpdateModelVersion {
+	updateModelVersion := modelversion.ModelVersion{
+		VID:             vid,
+		PID:             pid,
+		SoftwareVersion: softwareVersion,
+		OtaURL:          constants.OtaURL + "/new",
+		ReleaseNotesURL: constants.ReleaseNotesURL + "/new",
+	}
+
+	return modelversion.NewMsgUpdateModelVersion(
+		updateModelVersion,
+		owner,
+	)
+}
+
+func NewMsgAddTestingResult(vid uint16, pid uint16,
+	softwareVersion uint32, softwareVersionString string,
+	owner sdk.AccAddress) compliancetest.MsgAddTestingResult {
 	return compliancetest.NewMsgAddTestingResult(
 		vid,
 		pid,
+		softwareVersion,
+		softwareVersionString,
 		RandString(),
 		time.Now().UTC(),
 		owner,
@@ -994,13 +1066,13 @@ func parseGetReqResponse(response []byte, entity interface{}, code int) {
 func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
 	ComplianceInfosHeadersResult, ComplianceInfosHeadersResult) {
 	// Register new Vendor account
-	vendor := CreateNewAccount(auth.AccountRoles{auth.Vendor})
+	vendor := CreateNewAccount(auth.AccountRoles{auth.Vendor}, constants.VID)
 
 	// Register new ZBCertificationCenter account
-	zb := CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter})
+	zb := CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter}, 0)
 
 	// Publish model info
-	model := NewMsgAddModel(vendor.Address)
+	model := NewMsgAddModel(vendor.Address, constants.VID)
 	_, _ = AddModel(model, vendor)
 
 	// Get all certified models
