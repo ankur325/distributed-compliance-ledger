@@ -66,36 +66,36 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 	_, _ = utils.AddModelVersion(modelVersion, vendor)
 
 	// Check if model either certified or revoked before Compliance record was created
-	modelIsCertified, _ := utils.GetCertifiedModel(model.VID, model.PID, compliance.ZbCertificationType)
+	modelIsCertified, _ := utils.GetCertifiedModel(model.VID, model.PID, modelVersion.SoftwareVersion, compliance.ZbCertificationType)
 	require.False(t, modelIsCertified.Value)
 
-	modelIsRevoked, _ := utils.GetRevokedModel(model.VID, model.PID, compliance.ZbCertificationType)
+	modelIsRevoked, _ := utils.GetRevokedModel(model.VID, model.PID, modelVersion.SoftwareVersion, compliance.ZbCertificationType)
 	require.False(t, modelIsRevoked.Value)
 
 	// Publish testing result
-	testingResult := utils.NewMsgAddTestingResult(model.VID, model.PID, testHouse.Address)
+	testingResult := utils.NewMsgAddTestingResult(model.VID, model.PID, modelVersion.SoftwareVersion, modelVersion.SoftwareVersionString, testHouse.Address)
 	_, _ = utils.PublishTestingResult(testingResult, testHouse)
 
 	// Certify model
-	certifyModelMsg := compliance.NewMsgCertifyModel(model.VID, model.PID, time.Now().UTC(),
+	certifyModelMsg := compliance.NewMsgCertifyModel(model.VID, model.PID, modelVersion.SoftwareVersion, modelVersion.SoftwareVersionString, time.Now().UTC(),
 		compliance.CertificationType(testconstants.CertificationType), testconstants.EmptyString, zb.Address)
 	_, _ = utils.PublishCertifiedModel(certifyModelMsg, zb)
 
 	// Check model is certified
-	modelIsCertified, _ = utils.GetCertifiedModel(model.VID, model.PID, certifyModelMsg.CertificationType)
+	modelIsCertified, _ = utils.GetCertifiedModel(model.VID, model.PID, modelVersion.SoftwareVersion, certifyModelMsg.CertificationType)
 	require.True(t, modelIsCertified.Value)
 
 	// Register other ZBCertificationCenter account
-	secondZb := utils.CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter})
+	secondZb := utils.CreateNewAccount(auth.AccountRoles{auth.ZBCertificationCenter}, 0)
 
 	// Certify model by other ZBCertificationCenter account
-	secondCertifyModelMsg := compliance.NewMsgCertifyModel(model.VID, model.PID, time.Now().UTC(),
+	secondCertifyModelMsg := compliance.NewMsgCertifyModel(model.VID, model.PID, modelVersion.SoftwareVersion, modelVersion.SoftwareVersionString, time.Now().UTC(),
 		compliance.CertificationType(testconstants.CertificationType), testconstants.EmptyString, secondZb.Address)
 	secondCertifyResult, _ := utils.PublishCertifiedModel(secondCertifyModelMsg, secondZb)
 
 	require.Equal(t, compliance.CodeAlreadyCertifyed, sdk.CodeType(secondCertifyResult.Code))
 
-	modelIsRevoked, _ = utils.GetRevokedModel(model.VID, model.PID, certifyModelMsg.CertificationType)
+	modelIsRevoked, _ = utils.GetRevokedModel(model.VID, model.PID, modelVersion.SoftwareVersion, certifyModelMsg.CertificationType)
 	require.False(t, modelIsRevoked.Value)
 
 	// Get all certified models
@@ -104,15 +104,15 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 
 	// Revoke model certification
 	revocationTime := certifyModelMsg.CertificationDate.AddDate(0, 0, 1)
-	revokeModelMsg := compliance.NewMsgRevokeModel(model.VID, model.PID, revocationTime,
+	revokeModelMsg := compliance.NewMsgRevokeModel(model.VID, model.PID, modelVersion.SoftwareVersion, revocationTime,
 		compliance.CertificationType(testconstants.CertificationType), testconstants.RevocationReason, zb.Address)
 	_, _ = utils.PublishRevokedModel(revokeModelMsg, zb)
 
 	// Check model is revoked
-	modelIsCertified, _ = utils.GetCertifiedModel(model.VID, model.PID, revokeModelMsg.CertificationType)
+	modelIsCertified, _ = utils.GetCertifiedModel(model.VID, model.PID, modelVersion.SoftwareVersion, revokeModelMsg.CertificationType)
 	require.False(t, modelIsCertified.Value)
 
-	modelIsRevoked, _ = utils.GetRevokedModel(model.VID, model.PID, revokeModelMsg.CertificationType)
+	modelIsRevoked, _ = utils.GetRevokedModel(model.VID, model.PID, modelVersion.SoftwareVersion, revokeModelMsg.CertificationType)
 	require.True(t, modelIsRevoked.Value)
 
 	// Get all revoked models
@@ -128,7 +128,7 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 	require.Equal(t, utils.ParseUint(inputComplianceInfos.Total)+1, utils.ParseUint(complianceInfos.Total))
 
 	// Get compliance info
-	complianceInfo, _ := utils.GetComplianceInfo(model.VID, model.PID, certifyModelMsg.CertificationType)
+	complianceInfo, _ := utils.GetComplianceInfo(model.VID, model.PID, modelVersion.SoftwareVersion, certifyModelMsg.CertificationType)
 	require.Equal(t, complianceInfo.State, compliance.RevokedState)
 	require.Equal(t, 1, len(complianceInfo.History))
 	require.Equal(t, complianceInfo.History[0].State, compliance.CertifiedState)
@@ -138,19 +138,19 @@ func TestComplianceDemo_KeepTrackRevocation(t *testing.T) {
 	// Register new account Vendor, ZBCertificationCenter
 	// Publish model info
 	// Get all certified and revoked models
-	_, zb, model, inputCertifiedModels, inputRevokedModels := utils.InitStartData()
+	_, zb, model, modelVersion, inputCertifiedModels, inputRevokedModels := utils.InitStartData()
 
 	vid, pid := model.VID, model.PID
 
 	// Revoke non-existent model
 	revocationTime := time.Now().UTC()
-	revokeModelMsg := compliance.NewMsgRevokeModel(common.RandUint16(), common.RandUint16(), revocationTime,
+	revokeModelMsg := compliance.NewMsgRevokeModel(common.RandUint16(), common.RandUint16(), common.RandUint32(), revocationTime,
 		compliance.CertificationType(testconstants.CertificationType), testconstants.RevocationReason, zb.Address)
 	_, _ = utils.PublishRevokedModel(revokeModelMsg, zb)
 
 	// Check non-existent model is revoked
 	modelIsRevoked, _ := utils.GetRevokedModel(revokeModelMsg.VID,
-		revokeModelMsg.PID, revokeModelMsg.CertificationType)
+		revokeModelMsg.PID, revokeModelMsg.SoftwareVersion, revokeModelMsg.CertificationType)
 	require.False(t, modelIsRevoked.Value)
 
 	// Revoke model

@@ -294,6 +294,14 @@ func PrepareAddModelTransaction(model model.MsgAddModel) (types.StdTx, int) {
 	return parseStdTxn(response, code)
 }
 
+func PrepareAddModelVersionTransaction(modelVersion modelversion.MsgAddModelVersion) (types.StdTx, int) {
+	println("Prepare Add Model Version Transaction")
+
+	response, code := SendAddModelVersionRequest(modelVersion, "")
+
+	return parseStdTxn(response, code)
+}
+
 func SendAddModelRequest(msgAddModel model.MsgAddModel, account string) ([]byte, int) {
 	request := modelRest.AddModelRequest{
 		Model: msgAddModel.Model,
@@ -334,10 +342,26 @@ func UpdateModel(model model.MsgUpdateModel, sender KeyInfo) (TxnResponse, int) 
 	return parseWriteTxnResponse(response, code)
 }
 
+func UpdateModelVersion(modelVersion modelversion.MsgUpdateModelVersion, sender KeyInfo) (TxnResponse, int) {
+	println("Update Model Version")
+
+	response, code := SendUpdateModelVersionRequest(modelVersion, sender.Name)
+
+	return parseWriteTxnResponse(response, code)
+}
+
 func PrepareUpdateModelTransaction(model model.MsgUpdateModel) (types.StdTx, int) {
 	println("Prepare Update Model Info Transaction")
 
 	response, code := SendUpdateModelRequest(model, "")
+
+	return parseStdTxn(response, code)
+}
+
+func PrepareUpdateModelVersionTransaction(modelVersion modelversion.MsgUpdateModelVersion) (types.StdTx, int) {
+	println("Prepare Update Model Version Transaction")
+
+	response, code := SendUpdateModelVersionRequest(modelVersion, "")
 
 	return parseStdTxn(response, code)
 }
@@ -358,6 +382,22 @@ func SendUpdateModelRequest(msgUpdateModel model.MsgUpdateModel, account string)
 	return SendPutRequest(uri, body, account, constants.Passphrase)
 }
 
+func SendUpdateModelVersionRequest(msgUpdateModelVersion modelversion.MsgUpdateModelVersion, account string) ([]byte, int) {
+	request := modelVersionRest.UpdateModelVersionRequest{
+		ModelVersion: msgUpdateModelVersion.ModelVersion,
+		BaseReq: restTypes.BaseReq{
+			ChainID: constants.ChainID,
+			From:    msgUpdateModelVersion.Signer.String(),
+		},
+	}
+
+	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
+
+	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "model/version")
+
+	return SendPutRequest(uri, body, account, constants.Passphrase)
+}
+
 func GetModel(vid uint16, pid uint16) (model.Model, int) {
 	println(fmt.Sprintf("Get Model Info with VID:%v PID:%v", vid, pid))
 
@@ -365,6 +405,19 @@ func GetModel(vid uint16, pid uint16) (model.Model, int) {
 	response, code := SendGetRequest(uri)
 
 	var result model.Model
+
+	parseGetReqResponse(removeResponseWrapper(response), &result, code)
+
+	return result, code
+}
+
+func GetModelVersion(vid uint16, pid uint16, softwareVersion uint32) (modelversion.ModelVersion, int) {
+	println(fmt.Sprintf("Get Model Version with VID:%v PID:%v SV:%v", vid, pid, softwareVersion))
+
+	uri := fmt.Sprintf("%s/%s/%v/%v/%v", modelversion.RouterKey, "model/version", vid, pid, softwareVersion)
+	response, code := SendGetRequest(uri)
+
+	var result modelversion.ModelVersion
 
 	parseGetReqResponse(removeResponseWrapper(response), &result, code)
 
@@ -445,10 +498,10 @@ func SendTestingResultRequest(testingResult compliancetest.MsgAddTestingResult, 
 	return SendPostRequest(uri, body, name, constants.Passphrase)
 }
 
-func GetTestingResult(vid uint16, pid uint16) (compliancetest.TestingResults, int) {
-	println(fmt.Sprintf("Get Testing Result for Model with VID:%v PID:%v", vid, pid))
+func GetTestingResult(vid uint16, pid uint16, softwareVersion uint32) (compliancetest.TestingResults, int) {
+	println(fmt.Sprintf("Get Testing Result for Model with VID:%v PID:%v SV:%v", vid, pid, softwareVersion))
 
-	uri := fmt.Sprintf("%s/%s/%v/%v", compliancetest.RouterKey, "testresults", vid, pid)
+	uri := fmt.Sprintf("%s/%s/%v/%v/%v", compliancetest.RouterKey, "testresults", vid, pid, softwareVersion)
 	response, code := SendGetRequest(uri)
 
 	var result compliancetest.TestingResults
@@ -525,30 +578,30 @@ func SendRevokedModelRequest(revokeModel compliance.MsgRevokeModel, name string)
 	return SendPutRequest(uri, body, name, constants.Passphrase)
 }
 
-func GetComplianceInfo(vid uint16, pid uint16,
+func GetComplianceInfo(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfo, int) {
-	println(fmt.Sprintf("Get Compliance Info for Model with VID:%v PID:%v", vid, pid))
+	println(fmt.Sprintf("Get Compliance Info for Model with VID:%v PID:%v SV:%v", vid, pid, softwareVersion))
 
-	return getComplianceInfo(vid, pid, certificationType)
+	return getComplianceInfo(vid, pid, softwareVersion, certificationType)
 }
 
-func GetCertifiedModel(vid uint16, pid uint16,
+func GetCertifiedModel(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfoInState, int) {
-	println(fmt.Sprintf("Get if Model with VID:%v PID:%v Certified", vid, pid))
+	println(fmt.Sprintf("Get if Model with VID:%v PID:%v SV:%v Certified", vid, pid, softwareVersion))
 
-	return getComplianceInfoInState(vid, pid, certificationType, "certified")
+	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, "certified")
 }
 
-func GetRevokedModel(vid uint16, pid uint16,
+func GetRevokedModel(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfoInState, int) {
-	println(fmt.Sprintf("Get if Model with VID:%v PID:%v Revoked", vid, pid))
+	println(fmt.Sprintf("Get if Model with VID:%v PID:%v SV:%v revoked", vid, pid, softwareVersion))
 
-	return getComplianceInfoInState(vid, pid, certificationType, "revoked")
+	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, "revoked")
 }
 
-func getComplianceInfo(vid uint16, pid uint16,
+func getComplianceInfo(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfo, int) {
-	uri := fmt.Sprintf("%s/%v/%v/%v", compliance.RouterKey, vid, pid, certificationType)
+	uri := fmt.Sprintf("%s/%v/%v/%v/%v", compliance.RouterKey, vid, pid, softwareVersion, certificationType)
 	response, code := SendGetRequest(uri)
 
 	var result compliance.ComplianceInfo
@@ -558,9 +611,9 @@ func getComplianceInfo(vid uint16, pid uint16,
 	return result, code
 }
 
-func getComplianceInfoInState(vid uint16, pid uint16,
+func getComplianceInfoInState(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType, state string) (compliance.ComplianceInfoInState, int) {
-	uri := fmt.Sprintf("%s/%v/%v/%v/%v", compliance.RouterKey, state, vid, pid, certificationType)
+	uri := fmt.Sprintf("%s/%v/%v/%v/%v/%v", compliance.RouterKey, state, vid, pid, softwareVersion, certificationType)
 
 	response, code := SendGetRequest(uri)
 
@@ -1063,7 +1116,7 @@ func parseGetReqResponse(response []byte, entity interface{}, code int) {
 	}
 }
 
-func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
+func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel, modelversion.MsgAddModelVersion,
 	ComplianceInfosHeadersResult, ComplianceInfosHeadersResult) {
 	// Register new Vendor account
 	vendor := CreateNewAccount(auth.AccountRoles{auth.Vendor}, constants.VID)
@@ -1075,11 +1128,15 @@ func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel,
 	model := NewMsgAddModel(vendor.Address, constants.VID)
 	_, _ = AddModel(model, vendor)
 
+	// Publish model version
+	modelVersion := NewMsgAddModelVersion(model.VID, model.PID, constants.SoftwareVersion, constants.SoftwareVersionString, vendor.Address)
+	_, _ = AddModelVersion(modelVersion, vendor)
+
 	// Get all certified models
 	inputCertifiedModels, _ := GetAllCertifiedModels()
 
 	// Get all revoked models
 	inputRevokedModels, _ := GetAllRevokedModels()
 
-	return vendor, zb, model, inputCertifiedModels, inputRevokedModels
+	return vendor, zb, model, modelVersion, inputCertifiedModels, inputRevokedModels
 }
