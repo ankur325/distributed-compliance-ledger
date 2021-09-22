@@ -25,6 +25,7 @@ import (
 	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/compliancetest"
+	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/modelversion"
 )
 
@@ -34,6 +35,7 @@ type TestSetup struct {
 	CompliancetKeeper    Keeper
 	CompliancetestKeeper compliancetest.Keeper
 	authKeeper           auth.Keeper
+	ModelKeeper          model.Keeper
 	ModelversionKeeper   modelversion.Keeper
 	Handler              sdk.Handler
 	Querier              sdk.Querier
@@ -57,6 +59,9 @@ func Setup() TestSetup {
 	authKey := sdk.NewKVStoreKey(auth.StoreKey)
 	dbStore.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, nil)
 
+	modelKey := sdk.NewKVStoreKey(model.StoreKey)
+	dbStore.MountStoreWithDB(modelKey, sdk.StoreTypeIAVL, nil)
+
 	modelversionKey := sdk.NewKVStoreKey(modelversion.StoreKey)
 	dbStore.MountStoreWithDB(modelversionKey, sdk.StoreTypeIAVL, nil)
 
@@ -70,6 +75,7 @@ func Setup() TestSetup {
 	compliancetestKeeper := compliancetest.NewKeeper(compliancetestKey, cdc)
 	authKeeper := auth.NewKeeper(authKey, cdc)
 	modelversionKeeper := modelversion.NewKeeper(modelversionKey, cdc)
+	modelKeeper := model.NewKeeper(modelKey, cdc)
 
 	// Create context
 	ctx := sdk.NewContext(dbStore, abci.Header{ChainID: testconstants.ChainID}, false, log.NewNopLogger())
@@ -88,6 +94,7 @@ func Setup() TestSetup {
 		Ctx:                  ctx,
 		CompliancetKeeper:    compliancetKeeper,
 		CompliancetestKeeper: compliancetestKeeper,
+		ModelKeeper:          modelKeeper,
 		ModelversionKeeper:   modelversionKeeper,
 		authKeeper:           authKeeper,
 		Handler:              handler,

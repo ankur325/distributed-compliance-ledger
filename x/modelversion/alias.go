@@ -26,13 +26,14 @@ const (
 )
 
 var (
-	NewKeeper                   = keeper.NewKeeper
-	NewQuerier                  = keeper.NewQuerier
-	NewMsgAddModelVersion       = types.NewMsgAddModelVersion
-	NewMsgUpdateModelVersion    = types.NewMsgUpdateModelVersion
-	ModuleCdc                   = types.ModuleCdc
-	RegisterCodec               = types.RegisterCodec
-	ErrModelVersionDoesNotExist = types.ErrModelVersionDoesNotExist
+	NewKeeper                    = keeper.NewKeeper
+	NewQuerier                   = keeper.NewQuerier
+	NewMsgAddModelVersion        = types.NewMsgAddModelVersion
+	NewMsgUpdateModelVersion     = types.NewMsgUpdateModelVersion
+	ModuleCdc                    = types.ModuleCdc
+	RegisterCodec                = types.RegisterCodec
+	CodeModelVersionDoesNotExist = types.CodeModelVersionDoesNotExist
+	ErrModelVersionDoesNotExist  = types.ErrModelVersionDoesNotExist
 )
 
 type (
