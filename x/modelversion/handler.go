@@ -26,6 +26,7 @@ import (
 
 func NewHandler(keeper keeper.Keeper, authKeeper auth.Keeper, modelKeeper model.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+
 		switch msg := msg.(type) {
 		case types.MsgAddModelVersion:
 			return handleMsgAddModelVersion(ctx, keeper, authKeeper, modelKeeper, msg)
@@ -74,7 +75,10 @@ func handleMsgAddModelVersion(ctx sdk.Context, keeper keeper.Keeper, authKeeper 
 		ReleaseNotesURL:              msg.ReleaseNotesURL,
 	}
 
-	// store new model
+	// store new model version
+	keeper.Logger(ctx).Info("Creating a new model version",
+		"ModelVersion :", modelVersion.String())
+
 	keeper.SetModelVersion(ctx, modelVersion)
 	return sdk.Result{}
 }

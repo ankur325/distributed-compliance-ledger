@@ -24,17 +24,18 @@ import (
 )
 
 type AddModelVersionRequest struct {
-	ModelVersion types.ModelVersion `json:"modelversion"`
-	BaseReq      restTypes.BaseReq  `json:"base_req"`
+	types.ModelVersion
+	BaseReq restTypes.BaseReq `json:"base_req"`
 }
 
 type UpdateModelVersionRequest struct {
-	ModelVersion types.ModelVersion `json:"modelversion"`
-	BaseReq      restTypes.BaseReq  `json:"base_req"`
+	types.ModelVersion
+	BaseReq restTypes.BaseReq `json:"base_req"`
 }
 
 func addModelVersionHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		restCtx := rest.NewRestContext(w, r).WithCodec(cliCtx.Codec)
 
 		var req AddModelVersionRequest
@@ -53,24 +54,23 @@ func addModelVersionHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		modelVersion := types.ModelVersion{
-			VID:                          req.ModelVersion.VID,
-			PID:                          req.ModelVersion.PID,
-			SoftwareVersion:              req.ModelVersion.SoftwareVersion,
-			SoftwareVersionString:        req.ModelVersion.SoftwareVersionString,
-			CDVersionNumber:              req.ModelVersion.CDVersionNumber,
-			FirmwareDigests:              req.ModelVersion.FirmwareDigests,
-			SoftwareVersionValid:         req.ModelVersion.SoftwareVersionValid,
-			OtaURL:                       req.ModelVersion.OtaURL,
-			OtaFileSize:                  req.ModelVersion.OtaFileSize,
-			OtaChecksum:                  req.ModelVersion.OtaChecksum,
-			OtaChecksumType:              req.ModelVersion.OtaChecksumType,
-			MinApplicableSoftwareVersion: req.ModelVersion.MinApplicableSoftwareVersion,
-			MaxApplicableSoftwareVersion: req.ModelVersion.MaxApplicableSoftwareVersion,
-			ReleaseNotesURL:              req.ModelVersion.ReleaseNotesURL,
+			VID:                          req.VID,
+			PID:                          req.PID,
+			SoftwareVersion:              req.SoftwareVersion,
+			SoftwareVersionString:        req.SoftwareVersionString,
+			CDVersionNumber:              req.CDVersionNumber,
+			FirmwareDigests:              req.FirmwareDigests,
+			SoftwareVersionValid:         req.SoftwareVersionValid,
+			OtaURL:                       req.OtaURL,
+			OtaFileSize:                  req.OtaFileSize,
+			OtaChecksum:                  req.OtaChecksum,
+			OtaChecksumType:              req.OtaChecksumType,
+			MinApplicableSoftwareVersion: req.MinApplicableSoftwareVersion,
+			MaxApplicableSoftwareVersion: req.MaxApplicableSoftwareVersion,
+			ReleaseNotesURL:              req.ReleaseNotesURL,
 		}
 
 		msg := types.NewMsgAddModelVersion(modelVersion, restCtx.Signer())
-
 		restCtx.HandleWriteRequest(msg)
 	}
 }

@@ -71,6 +71,9 @@ func handleMsgAddModel(ctx sdk.Context, keeper keeper.Keeper, authKeeper auth.Ke
 	}
 
 	// store new model
+	keeper.Logger(ctx).Info("Creating a new model",
+		"Model :", model.String())
+
 	keeper.SetModel(ctx, model)
 
 	return sdk.Result{}

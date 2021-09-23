@@ -329,7 +329,7 @@ func SendAddModelVersionRequest(msgAddModelVersion modelversion.MsgAddModelVersi
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "model/version")
+	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "version")
 
 	return SendPostRequest(uri, body, account, constants.Passphrase)
 }
@@ -393,7 +393,7 @@ func SendUpdateModelVersionRequest(msgUpdateModelVersion modelversion.MsgUpdateM
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "model/version")
+	uri := fmt.Sprintf("%s/%s", modelversion.RouterKey, "version")
 
 	return SendPutRequest(uri, body, account, constants.Passphrase)
 }
@@ -414,7 +414,7 @@ func GetModel(vid uint16, pid uint16) (model.Model, int) {
 func GetModelVersion(vid uint16, pid uint16, softwareVersion uint32) (modelversion.ModelVersion, int) {
 	println(fmt.Sprintf("Get Model Version with VID:%v PID:%v SV:%v", vid, pid, softwareVersion))
 
-	uri := fmt.Sprintf("%s/%s/%v/%v/%v", modelversion.RouterKey, "model/version", vid, pid, softwareVersion)
+	uri := fmt.Sprintf("%s/%s/%v/%v/%v", modelversion.RouterKey, "version", vid, pid, softwareVersion)
 	response, code := SendGetRequest(uri)
 
 	var result modelversion.ModelVersion
@@ -485,10 +485,12 @@ func SendTestingResultRequest(testingResult compliancetest.MsgAddTestingResult, 
 			ChainID: constants.ChainID,
 			From:    testingResult.Signer.String(),
 		},
-		VID:        testingResult.VID,
-		PID:        testingResult.PID,
-		TestResult: testingResult.TestResult,
-		TestDate:   testingResult.TestDate,
+		VID:                   testingResult.VID,
+		PID:                   testingResult.PID,
+		SoftwareVersion:       testingResult.SoftwareVersion,
+		SoftwareVersionString: testingResult.SoftwareVersionString,
+		TestResult:            testingResult.TestResult,
+		TestDate:              testingResult.TestDate,
 	}
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
@@ -538,8 +540,8 @@ func SendCertifiedModelRequest(certifyModel compliance.MsgCertifyModel, name str
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s/%v/%v/%v", compliance.RouterKey, "certified",
-		certifyModel.VID, certifyModel.PID, certifyModel.CertificationType)
+	uri := fmt.Sprintf("%s/%v/%v/%v/%v/%v", compliance.RouterKey, compliance.Certified,
+		certifyModel.VID, certifyModel.PID, certifyModel.SoftwareVersion, certifyModel.CertificationType)
 
 	return SendPutRequest(uri, body, name, constants.Passphrase)
 }
@@ -572,8 +574,8 @@ func SendRevokedModelRequest(revokeModel compliance.MsgRevokeModel, name string)
 
 	body, _ := codec.MarshalJSONIndent(app.MakeCodec(), request)
 
-	uri := fmt.Sprintf("%s/%s/%v/%v/%v", compliance.RouterKey, "revoked",
-		revokeModel.VID, revokeModel.PID, revokeModel.CertificationType)
+	uri := fmt.Sprintf("%s/%v/%v/%v/%v/%v", compliance.RouterKey, compliance.Revoked,
+		revokeModel.VID, revokeModel.PID, revokeModel.SoftwareVersion, revokeModel.CertificationType)
 
 	return SendPutRequest(uri, body, name, constants.Passphrase)
 }
@@ -589,14 +591,14 @@ func GetCertifiedModel(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfoInState, int) {
 	println(fmt.Sprintf("Get if Model with VID:%v PID:%v SV:%v Certified", vid, pid, softwareVersion))
 
-	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, "certified")
+	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, compliance.Certified)
 }
 
 func GetRevokedModel(vid uint16, pid uint16, softwareVersion uint32,
 	certificationType compliance.CertificationType) (compliance.ComplianceInfoInState, int) {
 	println(fmt.Sprintf("Get if Model with VID:%v PID:%v SV:%v revoked", vid, pid, softwareVersion))
 
-	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, "revoked")
+	return getComplianceInfoInState(vid, pid, softwareVersion, certificationType, compliance.Revoked)
 }
 
 func getComplianceInfo(vid uint16, pid uint16, softwareVersion uint32,
@@ -612,7 +614,7 @@ func getComplianceInfo(vid uint16, pid uint16, softwareVersion uint32,
 }
 
 func getComplianceInfoInState(vid uint16, pid uint16, softwareVersion uint32,
-	certificationType compliance.CertificationType, state string) (compliance.ComplianceInfoInState, int) {
+	certificationType compliance.CertificationType, state compliance.ComplianceState) (compliance.ComplianceInfoInState, int) {
 	uri := fmt.Sprintf("%s/%v/%v/%v/%v/%v", compliance.RouterKey, state, vid, pid, softwareVersion, certificationType)
 
 	response, code := SendGetRequest(uri)
@@ -1126,11 +1128,13 @@ func InitStartData() (KeyInfo, KeyInfo, model.MsgAddModel, modelversion.MsgAddMo
 
 	// Publish model info
 	model := NewMsgAddModel(vendor.Address, constants.VID)
-	_, _ = AddModel(model, vendor)
+	txnResponse, errCode := AddModel(model, vendor)
+	fmt.Printf("%v, %v", txnResponse, errCode)
 
 	// Publish model version
 	modelVersion := NewMsgAddModelVersion(model.VID, model.PID, constants.SoftwareVersion, constants.SoftwareVersionString, vendor.Address)
-	_, _ = AddModelVersion(modelVersion, vendor)
+	txnResponse, errCode = AddModelVersion(modelVersion, vendor)
+	fmt.Printf("%v, %v", txnResponse, errCode)
 
 	// Get all certified models
 	inputCertifiedModels, _ := GetAllCertifiedModels()

@@ -25,6 +25,16 @@ type MsgAddModelVersion struct {
 	Signer sdk.AccAddress `json:"signer"`
 }
 
+func NewMsgAddModelVersion(
+	modelVersion ModelVersion,
+	signer sdk.AccAddress,
+) MsgAddModelVersion {
+	return MsgAddModelVersion{
+		ModelVersion: modelVersion,
+		Signer:       signer,
+	}
+}
+
 func (m MsgAddModelVersion) Route() string {
 	return RouterKey
 }
@@ -59,7 +69,7 @@ func (m MsgAddModelVersion) ValidateBasic() sdk.Error {
 	}
 
 	if m.OtaURL != "" || m.OtaFileSize != 0 || m.OtaChecksum != "" || m.OtaChecksumType != 0 {
-		if m.OtaURL == "" || m.OtaFileSize == 0 || m.OtaChecksum != "" || m.OtaChecksumType == 0 {
+		if m.OtaURL == "" || m.OtaFileSize == 0 || m.OtaChecksum == "" || m.OtaChecksumType == 0 {
 			return sdk.ErrUnknownRequest("Invalid MsgAddModelVersion: the fields OtaURL, OtaFileSize, OtaChecksum and " +
 				"OtaChecksumType must be either specified together, or not specified together")
 		}
@@ -79,16 +89,6 @@ func (m MsgAddModelVersion) GetSigners() []sdk.AccAddress {
 type MsgUpdateModelVersion struct {
 	ModelVersion
 	Signer sdk.AccAddress `json:"signer"`
-}
-
-func NewMsgAddModelVersion(
-	modelVersion ModelVersion,
-	signer sdk.AccAddress,
-) MsgAddModelVersion {
-	return MsgAddModelVersion{
-		ModelVersion: modelVersion,
-		Signer:       signer,
-	}
 }
 
 func NewMsgUpdateModelVersion(

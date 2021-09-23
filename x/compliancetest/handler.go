@@ -26,6 +26,7 @@ import (
 
 func NewHandler(keeper keeper.Keeper, modelversionKeeper modelversion.Keeper, authKeeper auth.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		keeper.Logger(ctx).Info("Inside the handleMsgAddTestingCenter...")
 		switch msg := msg.(type) {
 		case types.MsgAddTestingResult:
 			return handleMsgAddTestingResult(ctx, keeper, modelversionKeeper, authKeeper, msg)
@@ -40,6 +41,7 @@ func NewHandler(keeper keeper.Keeper, modelversionKeeper modelversion.Keeper, au
 func handleMsgAddTestingResult(ctx sdk.Context, keeper keeper.Keeper, modelversionKeeper modelversion.Keeper,
 	authKeeper auth.Keeper, msg types.MsgAddTestingResult) sdk.Result {
 	// check if sender has enough rights to add testing results
+	keeper.Logger(ctx).Info("Inside the handleMsgAddTestingCenter")
 	if err := checkAddTestingResultRights(ctx, authKeeper, msg.Signer); err != nil {
 		return err.Result()
 	}

@@ -45,43 +45,55 @@ func TestCompliancetestDemo(t *testing.T) {
 	// Publish model info
 	model := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
 	_, _ = utils.AddModel(model, vendor)
+	// Publish modelVersion
+	modelVersion := utils.NewMsgAddModelVersion(model.VID, model.PID,
+		testconstants.SoftwareVersion, testconstants.SoftwareVersionString, vendor.Address)
+	_, _ = utils.AddModelVersion(modelVersion, vendor)
 
 	// Publish first testing result using Sign and Broadcast AddTestingResult message
-	firstTestingResult := utils.NewMsgAddTestingResult(model.VID, model.PID, testHouse.Address)
+	firstTestingResult := utils.NewMsgAddTestingResult(model.VID, model.PID, modelVersion.SoftwareVersion, modelVersion.SoftwareVersionString, testHouse.Address)
 	utils.SignAndBroadcastMessage(testHouse, firstTestingResult)
 
 	// Check testing result is created
-	receivedTestingResult, _ := utils.GetTestingResult(firstTestingResult.VID, firstTestingResult.PID)
+	receivedTestingResult, _ := utils.GetTestingResult(firstTestingResult.VID, firstTestingResult.PID, firstTestingResult.SoftwareVersion)
 	require.Equal(t, receivedTestingResult.VID, firstTestingResult.VID)
 	require.Equal(t, receivedTestingResult.PID, firstTestingResult.PID)
+	require.Equal(t, receivedTestingResult.SoftwareVersion, firstTestingResult.SoftwareVersion)
 	require.Equal(t, 1, len(receivedTestingResult.Results))
 	require.Equal(t, receivedTestingResult.Results[0].TestResult, firstTestingResult.TestResult)
 	require.Equal(t, receivedTestingResult.Results[0].TestDate, firstTestingResult.TestDate)
 	require.Equal(t, receivedTestingResult.Results[0].Owner, firstTestingResult.Signer)
 
 	// Publish second model info
-	secondModel := utils.NewMsgAddModel(vendor.Address)
+	secondModel := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
 	_, _ = utils.AddModel(secondModel, vendor)
+	// Publish second modelVersion
+	secondModelVersion := utils.NewMsgAddModelVersion(secondModel.VID, secondModel.PID,
+		testconstants.SoftwareVersion, testconstants.SoftwareVersionString, vendor.Address)
+	_, _ = utils.AddModelVersion(modelVersion, vendor)
 
 	// Publish second testing result using POST
-	secondTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID, testHouse.Address)
+	secondTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID,
+		secondModelVersion.SoftwareVersion, secondModelVersion.SoftwareVersionString, testHouse.Address)
 	_, _ = utils.PublishTestingResult(secondTestingResult, testHouse)
 
 	// Check testing result is created
-	receivedTestingResult, _ = utils.GetTestingResult(secondTestingResult.VID, secondTestingResult.PID)
+	receivedTestingResult, _ = utils.GetTestingResult(secondTestingResult.VID, secondTestingResult.PID, secondTestingResult.SoftwareVersion)
 	require.Equal(t, receivedTestingResult.VID, secondTestingResult.VID)
 	require.Equal(t, receivedTestingResult.PID, secondTestingResult.PID)
+	require.Equal(t, receivedTestingResult.SoftwareVersion, secondTestingResult.SoftwareVersion)
 	require.Equal(t, 1, len(receivedTestingResult.Results))
 	require.Equal(t, receivedTestingResult.Results[0].TestResult, secondTestingResult.TestResult)
 	require.Equal(t, receivedTestingResult.Results[0].TestDate, secondTestingResult.TestDate)
 	require.Equal(t, receivedTestingResult.Results[0].Owner, secondTestingResult.Signer)
 
 	// Publish new testing result for second model
-	thirdTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID, secondTestHouse.Address)
+	thirdTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID,
+		secondModelVersion.SoftwareVersion, secondModelVersion.SoftwareVersionString, secondTestHouse.Address)
 	_, _ = utils.PublishTestingResult(thirdTestingResult, secondTestHouse)
 
 	// Check testing result is created
-	receivedTestingResult, _ = utils.GetTestingResult(secondTestingResult.VID, secondTestingResult.PID)
+	receivedTestingResult, _ = utils.GetTestingResult(secondTestingResult.VID, secondTestingResult.PID, secondTestingResult.SoftwareVersion)
 	require.Equal(t, 2, len(receivedTestingResult.Results))
 	require.Equal(t, receivedTestingResult.Results[0].Owner, secondTestingResult.Signer)
 	require.Equal(t, receivedTestingResult.Results[0].TestResult, secondTestingResult.TestResult)

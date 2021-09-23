@@ -23,6 +23,8 @@ const (
 	ModuleName           = types.ModuleName
 	RouterKey            = types.RouterKey
 	StoreKey             = types.StoreKey
+	Certified            = types.Certified
+	Revoked              = types.Revoked
 	CodeAlreadyCertifyed = types.CodeAlreadyCertifyed
 )
 
@@ -46,4 +48,5 @@ type (
 	ComplianceInfoKey     = types.ComplianceInfoKey
 	ComplianceInfoInState = types.ComplianceInfoInState
 	CertificationType     = types.CertificationType
+	ComplianceState       = types.ComplianceState
 )

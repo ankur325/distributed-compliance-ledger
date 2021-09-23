@@ -30,22 +30,21 @@ const (
 // RegisterRoutes - Central function to define routes that get registered by the main application.
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
 	r.HandleFunc(
-		fmt.Sprintf("/%s/model/version/", storeName),
+		fmt.Sprintf("/%s/version", storeName),
 		addModelVersionHandler(cliCtx),
 	).Methods("POST")
-
 	r.HandleFunc(
-		fmt.Sprintf("/%s/model/version", storeName),
+		fmt.Sprintf("/%s/version", storeName),
 		updateModelVersionHandler(cliCtx),
 	).Methods("PUT")
 
 	r.HandleFunc(
-		fmt.Sprintf("/%s/model/version/{%s}/{%s}", storeName, vid, pid),
+		fmt.Sprintf("/%s/versions/{%s}/{%s}", storeName, vid, pid),
 		getModelVersionsHandler(cliCtx, storeName),
 	).Methods("GET")
 
 	r.HandleFunc(
-		fmt.Sprintf("/%s/models/{%s}/{%s}/{%s}", storeName, vid, pid, softwareVersion),
+		fmt.Sprintf("/%s/version/{%s}/{%s}/{%s}", storeName, vid, pid, softwareVersion),
 		getModelVersionHandler(cliCtx, storeName),
 	).Methods("GET")
 
