@@ -96,7 +96,7 @@ func GetCmdGetCertifiedModel(queryRoute string, cdc *codec.Codec) *cobra.Command
 			"`certification_type`) is compliant to ZB standards",
 		Args: cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return getComplianceInfoInState(queryRoute, cdc, types.Certified)
+			return getComplianceInfoInState(queryRoute, cdc, types.CodeCertified)
 		},
 	}
 
@@ -139,7 +139,7 @@ func GetCmdGetRevokedModel(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Gets a boolean if the given Model (identified by the `vid`, `pid` and `certification_type`) is revoked",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return getComplianceInfoInState(queryRoute, cdc, types.Revoked)
+			return getComplianceInfoInState(queryRoute, cdc, types.CodeRevoked)
 		},
 	}
 
@@ -207,7 +207,7 @@ func getComplianceInfo(queryRoute string, cdc *codec.Codec) error {
 	return cliCtx.EncodeAndPrintWithHeight(complianceInfo, height)
 }
 
-func getComplianceInfoInState(queryRoute string, cdc *codec.Codec, state types.ComplianceState) error {
+func getComplianceInfoInState(queryRoute string, cdc *codec.Codec, status types.SoftwareVersionCertificationStatus) error {
 	cliCtx := cli.NewCLIContext().WithCodec(cdc)
 
 	vid, err_ := conversions.ParseVID(viper.GetString(FlagVID))
@@ -234,7 +234,7 @@ func getComplianceInfoInState(queryRoute string, cdc *codec.Codec, state types.C
 
 		cdc.MustUnmarshalBinaryBare(res, &complianceInfo)
 
-		isInState.Value = complianceInfo.State == state
+		isInState.Value = complianceInfo.SoftwareVersionCertificationStatus == status
 	}
 
 	if err != nil {

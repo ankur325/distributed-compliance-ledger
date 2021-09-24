@@ -70,7 +70,7 @@ func TestCompliancetestDemo(t *testing.T) {
 	// Publish second modelVersion
 	secondModelVersion := utils.NewMsgAddModelVersion(secondModel.VID, secondModel.PID,
 		testconstants.SoftwareVersion, testconstants.SoftwareVersionString, vendor.Address)
-	_, _ = utils.AddModelVersion(modelVersion, vendor)
+	_, _ = utils.AddModelVersion(secondModelVersion, vendor)
 
 	// Publish second testing result using POST
 	secondTestingResult := utils.NewMsgAddTestingResult(secondModel.VID, secondModel.PID,

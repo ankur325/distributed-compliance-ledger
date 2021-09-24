@@ -66,7 +66,7 @@ func handleMsgCertifyModel(ctx sdk.Context, keeper keeper.Keeper, modelversionKe
 		complianceInfo = keeper.GetComplianceInfo(ctx, msg.CertificationType, msg.VID, msg.PID, msg.SoftwareVersion)
 
 		// if state changes on `certified` check that certification_date is after revocation_date
-		if complianceInfo.State == types.Revoked {
+		if complianceInfo.SoftwareVersionCertificationStatus == types.CodeRevoked {
 			if msg.CertificationDate.Before(complianceInfo.Date) {
 				return types.ErrInconsistentDates(
 					fmt.Sprintf("The `certification_date`:%v must be after the current `date`:%v to "+
@@ -119,7 +119,7 @@ func handleMsgRevokeModel(ctx sdk.Context, keeper keeper.Keeper, modelversionKee
 		complianceInfo = keeper.GetComplianceInfo(ctx, msg.CertificationType, msg.VID, msg.PID, msg.SoftwareVersion)
 
 		// if state changes on `revoked` check that revocation_date is after certification_date
-		if complianceInfo.State == types.Certified {
+		if complianceInfo.SoftwareVersionCertificationStatus == types.CodeCertified {
 			if msg.RevocationDate.Before(complianceInfo.Date) {
 				return types.ErrInconsistentDates(
 					fmt.Sprintf("The `revocation_date`:%v must be after the `certification_date`:%v to "+
@@ -180,7 +180,7 @@ func checkZbCertificationDone(
 
 	complianceInfo := keeper.GetComplianceInfo(ctx, msg.CertificationType, msg.VID, msg.PID, msg.SoftwareVersion)
 
-	if complianceInfo.State != types.Certified {
+	if complianceInfo.SoftwareVersionCertificationStatus != types.CodeCertified {
 		return nil
 	}
 

@@ -44,7 +44,7 @@ func getCertifiedModelsHandler(cliCtx context.CLIContext, storeName string) http
 
 func getCertifiedModelHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		getComplianceInfoInState(cliCtx, w, r, storeName, types.Certified)
+		getComplianceInfoInState(cliCtx, w, r, storeName, types.CodeCertified)
 	}
 }
 
@@ -56,12 +56,12 @@ func getRevokedModelsHandler(cliCtx context.CLIContext, storeName string) http.H
 
 func getRevokedModelHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		getComplianceInfoInState(cliCtx, w, r, storeName, types.Revoked)
+		getComplianceInfoInState(cliCtx, w, r, storeName, types.CodeRevoked)
 	}
 }
 
 func getComplianceInfoInState(cliCtx context.CLIContext, w http.ResponseWriter, r *http.Request,
-	storeName string, state types.ComplianceState) {
+	storeName string, status types.SoftwareVersionCertificationStatus) {
 	restCtx := rest.NewRestContext(w, r).WithCodec(cliCtx.Codec)
 
 	vars := restCtx.Variables()
@@ -97,7 +97,7 @@ func getComplianceInfoInState(cliCtx context.CLIContext, w http.ResponseWriter, 
 
 		restCtx.Codec().MustUnmarshalBinaryBare(res, &complianceInfo)
 
-		isInState.Value = complianceInfo.State == state
+		isInState.Value = complianceInfo.SoftwareVersionCertificationStatus == status
 	}
 
 	if err != nil {

@@ -129,9 +129,9 @@ func TestComplianceDemo_KeepTrackCompliance(t *testing.T) {
 
 	// Get compliance info
 	complianceInfo, _ := utils.GetComplianceInfo(model.VID, model.PID, modelVersion.SoftwareVersion, certifyModelMsg.CertificationType)
-	require.Equal(t, complianceInfo.State, compliance.RevokedState)
+	require.Equal(t, complianceInfo.SoftwareVersionCertificationStatus, compliance.CodeRevoked)
 	require.Equal(t, 1, len(complianceInfo.History))
-	require.Equal(t, complianceInfo.History[0].State, compliance.CertifiedState)
+	require.Equal(t, complianceInfo.History[0].SoftwareVersionCertificationStatus, compliance.CodeCertified)
 }
 
 func TestComplianceDemo_KeepTrackRevocation(t *testing.T) {

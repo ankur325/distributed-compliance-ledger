@@ -37,17 +37,17 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryComplianceInfo:
-			return queryComplianceInfo(ctx, path[1:], keeper, types.NoStatus)
+			return queryComplianceInfo(ctx, path[1:], keeper, 0)
 		case QueryAllComplianceInfoRecords:
 			return queryAllComplianceInfoRecords(ctx, req, keeper)
 		case QueryCertifiedModel:
-			return queryComplianceInfo(ctx, path[1:], keeper, types.Certified)
+			return queryComplianceInfo(ctx, path[1:], keeper, types.CodeCertified)
 		case QueryAllCertifiedModels:
-			return queryAllComplianceInfoInStateRecords(ctx, req, keeper, types.Certified)
+			return queryAllComplianceInfoInStateRecords(ctx, req, keeper, types.CodeCertified)
 		case QueryRevokedModel:
-			return queryComplianceInfo(ctx, path[1:], keeper, types.Revoked)
+			return queryComplianceInfo(ctx, path[1:], keeper, types.CodeRevoked)
 		case QueryAllRevokedModels:
-			return queryAllComplianceInfoInStateRecords(ctx, req, keeper, types.Revoked)
+			return queryAllComplianceInfoInStateRecords(ctx, req, keeper, types.CodeRevoked)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown compliance query endpoint")
 		}
@@ -55,7 +55,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
-	requestedState types.ComplianceState) (res []byte, err sdk.Error) {
+	requestedStatus types.SoftwareVersionCertificationStatus) (res []byte, err sdk.Error) {
 	vid, err := conversions.ParseVID(path[0])
 	if err != nil {
 		return nil, err
@@ -79,8 +79,8 @@ func queryComplianceInfo(ctx sdk.Context, path []string, keeper Keeper,
 
 	complianceInfo := keeper.GetComplianceInfo(ctx, certificationType, vid, pid, softwareVersion)
 
-	if requestedState != types.NoStatus {
-		if complianceInfo.State != requestedState {
+	if requestedStatus != 0 {
+		if complianceInfo.SoftwareVersionCertificationStatus != requestedStatus {
 			return nil, types.ErrComplianceInfoDoesNotExist(vid, pid, softwareVersion, certificationType)
 		}
 
@@ -128,7 +128,7 @@ func queryAllComplianceInfoRecords(ctx sdk.Context, req abci.RequestQuery, keepe
 }
 
 func queryAllComplianceInfoInStateRecords(ctx sdk.Context, req abci.RequestQuery, keeper Keeper,
-	requestedState types.ComplianceState) (res []byte, err sdk.Error) {
+	requestedStatus types.SoftwareVersionCertificationStatus) (res []byte, err sdk.Error) {
 	var params types.ListQueryParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse request params: %s", err))
@@ -141,7 +141,7 @@ func queryAllComplianceInfoInStateRecords(ctx sdk.Context, req abci.RequestQuery
 	skipped := 0
 
 	keeper.IterateComplianceInfos(ctx, params.CertificationType, func(complianceInfo types.ComplianceInfo) (stop bool) {
-		if requestedState != types.NoStatus && complianceInfo.State != requestedState {
+		if requestedStatus != 0 && complianceInfo.SoftwareVersionCertificationStatus != requestedStatus {
 			return false
 		}
 

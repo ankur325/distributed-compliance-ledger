@@ -35,8 +35,8 @@ var (
 	NewMsgRevokeModel   = types.NewMsgRevokeModel
 	ModuleCdc           = types.ModuleCdc
 	RegisterCodec       = types.RegisterCodec
-	CertifiedState      = types.Certified
-	RevokedState        = types.Revoked
+	CodeCertified       = types.CodeCertified
+	CodeRevoked         = types.CodeRevoked
 	ZbCertificationType = types.ZbCertificationType
 )
 
