@@ -89,12 +89,16 @@ func GetCmdAddTestingResult(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(FlagVID, "", "Model vendor ID")
 	cmd.Flags().String(FlagPID, "", "Model product ID")
+	cmd.Flags().String(FlagSoftwareVersion, "", "Model software version")
+	cmd.Flags().String(FlagSoftwareVersionString, "", "Model software version string")
 	cmd.Flags().StringP(FlagTestResult, FlagTestResultShortcut, "",
 		"Test result (string or path to file containing data)")
 	cmd.Flags().StringP(FlagTestDate, FlagTestDateShortcut, "", "Date of test result (rfc3339 encoded)")
 
 	_ = cmd.MarkFlagRequired(FlagVID)
 	_ = cmd.MarkFlagRequired(FlagPID)
+	_ = cmd.MarkFlagRequired(FlagSoftwareVersion)
+	_ = cmd.MarkFlagRequired(FlagSoftwareVersionString)
 	_ = cmd.MarkFlagRequired(FlagTestResult)
 	_ = cmd.MarkFlagRequired(FlagTestDate)
 

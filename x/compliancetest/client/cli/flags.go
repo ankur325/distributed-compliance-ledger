@@ -17,7 +17,7 @@ package cli
 const (
 	FlagVID                   = "vid"
 	FlagPID                   = "pid"
-	FlagSoftwareVersion       = "softwarewareVersion"
+	FlagSoftwareVersion       = "softwareVersion"
 	FlagSoftwareVersionString = "softwareVersionString"
 	FlagTestResult            = "test-result"
 	FlagTestResultShortcut    = "r"

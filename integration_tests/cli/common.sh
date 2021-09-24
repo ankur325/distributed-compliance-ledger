@@ -17,6 +17,10 @@ set -euo pipefail
 
 passphrase="test1234"
 
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+RESET=`tput sgr0`
+
 random_string() {
   local __resultvar=$1
   local length=${2:-6} # Default is 6
@@ -33,7 +37,7 @@ check_response() {
   result=$1
   expected_string=$2
   if [[ $result != *$expected_string* ]]; then
-    echo "ERROR: command failed. The expected string: $expected_string not found in the result: $result"
+    echo "${GREEN}ERROR:${RESET} command failed. The expected string: $expected_string not found in the result: $result"
     exit 1
   fi
 }
@@ -42,7 +46,7 @@ check_response_and_report() {
   result=$1
   expected_string=$2
   check_response "$result" "$expected_string"
-  echo "SUCCESS: Result contains expected substring: $expected_string"
+  echo "${GREEN}SUCCESS: ${RESET} Result contains expected substring: $expected_string"
 }
 
 response_does_not_contain() {
@@ -52,6 +56,7 @@ response_does_not_contain() {
     echo "ERROR: command failed. The unexpected string: $unexpected_string found in the result: $result"
     exit 1
   fi
+  echo "${GREEN}SUCCESS: ${RESET}Result does not contain unexpected substring: $unexpected_string"
 }
 
 create_new_account(){
@@ -84,22 +89,39 @@ create_new_vendor_account(){
 
   name=$1
   vid=$2
-  echo "Account name: $name"
 
-  echo "Generate key for $name"
   echo $passphrase | dclcli keys add "$name"
-
   address=$(dclcli keys show $name -a)
   pubkey=$(dclcli keys show $name -p)
+
+  test_divider
 
   echo "Jack proposes account for \"$name\" with Vendor role"
   result=$(echo $passphrase | dclcli tx auth propose-add-account --address="$address" --pubkey="$pubkey" --roles=Vendor --vid=$vid --from jack --yes)
   check_response "$result" "\"success\": true"
-  echo "$result"
 
-  echo "Alice approve account for \"$name\" with Vendor role"
+  test_divider
+
+  echo "Alice approves account for \"$name\" with Vendor role"
   result=$(echo $passphrase | dclcli tx auth approve-add-account --address="$address" --from alice --yes)
   check_response "$result" "\"success\": true"
-  echo "$result"
+
+}
+
+create_model_and_version() {
+  vid=$1
+  pid=$2
+  softwareVersion=$3
+  user_address=$4
+  result=$(echo 'test1234' | dclcli tx model add-model --vid=$vid --pid=$pid --deviceTypeID=1 --productName=TestProduct --productLabel=TestingProductLabel --partNumber=1 --commissioningCustomFlow=0 --from=$user_address --yes)
+  check_response "$result" "\"success\": true"
+  result=$(echo 'test1234' | dclcli tx modelversion add-model-version --cdVersionNumber=1 --maxApplicableSoftwareVersion=10 --minApplicableSoftwareVersion=1 --vid=$vid --pid=$pid --softwareVersion=$softwareVersion --softwareVersionString=1 --from=$user_address --yes)
+  check_response "$result" "\"success\": true"
+}
+
+test_divider() {
+  echo ""
+  echo "--------------------------"
+  echo ""
 }
 

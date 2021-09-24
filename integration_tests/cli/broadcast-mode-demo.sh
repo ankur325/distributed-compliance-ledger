@@ -23,32 +23,32 @@ productName="Broadcast-Demo-Product"
 vendor_account=vendor_account_$vid1
 
 echo "Create Vendor account - $vendor_account"
-
 create_new_vendor_account $vendor_account $vid1
+
+test_divider
 
 # Body
 
 echo "Jack adds Model with VID: $vid1 PID: $pid1. Using default Broadcast Mode: block"
-echo "Command: dclcli tx model add-model --vid=$vid --pid=$pid1 --productName=$productName --productLabel=DeviceDescription   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12  --from=$vendor_account --yes"
 result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid1 --productName="$productName" --productLabel="Device Description"   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12  --from=$vendor_account --yes)
 check_response "$result" "\"gas_used\""
 check_response "$result" "\"txhash\""
 check_response "$result" "\"raw_log\""
 check_response "$result" "\"height\""
 response_does_not_contain "$result" "\"height\": \"0\""
-echo "$result"
+
+test_divider
 
 pid2=$RANDOM
 echo "Jack adds Model with VID: $vid1 PID: $pid2. Using async Broadcast Mode"
-echo `--> dclcli tx model add-model --vid=$vid --pid=$pid2 --productName="$productName" --productLabel="Device Description"   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12  --from=$vendor_account --yes --broadcast-mode "async"`
 result=$(echo "test1234" | dclcli tx model add-model --vid=$vid --pid=$pid2 --productName="$productName" --productLabel="Device Description"   --commissioningCustomFlow=0 --deviceTypeID=12 --partNumber=12  --from=$vendor_account --yes --broadcast-mode "async")
 check_response "$result" "\"txhash\""
 check_response "$result" "\"height\": \"0\""
 response_does_not_contain "$result" "\"gas_used\""
 response_does_not_contain "$result" "\"raw_log\""
-echo "$result"
 
-sleep 6
+
+test_divider
 
 pid3=$RANDOM
 echo "Jack adds Model with VID: $vid1 PID: $pid3. Using sync Broadcast Mode"
@@ -57,24 +57,24 @@ check_response "$result" "\"txhash\""
 check_response "$result" "\"raw_log\""
 check_response "$result" "\"height\": \"0\""
 response_does_not_contain "$result" "\"gas_used\""
-echo "$result"
 
-sleep 6
+
+test_divider
 
 echo "Get Model with VID: $vid1 PID: $pid1"
 result=$(dclcli query model model --vid=$vid1 --pid=$pid1 --prev-height)
 check_response "$result" "\"vid\": $vid1"
 check_response "$result" "\"pid\": $pid1"
-echo "$result"
+
 
 echo "Get Model with VID: $vid1 PID: $pid2"
 result=$(dclcli query model model --vid=$vid1 --pid=$pid2 --prev-height)
 check_response "$result" "\"vid\": $vid1"
 check_response "$result" "\"pid\": $pid2"
-echo "$result"
+
 
 echo "Get Model with VID: $vid1 PID: $pid3"
 result=$(dclcli query model model --vid=$vid1 --pid=$pid3 --prev-height)
 check_response "$result" "\"vid\": $vid1"
 check_response "$result" "\"pid\": $pid3"
-echo "$result"
+

@@ -223,6 +223,7 @@ func SignAndBroadcastMessage(sender KeyInfo, message sdk.Msg) (TxnResponse, int)
 		Msgs: []sdk.Msg{message},
 		Fee:  types.StdFee{Gas: 2000000},
 	}
+	fmt.Printf("txn: %v\n", txn)
 	signResponse, _ := SignMessage(sender, txn)
 
 	return BroadcastMessage(signResponse)
