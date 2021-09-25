@@ -21,7 +21,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/common"
-	testconstants "github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/constants"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/integration_tests/utils"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/auth"
 	"github.com/zigbee-alliance/distributed-compliance-ledger/x/model"
@@ -38,7 +37,8 @@ import (
 
 func TestModelDemo(t *testing.T) {
 	// Register new Vendor account
-	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID)
+	vid := common.RandUint16()
+	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, vid)
 
 	// Get all model infos
 	inputModels, _ := utils.GetModels()
@@ -47,7 +47,7 @@ func TestModelDemo(t *testing.T) {
 	inputVendors, _ := utils.GetVendors()
 
 	// Prepare model info
-	firstModel := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
+	firstModel := utils.NewMsgAddModel(vendor.Address, vid)
 	VID := firstModel.VID
 
 	// Sign and Broadcast AddModel message
@@ -61,8 +61,7 @@ func TestModelDemo(t *testing.T) {
 	require.Equal(t, receivedModel.ProductLabel, firstModel.ProductLabel)
 
 	// Publish second model info using POST command with passing name and passphrase. Same Vendor
-	secondModel := utils.NewMsgAddModel(vendor.Address, testconstants.VID)
-	secondModel.VID = VID // Set same Vendor as for the first model
+	secondModel := utils.NewMsgAddModel(vendor.Address, vid)
 	_, _ = utils.AddModel(secondModel, vendor)
 
 	// Check model is created
@@ -97,10 +96,11 @@ func TestModelDemo(t *testing.T) {
 
 func TestModelDemo_Prepare_Sign_Broadcast(t *testing.T) {
 	// Register new Vendor account
-	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID)
+	vid := common.RandUint16()
+	vendor := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, vid)
 
 	// Prepare model info
-	model := utils.NewMsgAddModel(vendor.Address, 0)
+	model := utils.NewMsgAddModel(vendor.Address, vid)
 
 	// Prepare Sign Broadcast
 	addModelTransaction, _ := utils.PrepareAddModelTransaction(model)
@@ -117,30 +117,33 @@ func TestModelDemo_Prepare_Sign_Broadcast(t *testing.T) {
 
 func Test_AddModel_ByNonVendor(t *testing.T) {
 	// register new account
-	testAccount := utils.CreateNewAccount(auth.AccountRoles{}, testconstants.VID)
+	vid := common.RandUint16()
+	testAccount := utils.CreateNewAccount(auth.AccountRoles{}, vid)
 
 	// try to publish model info
-	model := utils.NewMsgAddModel(testAccount.Address, testconstants.VID)
+	model := utils.NewMsgAddModel(testAccount.Address, vid)
 	res, _ := utils.SignAndBroadcastMessage(testAccount, model)
 	require.Equal(t, sdk.CodeUnauthorized, sdk.CodeType(res.Code))
 }
 
 func Test_AddModel_ByDifferentVendor(t *testing.T) {
 	// register new account
-	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID+1)
+	vid := common.RandUint16()
+	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, vid+1)
 
 	// try to publish model info
-	model := utils.NewMsgAddModel(testAccount.Address, testconstants.VID)
+	model := utils.NewMsgAddModel(testAccount.Address, vid)
 	res, _ := utils.SignAndBroadcastMessage(testAccount, model)
 	require.Equal(t, sdk.CodeUnauthorized, sdk.CodeType(res.Code))
 }
 
 func Test_AddModel_Twice(t *testing.T) {
 	// register new account
-	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, testconstants.VID)
+	vid := common.RandUint16()
+	testAccount := utils.CreateNewAccount(auth.AccountRoles{auth.Vendor}, vid)
 
 	// publish modelMsg info
-	modelMsg := utils.NewMsgAddModel(testAccount.Address, testconstants.VID)
+	modelMsg := utils.NewMsgAddModel(testAccount.Address, vid)
 	res, _ := utils.AddModel(modelMsg, testAccount)
 	require.Equal(t, sdk.CodeOK, sdk.CodeType(res.Code))
 
