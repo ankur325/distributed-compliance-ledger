@@ -17,9 +17,12 @@ set -euo pipefail
 
 passphrase="test1234"
 
-RED=`tput setaf 1`
-GREEN=`tput setaf 2`
-RESET=`tput sgr0`
+# RED=`tput setaf 1`
+# GREEN=`tput setaf 2`
+# RESET=`tput sgr0`
+GREEN=""
+RED=""
+RESET=""
 
 random_string() {
   local __resultvar=$1
