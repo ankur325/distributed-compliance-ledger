@@ -131,13 +131,3 @@ if [[ $TESTS_TO_RUN =~ "all" || $TESTS_TO_RUN =~ "rest" ]]; then
   done
 fi
 
-# Deploy tests
-if [[ $TESTS_TO_RUN =~ "all" || $TESTS_TO_RUN =~ "deploy" ]]; then
-    DEPLOY_SHELL_TEST="./integration_tests/deploy/test_deploy.sh"
-    if bash "$DEPLOY_SHELL_TEST" &>${DETAILED_OUTPUT_TARGET}; then
-      log "$DEPLOY_SHELL_TEST finished successfully"
-    else
-      log "$DEPLOY_SHELL_TEST failed"
-      exit 1
-    fi
-fi
