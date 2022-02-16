@@ -192,7 +192,6 @@ func (revoc PendingAccountRevocation) Validate() error {
 	return nil
 }
 
-//nolint:interfacer
 func (revoc PendingAccountRevocation) HasRevocationFrom(address sdk.AccAddress) bool {
 	addrStr := address.String()
 	for _, revoke := range revoc.Revocations {
