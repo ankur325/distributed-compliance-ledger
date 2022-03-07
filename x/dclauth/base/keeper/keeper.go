@@ -17,9 +17,6 @@ type (
 		memKey   sdk.StoreKey
 
 		paramSubspace paramtypes.Subspace
-
-		// The prototypical AccountI constructor.
-		proto func() basetypes.AccountI
 	}
 )
 
@@ -49,7 +46,7 @@ func (k Keeper) decodeAccount(bz []byte) basetypes.AccountI {
 }
 
 // UnmarshalAccount returns an Account interface from raw encoded account
-// bytes of a Proto-based Account type
+// bytes of a Proto-based Account type.
 func (k Keeper) UnmarshalAccount(bz []byte) (basetypes.AccountI, error) {
 	var acc basetypes.AccountI
 	return acc, k.cdc.UnmarshalInterface(bz, &acc)

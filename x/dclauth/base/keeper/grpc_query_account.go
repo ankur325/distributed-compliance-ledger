@@ -64,7 +64,7 @@ func (k Keeper) Account(c context.Context, req *types.QueryAccountRequest) (*typ
 	return &types.QueryAccountResponse{Account: any}, nil
 }
 
-// Params returns parameters of auth module
+// Params returns parameters of auth module.
 func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
