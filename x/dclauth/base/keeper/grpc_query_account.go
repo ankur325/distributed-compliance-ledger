@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/dclauth/base/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	authtypes "github.com/zigbee-alliance/distributed-compliance-ledger/x/dclauth/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -62,4 +62,15 @@ func (k Keeper) Account(c context.Context, req *types.QueryAccountRequest) (*typ
 	}
 
 	return &types.QueryAccountResponse{Account: any}, nil
+}
+
+// Params returns parameters of auth module
+func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	params := k.GetParams(ctx)
+
+	return &types.QueryParamsResponse{Params: params}, nil
 }

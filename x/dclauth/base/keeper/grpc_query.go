@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/zigbee-alliance/distributed-compliance-ledger/x/dclauth/base/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 var _ types.QueryServer = Keeper{}
